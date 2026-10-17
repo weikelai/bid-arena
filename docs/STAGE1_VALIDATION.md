@@ -60,3 +60,15 @@ Docker诊断（原阶段记录）：首次阶段检查时CLI/桌面可执行文�
 ## 尚未解决 / 不在阶段1范围
 
 Docker完整启动验收被环境阻塞；当前无Git仓库/历史。生产认证引导、登录、Agent鉴权、竞价、自动结算、WebSocket、20人模拟与公开业务OpenAPI均未实现。已建表不证明资金并发规则正确；接收时间及跨场锁策略必须阶段2用真实MySQL验证。
+
+## 2026-10-17 阶段1D及后续容器复验（追加，保留上文历史）
+
+此前“Docker阻塞/业务未实现”是当时事实，不代表当前。Docker Desktop已启动，Engine29.8.0、Compose5.5.1；本机3306仍为原进程8864，未操作其数据库。Compose使用loopback3307/8080/5173。
+
+实际执行 config --quiet（退出0）、build（退出0，.local/final-compose-build.log）、up -d --wait（退出0）、ps（三服务healthy）、logs --tail=200 mysql backend frontend（.local/final-compose-logs.log）。Docker Hub来源为mysql:8.4.8及Dockerfile中的基础镜像；本次实际构建成功。
+
+V1–V3全部success=1，16应用表。重启前后：3用户、3条INITIAL_CREDIT总3000，三个钱包1000/0，演示拍品1 DRAFT/100/end_at=NULL，逐字快照相等。证据.local/compose-data-verification.log，未重置数据卷。
+
+2026-10-17 20:06完整测试：node scripts/compose-verify.mjs --integration 退出0；前端5项、后端4项单元、18项真实MySQL集成全部无失败无跳过，含20人seed42模拟57断言、真实HTTP Agent、Edge三个独立会话、SQL核对与子进程结算死亡恢复。日志.local/final-suite-latest.log；浏览器backend/target/browser-acceptance.log。后端直接及前端代理健康UP，OpenAPI3.0.3实际17路径可读。密钥扫描通过。
+
+完整业务设计和非本阶段的后续实现见DESIGN.md与最终报告；未将后续结果覆盖为原阶段1历史。

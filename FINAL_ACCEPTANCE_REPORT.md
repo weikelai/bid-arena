@@ -1,0 +1,74 @@
+# 最终验收报告
+
+验证日期：2026-10-17，项目 E:\test\Agent-project。依据原始评测与后续持续自主开发总控指令。可在本机执行的核心实现、容器和自动化验证已完成；**不宣称整个评测通过**，外部提交、完整录屏及本人独立解释仍需本人完成。逐项状态见 REQUIREMENTS_MATRIX.md。
+
+## 实际代码与文件
+
+保留原始审计 PROJECT_AUDIT.md、DESIGN_DRAFT.md 及V1迁移。新增/完善：
+- backend：Api、AuctionService、Sql、应用注册、摘要会话、自动扫描、OpenAPI及真实MySQL/HTTP/进程故障测试。
+- database/migrations：V2认证会话、V3持久接收门和请求金额；共16应用表。
+- frontend：登录、拍卖、管理、钱包流水、结果、Agent签发、事件轮询及重连；room核心测试、Edge浏览器验收。
+- scripts：compose-verify、simulate-auction、auction-agent及完整测试顺序。
+- README、DESIGN、DECISIONS、DEBUG_LOG、AI_USAGE、AGENT_TOOL_SPEC、验收矩阵、实施计划、阶段1验证追加及DEMO_RUNBOOK。
+
+## 最终实际命令和结果
+
+以下命令已执行；日志包含正常信息与历史失败时应区分，以最后成功报告为准。不把PowerShell将原生stderr包装成NativeCommandError当成Maven测试失败；最终命令明确记录COMMAND_EXIT=0。
+
+| 命令 | 退出/真实结果 | 证据 |
+|---|---|---|
+| docker version / info / compose version | daemon可用，Engine29.8.0、Compose5.5.1 | 会话实际输出 |
+| docker compose config --quiet | 0 | 实际无配置错误 |
+| docker compose build | 0，前后端镜像构建成功 | .local/final-compose-build.log |
+| docker compose up -d --wait | 0，三服务healthy | 实际输出、final-compose-ps.log |
+| docker compose ps | 0 | mysql/backend/frontend均healthy |
+| docker compose logs --tail=200 mysql backend frontend | 0 | .local/final-compose-logs.log |
+| curl.exe --fail --silent http://127.0.0.1:8080/api/v1/health | 0，status/database UP | 实际HTTP响应 |
+| curl.exe --fail --silent http://127.0.0.1:5173/api/v1/health | 0，前端代理UP | 实际HTTP响应 |
+| Node fetch /api/v1/openapi.json | 0，OpenAPI3.0.3、17路径 | 实际JSON字段校验 |
+| node scripts/compose-verify.mjs --integration | **0**，完整回归成功 | .local/final-suite-latest.log，20:06:44结束 |
+| npm --prefix frontend test（上述脚本执行） | 0，5/5 | 完整日志 |
+| npm --prefix frontend run build（上述脚本执行） | 0，TS及Vite成功 | 完整日志 |
+| mvn -B -f backend/pom.xml verify -Pmysql-it（上述脚本执行） | 0，BUILD SUCCESS | 完整日志/target报告 |
+| node scripts/verify-secrets.mjs | 0，本地生成凭据未在交付文件出现 | 实际输出 |
+| node --check scripts/auction-agent.mjs | 0 | 语法检查；该独立示例未单独跑完整竞价 |
+| Get-NetTCPConnection -LocalPort 3306 -State Listen | 0，原PID8864仍监听 | 实际输出 |
+| git diff --check | 0 | 未发现空白错误 |
+
+一次用rg传入Windows通配符路径读取报告失败（os123），随后用rg目录配-g '*.txt'成功读取报告；不影响测试本身。早期触发器SUPER权限与类型等真实失败和修复保留在DEBUG_LOG，不隐瞒或删除断言。
+
+### 测试计数与资金核对
+
+后端单元4/4；真实MySQL集成18/18（AuctionIT11、DatabaseIT6、HttpSimulationIT1），失败0、错误0、跳过0。前端5/5。
+
+20人模拟 seed42：**57条断言通过**，赢家Agent用户24，成交350。包含并发同价、并发request重放、参数冲突、金额/余额拒绝、权限/范围/吊销/过期/限流、拒绝事件隐私、事件字段、三次狙击延时及上限、结束拒绝和无客户端结算。测试结束直接SQL核对所有钱包total与delta_total汇总、frozen与hold及delta_frozen、唯一CAPTURE、请求拍卖关联、摘要32字节，均通过。
+
+Edge浏览器三个独立上下文实际操作管理员创建/开始/取消、A/B加入/出价、远端更新、离线恢复、取消后释放，页面错误0；证据backend/target/browser-acceptance.log和.local/browser-acceptance.png。它不是完整3–5分钟演示视频，也未声称浏览器自动化覆盖所有UI路径。
+
+真实进程测试在结算资金写后halt73，InnoDB回滚后原hold仍存在、无CAPTURE；新执行器重复扫描只生成一次扣款和成交。其他测试覆盖跨锁等待截止、截止相等、并发延时、多个执行器、跨场共享钱包和两类事务异常回滚。
+
+## 最终容器与种子
+
+| 服务 | 状态 | 宿主机映射 |
+|---|---|---|
+| mysql mysql:8.4.8 | healthy | 127.0.0.1:3307→3306 |
+| backend bid-arena-backend | healthy | 127.0.0.1:8080→8080 |
+| frontend bid-arena-frontend | healthy | 127.0.0.1:5173→80 |
+
+Flyway版本1/2/3均success=1。重启前后逐字快照相同：3用户、3初始积分流水共3000；每个钱包1000/0；拍品1 DRAFT、当前100、end_at=NULL，未自动倒计时。证据.local/compose-data-verification.log。集成测试使用仅授权bid_arena_it_前缀的临时账号和UUID测试库，结束清理自己的库与账号。不访问本机3306，不删除数据卷，没有down-v/prune/reset。原数据库数据未通过侵入式测试修改。
+
+## 关键决策和风险
+
+持久接收事务+处理事务，拍卖锁串行价格和seq，升序钱包锁+条件UPDATE/CHECK，用户全局request主键，流水effect唯一、每场result主键。服务端接收定义为鉴权后取得接收门时的MySQL时间，网络到达不算已接收；这项边界已公开而非隐瞒。
+
+每秒读取持久已提交事件替代WebSocket，约1秒延迟；私有拒绝事件可能导致他人seq缺口，客户端取快照。扫描每批100、事件每页200。没有大规模性能、宿主机断电、多完整容器网络分区验证；多实例正确性目前通过同库独立执行器验证。
+
+生产TLS、首位管理员引导、密码重置、登录暴力破解防护、过期数据清理未实现。当前部署仅供loopback评测，不冒称生产可用。独立auction-agent示例仅语法验证；同一API的真实Agent出价与安全边界已在隔离HTTP模拟完整验证。
+
+## Git及外部交付
+
+原目录没有Git。此次真实git init并提交快照2503d71，后续验收文档单独提交；不倒填日期、不机械拆分成虚假开发历史。**这不能补足评测所需的全过程历史**，矩阵标NOT VERIFIED。
+
+完整录屏、GitHub/Gitee远端发布、姓名联系方式与邮件提交、可选线上部署均未完成。缺本人资料/外部授权；不自行发送邮件。本人独立设计决定及现场解释亦未验证，AI_USAGE如实标记。最小人工步骤：按docs/DEMO_RUNBOOK录制3–5分钟并检查无Token，确认AI_USAGE，提供远端仓库授权并发布，再由本人按评测要求提交资料。无其他本地代码修改是这些事项的替代。
+
+下一步优先本人复核事务边界和测试证据、演示录屏与外部交付；当前三服务保留运行，可直接打开 http://127.0.0.1:5173 。

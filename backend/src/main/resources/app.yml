@@ -1,0 +1,2 @@
+server.port: ${BACKEND_PORT:8080}
+solon.app.name: bid-arena

@@ -1,0 +1,16 @@
+{
+  "name": "bid-arena",
+  "version": "0.1.0",
+  "private": true,
+  "engines": { "node": ">=22.15.0" },
+  "scripts": {
+    "setup:env": "node scripts/setup-env.mjs",
+    "build": "node scripts/tasks.mjs build",
+    "test:unit": "node scripts/tasks.mjs unit",
+    "test:integration": "node scripts/tasks.mjs integration",
+    "test:all": "node scripts/tasks.mjs all",
+    "start:backend": "node scripts/tasks.mjs start",
+    "test:compose": "node scripts/compose-verify.mjs --integration",
+    "simulate:auction": "node scripts/simulate-auction.mjs"
+  }
+}

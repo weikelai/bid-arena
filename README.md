@@ -1,0 +1,91 @@
+# Bid Arena
+
+Vue 3 + TypeScript + Vite、Java 17 + Solon 3.10.7、MySQL 8.4 的单体多人拍卖间。真实数据库负责价格、余额、截止时间与唯一成交；每秒轮询已提交的持久事件实现实时同步，不引入 Redis。已实现登录、管理、加入、出价、资金流水、三次延时、自动结算、断线恢复及受限 Agent。
+
+## 五分钟启动
+
+需要 Docker Desktop（Linux containers、WSL2）、Compose、联网拉取 Docker Hub 镜像。运行本机测试另需 Java 17、Maven 3.8.8+、Node 22.15+ 和 npm；首次构建取决于下载速度。
+
+```powershell
+npm run setup:env
+docker compose config --quiet
+docker compose build
+docker compose up -d --wait
+docker compose ps
+```
+
+setup 从 .env.example 生成本地 .env 及随机数据库密码，已有文件不覆盖。不要提交 .env。MySQL 默认仅绑定 127.0.0.1:3307，后端 8080，前端 5173；保护原有 MySQL 3306。启动前检查端口，冲突时调整本地 .env 的 MYSQL_PORT / BACKEND_PORT / FRONTEND_PORT，不能停止别的项目。
+
+打开 http://127.0.0.1:5173 。API 健康检查 http://127.0.0.1:8080/api/v1/health ，同一接口通过前端 /api/v1/health 代理可访问。OpenAPI：http://127.0.0.1:5173/api/v1/openapi.json 。
+
+数据库健康后后端自动校验/执行 Flyway V1–V3，再幂等初始化种子，失败立即退出而不是跳过。初始 16 张应用表加 Flyway 历史表。迁移的唯一源为 database/migrations/，打包入 JAR；已执行 V1 不修改。
+
+## 演示账号与操作
+
+仅 development 且 SEED_DEMO=true 时初始化以下公开评测账号，每人 1000 积分：
+
+| 身份 | 账号 | 公开演示密码 |
+|---|---|---|
+| 管理员 | admin@example.com | Admin123456! |
+| 真人 A | bidder_a@example.com | Test123456! |
+| 真人 B | bidder_b@example.com | Test123456! |
+
+密码在表中为随机盐 PBKDF2-HMAC-SHA256、600000 轮哈希。启动/重启不重置余额或密码，不补发积分。演示拍品保持 DRAFT，end_at=NULL，不自动倒计时。
+
+1. 管理员登录，选择演示拍品或创建新拍品，点击“开始拍卖”；默认 180 秒。
+2. 使用两个独立浏览器窗口/无痕会话分别以 A、B 登录，选同一拍品，点击加入。
+3. A 出价 110，B 出价 120；观察当前价、领先者、剩余时间及各自冻结。领先者再次加价只冻结差额。
+4. 截止前五秒内合法出价使最新截止时间加十秒，最多三次。关闭网络再恢复，页面会重新获取权威快照。
+5. 到期无需客户端调用，约一秒扫描后自动结算。查看结果、钱包和流水。也可由管理员在 DRAFT/RUNNING 取消并释放资金。
+6. 管理员面板创建 Agent 用户、为本场签发 Token；仅显示一次，安全交给 Agent 后立即隐藏，禁止录屏 Token。见 AGENT_TOOL_SPEC.md。
+
+浏览器状态保存在 sessionStorage，每个标签页独立；退出只清理本标签。实时同步延迟通常约一秒；没有离线出价。
+
+## 20 人模拟与 Agent
+
+模拟会创建用户、拍品和流水，**必须对隔离环境运行**。推荐下方 test:compose 自动创建随机测试数据库并运行脚本、浏览器和 SQL 对账。也可以在专用测试部署上执行：
+
+```powershell
+$env:SIMULATION_ALLOW_MUTATION='isolated'
+$env:API_BASE_URL='http://127.0.0.1:5173/api/v1'
+npm run simulate:auction -- --bots=20 --seed=42
+```
+
+脚本自动创建短时拍卖、20 真人和 Agent，验证并发、重试、授权、最后五秒延时、自动结算并输出断言摘要；可传 --auctionId=<专用DRAFT拍卖ID>，该拍卖必须是适合测试的短时拍卖，不要使用现有业务数据。默认只支持评测演示管理员；不得用于生产。
+
+外部 Agent 安全设置 AUCTION_AGENT_TOKEN、AUCTION_ID 和可选 AGENT_MAX_AMOUNT（默认500）后运行 `node scripts/auction-agent.mjs`。Token 不要放在参数/命令历史中；使用私有环境注入。该示例每三秒查询并在预算内递增出价；真实钱包仍由服务端约束。接口契约和错误处理见 AGENT_TOOL_SPEC.md。
+
+## 构建与完整验证
+
+```powershell
+npm --prefix frontend ci
+npm run build
+npm run test:unit
+npm run test:compose
+node scripts/verify-secrets.mjs
+```
+
+test:compose 要求当前默认 Compose 服务已健康、宿主机端口为3307/5173；它验证种子重启不变，执行前端测试/构建，在容器 MySQL 创建临时测试账号（只授权 bid_arena_it_ 前缀），运行真实 MySQL 集成测试、20 人模拟和浏览器验收，再移除该账号。每个测试随机建库并仅删除自己的测试库，不接触本机3306或演示库。若修改默认端口，应同步脚本地址，不能把测试指向已有数据库。
+
+浏览器测试使用 Playwright 与已安装的 Edge（Windows），其他平台需先提供 Playwright Chromium；可配置 BROWSER_CHANNEL，见 frontend/browser-check.mjs。不会自动安装系统浏览器。当前实际验证详见 FINAL_ACCEPTANCE_REPORT.md。
+
+直接后端：`mvn -B -f backend/pom.xml package`；前端：`npm --prefix frontend run build`。有独立 MySQL 测试账号时设置 TEST_DB_URL、TEST_DB_USER、TEST_DB_PASSWORD 后运行 `npm run test:all`。该账号只能访问随机测试库。没有真实数据库会失败，不降级 Mock、不跳过。本机后端运行要求 DB_URL、DB_USER、DB_PASSWORD，执行 `npm run start:backend`；前端 `npm --prefix frontend run dev`。
+
+## 停止与排错
+
+```powershell
+docker compose logs --tail=200 mysql backend frontend
+docker compose restart backend
+docker compose ps
+docker compose stop
+```
+
+stop 保留容器和数据。禁止 down -v、全局 prune、Docker 重置和删除 MySQL 数据来解决普通故障。Flyway 校验失败应修复新迁移，不自动 repair/clean。修改 .env 密码不会自动改变已初始化卷中的 MySQL 账号。
+
+docker 不在 PATH：启动已安装 Docker Desktop，在当前终端 PATH 加入其 resources/bin，重新运行 docker version / info / compose version。不能仅凭 WSL 条目认定 daemon 可用。Docker Hub 下载失败请检查 Desktop 代理；registry /v2/ 返回401代表网络可达但需标准认证，不能据此认定镜像已下载。镜像来源与实际构建记录见验证文档。
+
+## 安全与交付边界
+
+生产关闭演示种子、配置独立随机数据库凭据及 TLS；当前 Compose 是 loopback 评测部署，不是已上线服务。Token 为随机256位，数据库只存 SHA-256 摘要；会话八小时，Agent 支持范围、权限、过期、吊销及固定分钟限流。未实现生产首位管理员引导、密码重置、登录防暴力破解或运营审计后台。
+
+设计见 DESIGN.md，决策/真实错误/AI 分工见 DECISIONS.md、DEBUG_LOG.md、AI_USAGE.md。原始审计与历史验证保留；需求逐项状态见 REQUIREMENTS_MATRIX.md。3–5分钟演示流程见 docs/DEMO_RUNBOOK.md。真人现场讲解、外部仓库发布和录屏交付需本人完成，不伪称已验收。

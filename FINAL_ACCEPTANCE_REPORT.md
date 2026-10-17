@@ -84,3 +84,14 @@ Flyway版本1/2/3均success=1。重启前后逐字快照相同：3用户、3初�
 发布安全命令：node scripts/audit-release.mjs 与 node scripts/verify-secrets.mjs；扫描全部可达Git历史、跟踪文件及本地日志，不输出凭据值。真实.env、.local和日志截图不上传。HTTPS默认多账号凭据选择失败后选用现有weikelai GCM账号，dry-run通过；未要求提供Token或伪造历史。架构和已通过业务逻辑本轮未重构。
 
 本节明确取代旧文档中“远端未授权”“独立Agent仅语法检查”“本人必须完成录屏/外部提交”的当前状态描述，旧文字保留作历史。AI完成本轮安全扫描、Agent脚本验收、自动化回归及发布整理，不代表本人独立设计能力已核验。仓库：https://github.com/weikelai/bid-arena 。
+## 实际发布成功及远端验证
+
+代码发布提交：c41ffb91bfd5129a0b47ee28783d8f71ccf51247。
+`git -c credential.interactive=false push -u origin master` 退出0，新建远端master；`git ls-remote origin refs/heads/master` 返回同一完整提交ID。
+`git -c credential.interactive=false clone --no-checkout https://github.com/weikelai/bid-arena.git .local/github-release-check` 退出0。对独立远端克隆执行 `git ls-tree -r --name-only HEAD`，确认Vue源码、Solon源码、V1–V3迁移、后端测试、前端测试、模拟与Agent脚本、Compose和全部规定文档实际存在。远端不含.env、.local、日志、target、dist或node_modules。原始评测Markdown及PDF保留。
+
+推送前提交后安全扫描：PASS，3提交、77历史blob、3个已知本地凭据匹配项来源、33份本地证据文件；未发现泄露。这里的3是检查的本地凭据数，不是泄露数。后续文档收尾提交同样必须扫描、正常推送并核对远端HEAD；最新提交ID以 `git ls-remote origin refs/heads/master` 为准，报告不嵌入包含自身的提交哈希。
+
+最终容器均healthy：mysql 127.0.0.1:3307→3306，backend 127.0.0.1:8080→8080，frontend 127.0.0.1:5173→80。本机MySQL3306仍为PID8864，未停止、修改或删除。没有down -v、prune或数据重置。
+
+GitHub远端发布状态为PASS；正式录屏、本人讲解及评测方外部提交仍为OUT OF SCOPE，未执行；全过程早期历史不能补造，可选线上部署未执行，不宣称原始评分全部通过。

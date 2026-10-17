@@ -13,3 +13,15 @@
 实际推送及远端检查结果在下方追加；未记录成功前不视为已发布。
 
 正式录屏、本人独立讲解及评测方外部提交：用户明确不要求本次交付，未执行。可选线上部署未执行。原始全过程开发历史不能补造；生产防护和大规模故障演练限制仍见FINAL_ACCEPTANCE_REPORT。
+
+## 实际发布成功及远端验证
+
+代码发布提交：c41ffb91bfd5129a0b47ee28783d8f71ccf51247。
+`git -c credential.interactive=false push -u origin master` 退出0，新建远端master；`git ls-remote origin refs/heads/master` 返回同一完整提交ID。
+`git -c credential.interactive=false clone --no-checkout https://github.com/weikelai/bid-arena.git .local/github-release-check` 退出0。对独立远端克隆执行 `git ls-tree -r --name-only HEAD`，确认Vue源码、Solon源码、V1–V3迁移、后端测试、前端测试、模拟与Agent脚本、Compose和全部规定文档实际存在。远端不含.env、.local、日志、target、dist或node_modules。原始评测Markdown及PDF保留。
+
+推送前提交后安全扫描：PASS，3提交、77历史blob、3个已知本地凭据匹配项来源、33份本地证据文件；未发现泄露。这里的3是检查的本地凭据数，不是泄露数。后续文档收尾提交同样必须扫描、正常推送并核对远端HEAD；最新提交ID以 `git ls-remote origin refs/heads/master` 为准，报告不嵌入包含自身的提交哈希。
+
+最终容器均healthy：mysql 127.0.0.1:3307→3306，backend 127.0.0.1:8080→8080，frontend 127.0.0.1:5173→80。本机MySQL3306仍为PID8864，未停止、修改或删除。没有down -v、prune或数据重置。
+
+GitHub远端发布状态为PASS；正式录屏、本人讲解及评测方外部提交仍为OUT OF SCOPE，未执行；全过程早期历史不能补造，可选线上部署未执行，不宣称原始评分全部通过。

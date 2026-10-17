@@ -38,10 +38,11 @@
 | R30 | DESIGN/DECISIONS/DEBUG_LOG/AGENT_TOOL_SPEC | 根目录文档 | 文件及对应代码核对 | PASS | 外部模型Agent接入未声称已做 |
 | R31 | AI_USAGE含本人决策、分工、可独立解释范围 | AI_USAGE | 文档已记录Agent事实与待确认项 | NOT VERIFIED | 本人必须确认三项设计与独立讲解，不能代签 |
 | R32 | 有意义的真实开发历史 | Git | git log/status | NOT VERIFIED：原目录无Git，本次仅真实快照与后续验收提交 | 不可重建不存在的逐步历史 |
-| R33 | 3–5分钟录屏 | docs/DEMO_RUNBOOK | 自动化截图存在，完整录屏未交付 | BLOCKED | 本人录制并检查无Token |
-| R34 | GitHub/Gitee仓库、姓名联系方式及邮件提交 | 外部交付 | 未发布、未发送 | BLOCKED | 缺仓库授权与本人资料，禁止自行外发 |
+| R33 | 3–5分钟录屏 | docs/DEMO_RUNBOOK | 未制作 | OUT OF SCOPE | 用户明确不要求本次交付 |
+| R34a | GitHub发布 | origin/master | 推送及独立克隆文件检查通过 | PASS | 见GITHUB_RELEASE_REPORT |
+| R34b | 姓名联系方式及邮件提交 | 外部交付 | 未执行 | OUT OF SCOPE | 用户明确不要求本次交付 |
 | R35 | 可访问线上地址（加分） | 外部部署 | 未部署 | BLOCKED | 需服务器/域名/凭据授权 |
-| R36 | 现场无Agent讲解/临时变更核验 | 本人 | 未进行 | BLOCKED | 由本人及评审安排 |
+| R36 | 现场无Agent讲解/临时变更核验 | 本人 | 未进行 | OUT OF SCOPE | 用户明确不要求本次交付 |
 
 所有本地PASS的详细结果和命令退出码见 FINAL_ACCEPTANCE_REPORT.md；原始需求未因外部阻塞删减。当前不宣称整个评测已经通过。
 

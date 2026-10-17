@@ -1,5 +1,27 @@
 # 最终验收矩阵
 
+## 当前冻结证据（2026-10-17，本节优先于历史时间）
+
+本轮最终回归20:46:45+08:00退出0：单元4、真实MySQL集成21、前端5、20人seed42模拟65断言、Edge关键场景及SQL对账通过。生产代码仍为e13339b；唯一代码库行为变更是浏览器测试增加显式状态/列表响应同步及断言，验收提交8bf8b4512f85be67b2ec184e421a837cb05c5db4。之后只补交付文档。最新原题P1–P5详表中的运行PASS以.local/freeze-tests-retry.log重新验证；不再仅依赖20:31历史结果。
+
+| 冻结复核项 | 状态 | 本轮证据/局限 |
+|---|---|---|
+| 技术栈、构建、迁移、种子、前后端、竞价资金幂等延时结算、权限、实时恢复及模拟 | PASS | config/build/up均0；T完整回归0；4/21/5及65；真实SQL与浏览器通过，详见TEST_EXECUTION_REPORT冻结附节 |
+| 初次冻结套件失败 | FAIL | .local/freeze-tests.log退出1，浏览器列表按钮超时；这是保留的首次结果，不是最终套件状态 |
+| 测试同步修正后的完整套件 | PASS | .local/freeze-tests-retry.log退出0；新增列表内容断言，未删除旧断言；超时唯一根因不能仅凭旧日志完全确定 |
+| 当前运行、代理、OpenAPI与种子重启 | PASS | 三healthy，四HTTP200，health database=UP，种子快照逐字一致 |
+| 远端发布与敏感信息 | PASS | 独立克隆/最终全树比对及全历史审计，见GITHUB_RELEASE_REPORT；扫描不证明所有未知秘密不存在 |
+| 实际死锁环 | NOT VERIFIED | 1205真实锁超时通过；1213为注入，不是实际死锁复现 |
+| 完整容器网络分区、宿主机断电、大规模压力 | NOT VERIFIED | 没有相应演练；同库多执行器、halt73恢复及20人不等价 |
+| 生产TLS、管理员引导、登录防护 | NOT VERIFIED | 生产能力已知不完善，当前仅loopback演示验收，不直接公开部署 |
+| 全过程早期Git历史、本人设计归属 | NOT VERIFIED | 不补造历史，不代签人工决定 |
+| 可选线上部署 | NOT VERIFIED | 未执行 |
+| 正式录屏、本人现场讲解/临时修改、评测方外部提交 | OUT OF SCOPE | 用户明确不要求，均未执行，不算原题评分已通过 |
+
+没有待人工解除的外部BLOCKED；最终未发现未处理的严重业务缺陷。浏览器同步修正后已完整通过，仍不能据一次复测证明永不波动。最终交付说明见FINAL_HANDOFF.md。下方保留此前矩阵及需求展开历史。
+
+## 此前矩阵（保留历史）
+
 依据原始《全栈评测-拍卖间.md》逐项核对。原阶段1矩阵已保存在 Git 初始快照2503d71，原始审计未改。PASS只表示所列验证范围，不代表外部隐藏测试或本人能力已通过。
 
 命令 C：docker compose config --quiet / build / up -d --wait / ps；T：npm run test:compose（包含前端5项、后端4项单元及真实MySQL集成、20人模拟、Edge浏览器）；S：node scripts/verify-secrets.mjs。原生历史结果见 docs/STAGE1_VALIDATION.md，以下为最新容器MySQL验收。

@@ -1,5 +1,19 @@
 # GitHub 发布验收
 
+## 当前冻结发布（2026-10-17）
+
+仓库https://github.com/weikelai/bid-arena.git，分支master。生产实现基线e13339bedb3f1e46b6cba0811b0f0da6cb5b0557；本轮测试同步修正及失败记录提交8bf8b4512f85be67b2ec184e421a837cb05c5db4。实际执行 `git -c credential.interactive=false push origin master` 退出0（e13339b→8bf8b45），`git ls-remote origin refs/heads/master` 返回同一完整ID；独立新克隆.local/freeze-remote-check及fetch成功，保留真实历史、没有force push。
+
+当前完整回归结束20:46:45+08:00，退出0：4单元/21真实MySQL集成/5前端/65模拟断言，浏览器与SQL对账通过。首次冻结套件退出1，浏览器列表按钮超时；只新增状态/列表响应同步及内容断言，不改核心业务、不删断言，日志与诊断见TEST_EXECUTION_REPORT和DEBUG_LOG。
+
+最终交付新增FINAL_HANDOFF.md并更新四份报告；这是8bf8b45之后的真实文档提交，不改变已测试实现。发布流程要求该文档提交安全扫描后正常push，并从独立克隆fetch核对完整Git树、本地与远端HEAD、必需文件及禁止路径；最终结果保存在忽略的.local/freeze-remote.json，最终完整HEAD由 `git rev-parse HEAD` 与 `git ls-remote origin refs/heads/master` 对照。文档不嵌入包含自身的提交哈希，避免将旧提交误称最终文档提交。
+
+审计命令 `node scripts/audit-release.mjs`、`node scripts/verify-secrets.mjs`，本轮提交前后执行，全可达历史及跟踪文件、已知本地秘密/常见模式、本地证据日志均未命中；运行时65断言另核对临时凭据未出现在后端日志和前端包。真实.env、.local、日志、截图、随机测试库和构建产物不发布；.env.example仅空密码占位。自动扫描不是对所有未知秘密的保证。
+
+冻结范围仅loopback评测。生产防护不完善、真实死锁环/断电/完整容器网络分区/大规模性能、全过程早期Git历史、本人设计归属及线上部署保持NOT VERIFIED；正式录屏、本人现场讲解/临时修改、评测方外部提交保持OUT OF SCOPE，均未执行。尚无需人工解除的发布阻塞。下方为保留的此前发布记录。
+
+## 此前发布记录（保留历史）
+
 目标：https://github.com/weikelai/bid-arena.git ，分支 master。
 
 发布前远端 `git ls-remote origin` 退出0且没有分支，故不需要合并或覆盖历史。保留原有两个真实提交，不倒填历史。

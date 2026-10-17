@@ -1,5 +1,33 @@
 # 全面验收执行记录（2026-10-17）
 
+## 最后一次冻结回归（本节为当前证据）
+
+基线：生产代码e13339b；测试同步修正提交8bf8b4512f85be67b2ec184e421a837cb05c5db4。环境本轮实际复核：Java17.0.17、Maven3.8.8、Node22.15.1、npm11.14.0、Docker Engine29.8.0、Compose5.5.1。原始规则逐项状态沿用下方报告引用的最新矩阵，但本轮运行证据替换为以下freeze文件；旧日志保留。
+
+| 本轮实际命令 | 退出码及结果 | 本地证据 |
+|---|---|---|
+| git status --short、branch --show-current、log --oneline -10、remote -v、ls-remote origin refs/heads/master | 均0；开始master干净，本地/远端均e13339b | 终端、.local/freeze-remote.json |
+| docker compose config --quiet | 0 | .local/freeze-config.log |
+| docker compose build | 0，前后端镜像成功 | .local/freeze-build.log |
+| docker compose up -d --wait | 0，三服务healthy | .local/freeze-up.log |
+| node scripts/compose-verify.mjs --integration（第一次） | 1；单元4、AuctionIT14、DatabaseIT6、前端5、模拟65通过，HttpSimulationIT浏览器列表按钮超时失败 | .local/freeze-tests.log、freeze-browser-failed.log、freeze-http-failed.log |
+| node scripts/compose-verify.mjs --integration（同步修正后） | 0；20:46:45+08:00，4单元、21真实集成、5前端，失败0/错误0/跳过0；模拟65断言 | .local/freeze-tests-retry.log、backend/target/{http-simulation,browser-acceptance}.log |
+| docker compose ps；docker compose logs --tail=100 mysql backend frontend | 0；三healthy，日志含初始化和重启历史，不据历史告警判当前失败 | .local/freeze-container.log及最终状态记录 |
+| node .local/freeze-http.cjs | 0；后端health、前端代理health、页面、OpenAPI均200，health database=UP；只读SQL确认空密码root数0 | .local/freeze-http.json |
+| node scripts/audit-release.mjs；node scripts/verify-secrets.mjs | 均0，提交前后再扫描；已知凭据及常见模式未命中 | .local/release-security.json |
+| git clone --no-checkout（已有GCM非交互认证）到.local/freeze-remote-check；fetch/全树比对 | 开始核验0，最终提交后再核验，见发布报告 | .local/freeze-remote.json |
+| git diff --check；Get-NetTCPConnection -LocalPort 3306 -State Listen | 0；原MySQL仍PID8864，未修改数据 | 终端 |
+
+完整脚本实际包含npm --prefix frontend test、npm --prefix frontend run build（vue-tsc及Vite）、mvn -B -f backend/pom.xml verify -Pmysql-it、Node模拟及Edge浏览器。隔离随机库和前缀受限临时账号使用后清理；没有down -v、prune或重置。
+
+Flyway1/2/3 success=1、3种子用户、3初始流水共3000、钱包各1000/0、演示DRAFT且end_at NULL；后端重启前后逐字一致（.local/compose-data-verification.log）。真实数据库SQL对账通过：钱包总额/冻结与流水及hold一致；每场唯一结果/扣款，HTTP测试包含模拟与浏览器两场CAPTURE；请求关联、32字节Token摘要符合断言。65断言包括临时凭据未出现在后端日志或前端包中，且不输出凭据。
+
+首次失败定位与修正见DEBUG_LOG首节：只增加RUNNING、列表响应与目标拍品断言，核心业务未改动。旧日志不足以证明该超时唯一根因；一次成功复测不是永不波动的证明，今后若重现应继续按保存的日志定位，不静默重试掩盖失败。
+
+本轮最终日志SHA256：F2C2ADD110F836F59058713D587374B3E9E0ACC3DA59386D079BF2D9695E405C。浏览器与模拟日志内容相同可有相同哈希，但实际进程已在本轮重新运行，JUnit时间与freeze日志为本轮证据。首轮退出1日志完整保留。未验证风险及OUT OF SCOPE见FINAL_HANDOFF，不重复声明原题全部通过。
+
+## 此前执行记录（保留历史）
+
 原始依据：根目录评测Markdown及PDF五页，已完整读取。PDF使用pypdf提取至忽略的.local/original-pdf.txt，与Markdown关键要求一致。本报告是发布后的新一轮验收，不将20:16的上一轮结果当成本轮结果。详细映射见REQUIREMENTS_MATRIX.md最新附表。
 
 ## 环境和隔离

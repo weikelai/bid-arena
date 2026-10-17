@@ -88,7 +88,7 @@ docker 不在 PATH：启动已安装 Docker Desktop，在当前终端 PATH 加�
 
 生产关闭演示种子、配置独立随机数据库凭据及 TLS；当前 Compose 是 loopback 评测部署，不是已上线服务。Token 为随机256位，数据库只存 SHA-256 摘要；会话八小时，Agent 支持范围、权限、过期、吊销及固定分钟限流。未实现生产首位管理员引导、密码重置、登录防暴力破解或运营审计后台。
 
-设计见 DESIGN.md，决策/真实错误/AI 分工见 DECISIONS.md、DEBUG_LOG.md、AI_USAGE.md。原始审计与历史验证保留；需求逐项状态见 REQUIREMENTS_MATRIX.md。3–5分钟演示流程见 docs/DEMO_RUNBOOK.md。真人现场讲解、外部仓库发布和录屏交付需本人完成，不伪称已验收。
+设计见 DESIGN.md，决策/真实错误/AI 分工见 DECISIONS.md、DEBUG_LOG.md、AI_USAGE.md。原始审计与历史验证保留；需求逐项状态见 REQUIREMENTS_MATRIX.md。3–5分钟演示流程见 docs/DEMO_RUNBOOK.md。GitHub已发布，核验见GITHUB_RELEASE_REPORT.md；正式录屏、本人现场讲解与评测方外部提交按用户指示OUT OF SCOPE，均未执行。
 
 ## 2026-10-17 最终收尾最新状态（取代此前外部交付待办描述）
 
@@ -101,3 +101,6 @@ docker 不在 PATH：启动已安装 Docker Desktop，在当前终端 PATH 加�
 发布安全命令：node scripts/audit-release.mjs 与 node scripts/verify-secrets.mjs；扫描全部可达Git历史、跟踪文件及本地日志，不输出凭据值。真实.env、.local和日志截图不上传。HTTPS默认多账号凭据选择失败后选用现有weikelai GCM账号，dry-run通过；未要求提供Token或伪造历史。架构和已通过业务逻辑本轮未重构。
 
 本节明确取代旧文档中“远端未授权”“独立Agent仅语法检查”“本人必须完成录屏/外部提交”的当前状态描述，旧文字保留作历史。AI完成本轮安全扫描、Agent脚本验收、自动化回归及发布整理，不代表本人独立设计能力已核验。仓库：https://github.com/weikelai/bid-arena 。
+## 最终全面回归证据
+
+2026-10-17 20:31:00+08:00，完整回归退出0：4单元、21真实MySQL集成、5前端测试，失败/错误/跳过均0；20人seed42模拟65断言，winner24 price370；新增动态凭据在后端日志及前端包中不存在的检查通过。Edge扩展测试包括旧钱包响应跨登录隔离、出价历史、自动SOLD及余额890/冻结0。详见TEST_EXECUTION_REPORT.md及需求矩阵新附表。原始MySQL3306仍PID8864，三个容器healthy。

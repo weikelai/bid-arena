@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 
 // This script creates isolated test identities and never logs bearer credentials.
 if(process.env.SIMULATION_ALLOW_MUTATION!=='isolated') throw new Error('Use an isolated test environment and set SIMULATION_ALLOW_MUTATION=isolated');
@@ -14,6 +15,10 @@ function check(condition,message){assert.ok(condition,message);checks++;console.
 async function call(path,token,body,expected=200){const r=await fetch(base+path,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:body===undefined?undefined:JSON.stringify(body)});const raw=await r.text();let value;try{value=JSON.parse(raw);}catch{throw new Error(`${path}: HTTP ${r.status}, invalid JSON (${raw.slice(0,100)})`);}assert.equal(r.status,expected,`${path}: ${JSON.stringify(value)}`);return value;}
 const login=async(email,pwd)=> (await call('/auth/login',null,{email,password:pwd})).token;
 const admin=await login(process.env.SIMULATION_ADMIN_EMAIL??'admin@example.com',process.env.SIMULATION_ADMIN_PASSWORD??'Admin123456!');
+const spec=await call('/openapi.json');
+check(spec.openapi==='3.0.3'&&['/api/v1/auth/login','/api/v1/users/me','/api/v1/wallets/me','/api/v1/admin/auctions','/api/v1/admin/auctions/{id}/start','/api/v1/admin/auctions/{id}/cancel','/api/v1/admin/agent-tokens','/api/v1/auctions','/api/v1/auctions/{id}','/api/v1/auctions/{id}/join','/api/v1/auctions/{id}/bids'].every(p=>spec.paths[p]),'OpenAPI exposes all required API paths');
+check(spec.paths['/api/v1/wallets/me'].get.responses['200'].content['application/json'].schema.$ref.endsWith('/Wallet'),'OpenAPI documents private wallet response');
+check((await call('/users/me',admin)).role==='ADMIN','authenticated identity endpoint matches role');
 const users=[];
 for(let i=0;i<bots;i++){const email=`sim-${run}-${i}@example.test`;const u=await call('/admin/users',admin,{email,password,kind:'HUMAN'});users.push({...u,token:await login(email,password)});}
 const agent=await call('/admin/users',admin,{email:`agent-${run}@example.test`,password,kind:'AGENT'});
@@ -25,6 +30,10 @@ const issue=async(permissions,extra={})=>call('/admin/agent-tokens',admin,{userI
 const full=await issue(['auction:read','auction:bid']);
 await call(`/auctions/${id}/join`,full.token,{});
 const read=await issue(['auction:read']);
+const bidOnly=await issue(['auction:bid']);
+await call(`/auctions/${id}`,bidOnly.token,undefined,403);
+await call(`/auctions/${id}/events?after=0`,bidOnly.token,undefined,403);
+check(true,'bid-only Agent cannot read snapshots or events');
 await call(`/auctions/${id}/bids`,read.token,{requestId:'forbidden',amount:110},403);
 await call('/admin/auctions',full.token,{title:'forbidden'},403);
 await call('/wallets/me',full.token,undefined,403);
@@ -47,6 +56,9 @@ check(retries.every(r=>r.type==='BID_ACCEPTED')&&retries.filter(r=>!r.replayed).
 await call(`/auctions/${id}/bids`,users[0].token,{...duplicate,amount:price+10},409);
 const race=await Promise.all([users[1],users[2]].map((u,i)=>call(`/auctions/${id}/bids`,u.token,{requestId:`race-${i}`,amount:price+10})));
 check(race.filter(r=>r.type==='BID_ACCEPTED').length===1,'same-price race has exactly one leader');price+=10;
+const adjacent=await Promise.all([users[5],users[6]].map((u,i)=>call(`/auctions/${id}/bids`,u.token,{requestId:`adjacent-${i}`,amount:price+10+i*10})));
+price+=20;
+check(adjacent[1].type==='BID_ACCEPTED'&&(await call(`/auctions/${id}`,admin)).current_price===price,'adjacent-price race converges to higher bid');
 check((await call(`/auctions/${id}/bids`,users[3].token,{requestId:'low',amount:100})).error==='BID_TOO_LOW','low bid rejected');
 check((await call(`/auctions/${id}/bids`,users[3].token,{requestId:'funds',amount:1001})).error==='INSUFFICIENT_FUNDS','insufficient funds rejected');
 const ownEvents=await call(`/auctions/${id}/events?after=0`,users[3].token);
@@ -84,4 +96,10 @@ try {
   const code=await Promise.race([exited,new Promise(resolve=>setTimeout(()=>resolve(-1),5000))]);
   check(code===0,'standalone Agent reads terminal state and exits');
 } finally {if(child.exitCode===null)child.kill();}
+const credentials=[admin,...users.map(u=>u.token),full.token,read.token,bidOnly.token,limited.token,expires.token,externalToken.token];
+if(process.env.VERIFY_LOCAL_ARTIFACTS==='true'){
+  const backendLog=fileURLToPath(new URL('../backend/target/http-simulation-backend.log',import.meta.url));
+  const assets=fileURLToPath(new URL('../frontend/dist/assets/',import.meta.url));
+  check(existsSync(backendLog)&&existsSync(assets)&&[backendLog,...readdirSync(assets).filter(p=>p.endsWith('.js')).map(p=>assets+p)].every(p=>credentials.every(t=>!readFileSync(p,'utf8').includes(t))),'issued test credentials absent from backend log and frontend bundle');
+}
 console.log(JSON.stringify({type:'SIMULATION_SUMMARY',auctionId:id,bots,seed,assertions:checks,winnerId:agent.id,price,status:'PASS'}));

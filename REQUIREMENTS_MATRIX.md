@@ -57,3 +57,49 @@
 发布安全命令：node scripts/audit-release.mjs 与 node scripts/verify-secrets.mjs；扫描全部可达Git历史、跟踪文件及本地日志，不输出凭据值。真实.env、.local和日志截图不上传。HTTPS默认多账号凭据选择失败后选用现有weikelai GCM账号，dry-run通过；未要求提供Token或伪造历史。架构和已通过业务逻辑本轮未重构。
 
 本节明确取代旧文档中“远端未授权”“独立Agent仅语法检查”“本人必须完成录屏/外部提交”的当前状态描述，旧文字保留作历史。AI完成本轮安全扫描、Agent脚本验收、自动化回归及发布整理，不代表本人独立设计能力已核验。仓库：https://github.com/weikelai/bid-arena 。
+## 全面验收重新提取的证据矩阵（2026-10-17，本节优先）
+
+原题没有连续编号，以下以PDF页码/章节及规则号作稳定定位，并展开本轮新增边界。完整命令、退出码、数据库SQL与日志集中于TEST_EXECUTION_REPORT。历史R表保留，不将其旧PASS自动视为本轮结果。
+
+证据命令：C=`docker compose config --quiet; docker compose build; docker compose up -d --wait`，均0；T=`node scripts/compose-verify.mjs --integration`，修复后的attempt2退出0；S=`node scripts/audit-release.mjs; node scripts/verify-secrets.mjs`，以最终安全结果为准；G=`git ls-remote`加独立克隆fetch/ls-tree/show。T内部真实执行前端test/build、Maven verify -Pmysql-it、simulate-auction与Edge浏览器。最终新增凭据检查结果在执行报告追加。以下PASS依据attempt2已实际结果，最终回归若失败必须覆盖。
+
+| 原题定位/编号 | 原始要求及验收条件 | 源代码 | 测试名/关键断言 | 命令/退出码 | 数据库核对/证据 | 状态 | 风险/剩余 |
+|---|---|---|---|---|---|---|---|
+| P1 技术-前端 | Vue3/TS可操作界面 | frontend/src/App.vue,package.json | vitest5、vue-tsc、Edge三用户操作 | C/T 0 | comprehensive-build-final、tests-attempt2 | PASS | 非全UI路径覆盖 |
+| P1 技术-后端 | Java17/Solon3 HTTP | pom.xml,Application,Api | JAR真实启动/HTTP模拟 | C/T 0 | DatabaseIT启动两次 | PASS | 手动组装服务依赖；非复杂分层 |
+| P1 技术-数据 | MySQL8唯一事实/自动迁移 | Database,migrations V1–V3 | migrationHistoryIsVersionedAndAllTablesUseInnoDb | T 0 | 16表、checksum失败检测/InnoDB | PASS | 不用Redis |
+| P1 交付 | Compose一键三服务 | compose.yaml,Dockerfile | config/build/up-wait，三healthy/代理 | C/T 0 | 3307/8080/5173，日志和HTTP | PASS | 首次联网下载未保证5分钟 |
+| P2 状态机 | DRAFT/RUNNING/SETTLING/FINISHED及取消限制 | AuctionService | settlingCannotCancelAndFinishedCannotBid；rejectsAndIdempotencyPreserveMoney | T 0 | 非法状态无bid/资金流水 | PASS | SETTLING中间态通常同事务不可见 |
+| P2 规则1 | 100/10/180/1000，无出价当前100 | V1,DemoSeeder,Api.create | repeatedAndConcurrentSeedsIssueExactlyOneInitialCredit | T 0 | 默认值、3钱包、DRAFT end NULL | PASS | 允许测试自选短时拍卖 |
+| P2 规则2/5a | 差额冻结/可用余额 | place,money | differentialReleaseAndUniqueCapture | T 0 | 120hold、差额10、旧hold0 | PASS | 积分非支付 |
+| P2 规则5b | 余额不足/低价/失败不改资金 | place | rejectsAndIdempotencyPreserveMoney，HTTP low/funds | T 0 | bid0/资金变化0；CHECK total>=frozen>=0 | PASS | 拒绝有私有事件及请求终态 |
+| P2 规则4a | 顺序及并发requestId一次效果 | bid,bid_requests PK | concurrentDuplicateProducesOneBid，HTTP四重放/金额冲突409 | T 0 | bid1、FREEZE1，replayed | PASS | 唯一范围(user,request)，跨场冲突 |
+| P2 规则4b | 同价/相邻价竞争唯一领先 | place/钱包排序锁 | competingUsersAndSharedWallets，HTTP same/adjacent race | T 0 | 最高相邻价成功，单场正hold1 | PASS | 顺序由数据库接收门决定 |
+| P2 规则5c | 跨场共享钱包不超花 | lockWallets,money | competingUsersAndSharedWallets | T 0 | 钱包=hold=流水汇总 | PASS | 未做大规模压力 |
+| P2 规则3 | 截止前/相等/之后 | bid接收门/place | durableReceiptSurvivesLockWaitAcrossDeadline；deadlineEqualIsRejectedAndRestartScannerFinishesEmptyAuction；HTTP late | T 0 | 预收请求跨锁等待成功，相等拒绝/无成交扣款 | PASS | 接收定义为鉴权后取得intake门的DB时间 |
+| P2 规则6 | 最新截止+10/最多3/到顶仍成功/并发不覆盖 | place | extendsThreeTimesAndStillAcceptsAtLimit；concurrentSnipesUseLatestDeadlineOnlyOnce | T 0 | deadline精确+10、extension<=3、并发仅1 | PASS | 含5秒边界以>=end-5判断 |
+| P2 规则5d/6 | 资金/价格/延时/事件同事务 | Database.transaction/place | failureAfterWalletWritesRollsBackAndPendingReceiptRecovers | T 0 | 资金/流水/价格全部回滚；PENDING恢复一次 | PASS | 故障注入点为资金写后 |
+| 扩展 C8 | 锁超时/死锁错误重试不重复 | bid有限3次重试 | retryAfterActualWalletLockTimeoutHasOneEffect；deadlockVictimRetryRollsBackBeforeOneAcceptedEffect | T 0 | 真实1205三次耗尽后零bid/流水，同request恢复1次；注入1213两次尝试1次效果 | PASS | 实际死锁环形成NOT VERIFIED，1213为注入 |
+| P2 规则7a | 到期无人/赢家自动结算/取消释放 | tick,finish | HTTP自动FINISHED、浏览器SOLD、NO_BIDS、cancel | T 0 | 每场result1、winner余额=1000-price、hold0 | PASS | 扫描间隔1秒 |
+| P2 规则7b | 重复/多执行器唯一结果/扣款 | finish,result PK,effect unique | differentialReleaseAndUniqueCapture四执行器 | T 0 | 唯一CAPTURE/result，重复无新增 | PASS | 同库独立执行器，不是双完整容器 |
+| P2 规则7c | 中途停止/重启/事务失败恢复 | finish/tick | processDeathDuringSettlementRollsBackAndScannerRecovers；settlementFailureRollsBackCaptureAndNewExecutorRecovers | T 0 | halt73未提交CAPTURE0/hold110，恢复CAPTURE1/result1 | PASS | 未测宿主机断电 |
+| P2 规则8/P3事件 | 通知失败不回滚、seq/envelope、私有拒绝 | event,Api.events,snapshot,room.ts | HTTP envelope/ordered/private；Edge offline/reconnect；requiresSnapshot | T 0 | 持久事件与业务同事务；断网快照恢复 | PASS | 1秒轮询等价；私有seq缺口可见但无私有内容 |
+| P2–3 模型八类 | 用户/钱包/流水/拍卖/参与者/出价/结果/Token | V1–V3 | DatabaseIT constraints/表集合 | T 0 | CHECK3819/FK1452/唯一1062，16表 | PASS | 跨表汇总靠事务，非CHECK |
+| P3 API | 原题12项能力/OpenAPI | Api,openapi.json | HTTP身份/业务调用，spec路径/钱包schema | T 0 | 原题路径均存在，响应补schema | PASS | 未引入完整自动JSON-schema契约引擎 |
+| P3 Token | 摘要/一次返回/独立凭据/权限/范围/过期/吊销/限流 | Api.issue/authenticate/permit | HTTP read-only/bid-only、401/403/429 | T 0 | SQL摘要32字节；无取回明文接口 | PASS | SHA256不可逆为密码学设计，不能数学证明不可恢复 |
+| P3 Token安全 | 不泄露Token至Git/日志/包 | audit-release,simulate | 全历史/已知凭据扫描，新增运行时凭据断言 | S及最终T均0 | .local/release-security.json、65断言 | PASS | 模式扫描不保证所有未知秘密 |
+| P3–4 模拟 | 20人seed42/递增/并发/重试/迟到/延时/重连/最终核对 | simulate,HttpSimulationIT | attempt2为64断言，winner24 price370 | T 0 | 钱包/hold/流水/唯一成交/请求关联直接SQL | PASS | 隔离库，不能对原数据运行 |
+| P4 Vue核心测试 | 至少一项核心交互 | room.test.ts,health.test.ts | 5项：缺口/倒计时/健康反馈 | T 0 | vitest输出 | PASS | 组件交互另由Edge覆盖 |
+| 扩展 前端隔离/展示 | 退出切换不残留、历史/成交/钱包 | App.vue,browser-check | 延迟777响应跨登录、history120、SOLD/890/冻结0 | T 0 | browser-acceptance.log | PASS | 未测所有浏览器与多设备撤销会话 |
+| P4 初始化 | 自动种子不重复、DRAFT不自动倒计时 | DemoSeeder,compose-verify | 并发种子、JAR两启动、容器重启快照一致 | T 0 | 初始3用户/3流水3000，无Token | PASS | 无生产管理员引导 |
+| P4 README | 可复制完整演示/测试/Agent路径 | README,AGENT_TOOL_SPEC | 按命令启动、独立Agent出价110终态退出0 | C/T 0及文档核对 | tests-attempt2，浏览器 | PASS | 外部模型接入未声称验证 |
+| P4 文档规范 | DESIGN/DECISIONS/DEBUG_LOG/工具契约 | 根文档 | 对照源码/真实日志静态核对 | 阅读命令0 | 保留至少2真实错误与决策取舍 | PASS | 文档存在不等于本人理解 |
+| P4 AI_USAGE | 模型/分工/3项本人决定/2取舍/错误/能力边界 | AI_USAGE | 记录AI实际工作与未确认事项 | 文档核对 | 未代签本人3项决定 | NOT VERIFIED | 人工设计归属不能由自动化证明 |
+| P4 Git历史 | 有意义全过程历史 | git log | 保留真实snapshot及后续行为提交 | G 0 | 无force/倒填 | NOT VERIFIED | 原早期历史不存在，不能补造 |
+| P5 仓库交付 | GitHub远端代码/迁移/测试/文档齐全 | origin/master | 独立克隆检查 | G 0，最终修复同步见发布报告 | GITHUB_RELEASE_REPORT | PASS | 不改远端既有历史 |
+| P4–5 录屏 | 3–5分钟正式视频 | DEMO_RUNBOOK仅可选说明 | 未制作 | 未执行 | 用户明确跳过 | OUT OF SCOPE | 不算评分已通过 |
+| P5 现场核验 | 本人独立解释/临时变更 | 本人及评审 | 未进行 | 未执行 | 用户明确跳过 | OUT OF SCOPE | 不代签个人能力 |
+| P5 外部提交 | 邮件/个人资料/报名 | 外部流程 | 未发送 | 未执行 | 用户明确跳过 | OUT OF SCOPE | 不外发消息 |
+| P5 加分线上 | 公开访问部署 | 无 | 未部署 | 未执行 | 未提供主机/域名/部署授权 | NOT VERIFIED | 不影响本地测试结论 |
+| P5 评分10分 | 架构/业务/Solon/Vue/MySQL/质量/测试/Git/Agent | 全项目与人工核验 | 不自动自评分 | 未执行评分 | 分项证据与缺口见本表 | NOT VERIFIED | 最终由评审综合判定 |
+最终回归补证：20:31:00+08:00退出0，4单元/21真实MySQL集成/5前端/65模拟断言。新增凭据对后端日志及前端包逐值检查通过；上表T的最终证据为.local/comprehensive-tests-final.log。

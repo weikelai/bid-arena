@@ -29,9 +29,30 @@ try {
   await a.getByLabel('出价积分').fill('120');await a.getByRole('button',{name:'提交出价'}).click();await expect(a.getByRole('status')).toContainText('出价成功');
   await b.context().setOffline(false);await expect(b.locator('.room .stats .price').first()).toHaveText('120',{timeout:10000});
   await expect(b.locator('.room .eyebrow')).toContainText('已同步');
+  await expect(a.getByRole('table',{name:'出价历史'})).toContainText('120');
   await admin.getByRole('button',{name:'取消拍卖',exact:true}).click();await expect(a.locator('.room .notice')).toContainText('CANCELLED',{timeout:10000});await expect(a.locator('aside section').first()).toContainText('冻结 0');
   await a.screenshot({path:'../.local/browser-acceptance.png',fullPage:true});
+  // Hold an old user's private response across logout; it must never populate the next session.
+  let releaseWallet, walletRequested, walletHandled;
+  const gate=new Promise(r=>{releaseWallet=r;});const requested=new Promise(r=>{walletRequested=r;});const handled=new Promise(r=>{walletHandled=r;});
+  await a.route('**/api/v1/wallets/me',async route=>{walletRequested();await gate;await route.fulfill({json:{total_balance:777,frozen_balance:0,available_balance:777,transactions:[]}});walletHandled();});
+  await a.reload({waitUntil:'domcontentloaded'});await requested;
+  await a.getByRole('button',{name:'退出登录'}).click();releaseWallet();await handled;
+  await a.unroute('**/api/v1/wallets/me');
+  await a.getByLabel('邮箱',{exact:true}).fill('bidder_b@example.com');await a.getByLabel('密码',{exact:true}).fill('Test123456!');
+  await a.getByRole('button',{name:'登录',exact:true}).click();await expect(a.locator('aside section').first()).toContainText('总余额 1000');
+  await expect(a.locator('aside section').first()).not.toContainText('777');
+  const finishTitle='Browser automatic finish '+Date.now();
+  await admin.getByLabel('名称',{exact:true}).fill(finishTitle);await admin.getByLabel('时长（秒）').fill('8');
+  await admin.getByRole('button',{name:'创建 DRAFT 拍品'}).click();await expect(admin.getByRole('heading',{name:finishTitle})).toBeVisible();
+  await admin.getByRole('button',{name:'开始拍卖',exact:true}).click();
+  await b.getByRole('button',{name:'刷新列表',exact:true}).click();await b.getByRole('button',{name:new RegExp(finishTitle)}).click();
+  await b.getByRole('button',{name:'加入拍卖',exact:true}).click();await expect(b.getByRole('status')).toContainText('已加入拍卖');
+  await b.getByLabel('出价积分').fill('110');await b.getByRole('button',{name:'提交出价'}).click();await expect(b.getByRole('status')).toContainText('出价成功');
+  await expect(b.locator('.room .notice')).toContainText('SOLD',{timeout:25000});
+  await expect(b.locator('aside section').first()).toContainText('总余额 890');await expect(b.locator('aside section').first()).toContainText('冻结 0');
+  await expect(b.getByRole('button',{name:'提交出价'})).toBeDisabled();
   expect(errors).toEqual([]);
-  console.log('PASS browser: admin create/start/cancel; two independent users; join/bid; remote price update; offline/reconnect snapshot; wallet release; no page errors');
+  console.log('PASS browser: admin create/start/cancel; two independent users; join/bid/history; remote update; offline/reconnect; wallet release; delayed private response across logout/login; automatic SOLD result and wallet debit; no page errors');
   for(const context of contexts)await context.close();
 }finally{if(browser)await browser.close();await new Promise(r=>server.close(r));}

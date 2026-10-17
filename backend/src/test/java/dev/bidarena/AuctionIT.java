@@ -114,6 +114,39 @@ class AuctionIT {
         assertEquals(java.time.Instant.parse(before).plusSeconds(10).toString(),service.snapshot(id).get("end_at"));
         service.cancel(id);reconcile();
     }
+    @Test void settlingCannotCancelAndFinishedCannotBid()throws Exception {
+        long id=auction();service.start(id);
+        try(var c=db.connection()){update(c,"UPDATE auctions SET status='SETTLING' WHERE id=?",id);}
+        assertThrows(Fault.class,()->service.cancel(id));
+        assertEquals("INVALID_STATE",service.bid(id,a,key(),110).get("error"));
+        service.settle(id);assertEquals("FINISHED",service.snapshot(id).get("status"));
+        assertEquals("INVALID_STATE",service.bid(id,b,key(),110).get("error"));
+        assertEquals(0,scalar("SELECT COUNT(*) FROM wallet_transactions WHERE auction_id=?",id));reconcile();
+    }
+    @Test void retryAfterActualWalletLockTimeoutHasOneEffect()throws Exception {
+        // Configure only this fixture's pool sessions, never the server/global setting.
+        var sessions=new ArrayList<Connection>();
+        try{for(int i=0;i<8;i++){var c=db.connection();sessions.add(c);update(c,"SET SESSION innodb_lock_wait_timeout=1");}}finally{for(var c:sessions)c.close();}
+        long id=auction();service.start(id);String request=key();var pool=Executors.newSingleThreadExecutor();
+        try(var locked=db.connection()){
+            locked.setAutoCommit(false);one(locked,"SELECT user_id FROM wallets WHERE user_id=? FOR UPDATE",a);
+            var pending=pool.submit(()->service.bid(id,a,request,110));
+            var error=assertThrows(ExecutionException.class,()->pending.get(15,TimeUnit.SECONDS));
+            assertInstanceOf(SQLException.class,error.getCause());assertEquals(1205,((SQLException)error.getCause()).getErrorCode());
+            assertEquals(0,scalar("SELECT COUNT(*) FROM bids WHERE auction_id=?",id));
+            assertEquals(0,scalar("SELECT COUNT(*) FROM wallet_transactions WHERE auction_id=?",id));locked.rollback();
+            assertEquals("BID_ACCEPTED",service.bid(id,a,request,110).get("type"));
+            assertEquals(true,service.bid(id,a,request,110).get("replayed"));
+            assertEquals(1,scalar("SELECT COUNT(*) FROM bids WHERE auction_id=?",id));service.cancel(id);reconcile();
+        }finally{pool.shutdownNow();sessions.clear();try{for(int i=0;i<8;i++){var c=db.connection();sessions.add(c);update(c,"SET SESSION innodb_lock_wait_timeout=50");}}finally{for(var c:sessions)c.close();}}
+    }
+    @Test void deadlockVictimRetryRollsBackBeforeOneAcceptedEffect()throws Exception {
+        long id=auction();service.start(id);String request=key();var count=new java.util.concurrent.atomic.AtomicInteger();
+        var retrying=new AuctionService(db,point->{if(point.equals("bid.afterMoney")&&count.getAndIncrement()==0)throw new SQLException("injected deadlock victim","40001",1213);});
+        assertEquals("BID_ACCEPTED",retrying.bid(id,a,request,110).get("type"));
+        assertEquals(2,count.get());assertEquals(1,scalar("SELECT COUNT(*) FROM bids WHERE auction_id=?",id));
+        assertEquals(1,scalar("SELECT COUNT(*) FROM wallet_transactions WHERE auction_id=? AND type='FREEZE'",id));service.cancel(id);reconcile();
+    }
     void reconcile()throws Exception {
         assertEquals(0,scalar("SELECT COUNT(*) FROM wallets w WHERE frozen_balance<>(SELECT COALESCE(SUM(amount),0) FROM auction_holds h WHERE h.user_id=w.user_id) OR total_balance<>(SELECT SUM(delta_total) FROM wallet_transactions t WHERE t.user_id=w.user_id) OR frozen_balance<>(SELECT SUM(delta_frozen) FROM wallet_transactions t WHERE t.user_id=w.user_id)"));
     }

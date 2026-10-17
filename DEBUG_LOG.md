@@ -24,3 +24,13 @@
 发布安全命令：node scripts/audit-release.mjs 与 node scripts/verify-secrets.mjs；扫描全部可达Git历史、跟踪文件及本地日志，不输出凭据值。真实.env、.local和日志截图不上传。HTTPS默认多账号凭据选择失败后选用现有weikelai GCM账号，dry-run通过；未要求提供Token或伪造历史。架构和已通过业务逻辑本轮未重构。
 
 本节明确取代旧文档中“远端未授权”“独立Agent仅语法检查”“本人必须完成录屏/外部提交”的当前状态描述，旧文字保留作历史。AI完成本轮安全扫描、Agent脚本验收、自动化回归及发布整理，不代表本人独立设计能力已核验。仓库：https://github.com/weikelai/bid-arena 。
+## 2026-10-17 全面验收追加
+
+本轮依据原题PDF五页及Markdown重新审查，而非复用旧结论。发现App.vue退出后旧异步响应可写回钱包的风险，新增会话代次检查和状态清理，Edge延迟私有响应跨登录测试通过；补出价历史及终态展示。OpenAPI补充实际200响应schema。新增真实1205锁超时重试、注入1213回滚重试、SETTLING取消限制、相邻价格并发、bid-only权限测试。
+
+本轮第一次扩展浏览器脚本报Route is already handled，属于测试拦截器unroute/fulfill竞争；完整失败日志.local/comprehensive-tests-attempt1.log与comprehensive-browser-attempt1.log保留。等待handled后移除，完整attempt2回归退出0，20:28:30完成：4单元/21真实MySQL集成/5前端/64模拟断言，浏览器SOLD/扣款与SQL对账通过；未删减断言。凭据日志与前端包检查新增后的最终运行结果见TEST_EXECUTION_REPORT.md。
+
+真实死锁环未复现，1213是真实事务中的错误注入；实际1205锁超时已由真实MySQL产生。用户本人设计归属不能代签；早期全过程历史不存在；完整容器网络分区/断电/线上部署未验证。正式视频、本人现场核验、评测方外部提交仍按用户要求OUT OF SCOPE。
+## 最终全面回归证据
+
+2026-10-17 20:31:00+08:00，完整回归退出0：4单元、21真实MySQL集成、5前端测试，失败/错误/跳过均0；20人seed42模拟65断言，winner24 price370；新增动态凭据在后端日志及前端包中不存在的检查通过。Edge扩展测试包括旧钱包响应跨登录隔离、出价历史、自动SOLD及余额890/冻结0。详见TEST_EXECUTION_REPORT.md及需求矩阵新附表。原始MySQL3306仍PID8864，三个容器healthy。

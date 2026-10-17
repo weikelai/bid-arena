@@ -22,7 +22,14 @@
         "operationId": "post__auth_login",
         "responses": {
           "200": {
-            "description": "Successful response; bid business rejection also returns 200 with BID_REJECTED"
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid input",
@@ -360,7 +367,14 @@
         "operationId": "get__users_me",
         "responses": {
           "200": {
-            "description": "Successful response; bid business rejection also returns 200 with BID_REJECTED"
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSummary"
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid input",
@@ -441,7 +455,14 @@
         "operationId": "get__wallets_me",
         "responses": {
           "200": {
-            "description": "Successful response; bid business rejection also returns 200 with BID_REJECTED"
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Wallet"
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid input",
@@ -522,7 +543,17 @@
         "operationId": "get__auctions",
         "responses": {
           "200": {
-            "description": "Successful response; bid business rejection also returns 200 with BID_REJECTED"
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuctionRow"
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid input",
@@ -603,7 +634,14 @@
         "operationId": "get__auctions_id",
         "responses": {
           "200": {
-            "description": "Successful response; bid business rejection also returns 200 with BID_REJECTED"
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Snapshot"
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid input",
@@ -695,7 +733,17 @@
         "operationId": "get__auctions_id_bids",
         "responses": {
           "200": {
-            "description": "Successful response; bid business rejection also returns 200 with BID_REJECTED"
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BidRow"
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid input",
@@ -785,7 +833,7 @@
         "operationId": "post__auctions_id_bids",
         "responses": {
           "200": {
-            "description": "Successful response; bid business rejection also returns 200 with BID_REJECTED",
+            "description": "Accepted or business-rejected bid; inspect type and error",
             "content": {
               "application/json": {
                 "schema": {
@@ -894,7 +942,14 @@
         "operationId": "get__auctions_id_events",
         "responses": {
           "200": {
-            "description": "Successful response; bid business rejection also returns 200 with BID_REJECTED"
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionState"
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid input",
@@ -995,7 +1050,31 @@
         "operationId": "post__admin_users",
         "responses": {
           "200": {
-            "description": "Successful response; bid business rejection also returns 200 with BID_REJECTED"
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "email",
+                    "kind"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid input",
@@ -1086,7 +1165,23 @@
         "operationId": "post__admin_auctions",
         "responses": {
           "200": {
-            "description": "Successful response; bid business rejection also returns 200 with BID_REJECTED"
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "format": "int64"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid input",
@@ -1177,7 +1272,14 @@
         "operationId": "post__admin_agent-tokens",
         "responses": {
           "200": {
-            "description": "Successful response; bid business rejection also returns 200 with BID_REJECTED"
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid input",
@@ -1268,7 +1370,22 @@
         "operationId": "post__auctions_id_join",
         "responses": {
           "200": {
-            "description": "Successful response; bid business rejection also returns 200 with BID_REJECTED"
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "joined"
+                  ],
+                  "properties": {
+                    "joined": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid input",
@@ -1360,7 +1477,14 @@
         "operationId": "post__admin_auctions_id_start",
         "responses": {
           "200": {
-            "description": "Successful response; bid business rejection also returns 200 with BID_REJECTED"
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Snapshot"
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid input",
@@ -1452,7 +1576,14 @@
         "operationId": "post__admin_auctions_id_cancel",
         "responses": {
           "200": {
-            "description": "Successful response; bid business rejection also returns 200 with BID_REJECTED"
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Snapshot"
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid input",
@@ -1544,7 +1675,22 @@
         "operationId": "post__admin_agent-tokens_id_revoke",
         "responses": {
           "200": {
-            "description": "Successful response; bid business rejection also returns 200 with BID_REJECTED"
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "revoked"
+                  ],
+                  "properties": {
+                    "revoked": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid input",
@@ -1839,6 +1985,412 @@
         "properties": {
           "error": {
             "type": "string"
+          }
+        }
+      },
+      "UserSummary": {
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "role",
+          "status",
+          "kind"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "ADMIN",
+              "BIDDER"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "required": [
+          "token",
+          "role",
+          "userId"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Opaque session credential; never log or publish"
+          },
+          "role": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "WalletTransaction": {
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "type",
+          "delta_total",
+          "delta_frozen",
+          "total_after",
+          "frozen_after"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "user_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "type": {
+            "enum": [
+              "INITIAL_CREDIT",
+              "FREEZE",
+              "RELEASE",
+              "CAPTURE"
+            ]
+          },
+          "delta_total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "delta_frozen": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total_after": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "frozen_after": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "Wallet": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "total_balance",
+          "frozen_balance",
+          "available_balance",
+          "transactions"
+        ],
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total_balance": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "frozen_balance": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "available_balance": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletTransaction"
+            }
+          }
+        }
+      },
+      "Result": {
+        "type": "object",
+        "required": [
+          "auction_id",
+          "winner_id",
+          "price",
+          "reason"
+        ],
+        "properties": {
+          "auction_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "winner_id": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "price": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "reason": {
+            "enum": [
+              "SOLD",
+              "NO_BIDS",
+              "CANCELLED"
+            ]
+          }
+        }
+      },
+      "AuctionRow": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "status",
+          "start_price",
+          "current_price",
+          "min_increment",
+          "duration_seconds",
+          "leader_id",
+          "end_at",
+          "extension_count",
+          "seq"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "RUNNING",
+              "SETTLING",
+              "FINISHED",
+              "CANCELLED"
+            ]
+          },
+          "start_price": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "current_price": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "min_increment": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "duration_seconds": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "leader_id": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "end_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "extension_count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "seq": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "Snapshot": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AuctionRow"
+          },
+          {
+            "type": "object",
+            "required": [
+              "auctionId",
+              "seq",
+              "serverTime",
+              "type",
+              "result",
+              "participants"
+            ],
+            "properties": {
+              "auctionId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "seq": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "serverTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "type": {
+                "enum": [
+                  "AUCTION_SNAPSHOT"
+                ]
+              },
+              "result": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Result"
+                }
+              },
+              "participants": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "user_id",
+                    "email",
+                    "kind"
+                  ],
+                  "properties": {
+                    "user_id": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "BidRow": {
+        "type": "object",
+        "required": [
+          "id",
+          "auction_id",
+          "user_id",
+          "request_id",
+          "amount",
+          "seq",
+          "received_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "auction_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "user_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "seq": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "received_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "TokenResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "token",
+          "userId",
+          "auctionId"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "token": {
+            "type": "string",
+            "description": "Returned exactly once. Store securely; never log."
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "auctionId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ConnectionState": {
+        "type": "object",
+        "required": [
+          "events",
+          "connectionState",
+          "auctionId",
+          "seq",
+          "type",
+          "serverTime"
+        ],
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Event"
+            }
+          },
+          "connectionState": {
+            "enum": [
+              "CONNECTED"
+            ]
+          },
+          "auctionId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "seq": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "type": {
+            "enum": [
+              "CONNECTION_STATE"
+            ]
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       }

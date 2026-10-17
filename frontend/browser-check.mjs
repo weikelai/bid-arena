@@ -46,7 +46,12 @@ try {
   await admin.getByLabel('名称',{exact:true}).fill(finishTitle);await admin.getByLabel('时长（秒）').fill('8');
   await admin.getByRole('button',{name:'创建 DRAFT 拍品'}).click();await expect(admin.getByRole('heading',{name:finishTitle})).toBeVisible();
   await admin.getByRole('button',{name:'开始拍卖',exact:true}).click();
-  await b.getByRole('button',{name:'刷新列表',exact:true}).click();await b.getByRole('button',{name:new RegExp(finishTitle)}).click();
+  await expect(admin.locator('.room .eyebrow')).toContainText('RUNNING');
+  const refreshed=b.waitForResponse(r=>new URL(r.url()).pathname==='/api/v1/auctions'&&r.request().method()==='GET');
+  await b.getByRole('button',{name:'刷新列表',exact:true}).click();
+  const auctionList=await (await refreshed).json();
+  expect(auctionList.some(item=>item.title===finishTitle),'refreshed authoritative list contains newly started auction').toBe(true);
+  await b.getByRole('button',{name:new RegExp(finishTitle)}).click();
   await b.getByRole('button',{name:'加入拍卖',exact:true}).click();await expect(b.getByRole('status')).toContainText('已加入拍卖');
   await b.getByLabel('出价积分').fill('110');await b.getByRole('button',{name:'提交出价'}).click();await expect(b.getByRole('status')).toContainText('出价成功');
   await expect(b.locator('.room .notice')).toContainText('SOLD',{timeout:25000});

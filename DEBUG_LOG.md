@@ -1,5 +1,11 @@
 # 真实问题记录
 
+## 2026-10-17 冻结回归：浏览器列表等待超时
+
+本轮首次完整回归退出1：HttpSimulationIT中Edge在自动成交场景等待新拍品列表按钮30秒超时；后端单元4、AuctionIT14、DatabaseIT6、前端5和模拟65断言已通过，但不能据此将完整套件标PASS。证据：.local/freeze-tests.log、freeze-browser-failed.log、freeze-http-failed.log，失败结束20:43:18+08:00。
+
+定位发现该测试点击管理员“开始”后立即点击另一浏览器刷新，没有显式等待管理员RUNNING或列表请求响应。只调整browser-check.mjs：先断言管理员RUNNING，再等待GET拍卖列表响应并新增“包含目标拍品”断言，随后验证原有界面/成交/资金断言；没有延长拍卖或删减断言。旧日志不足以证明超时唯一根因，因此以复测及新增服务端列表断言判断，不声称已复现数据库业务缺陷。完整复测结果见TEST_EXECUTION_REPORT冻结附节。核心业务未改动。
+
 历史阶段 1 记录保留在 docs/STAGE1_VALIDATION.md。本文件只记录实际遇到的问题，不补造历史。
 
 | 问题 | 证据与定位 | 修复 | 验证 |

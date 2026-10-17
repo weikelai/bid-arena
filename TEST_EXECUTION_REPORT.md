@@ -58,3 +58,13 @@ AuctionIT每组直接核对wallet.total等于SUM(delta_total)、wallet.frozen等
 Edge浏览器三独立上下文：管理员创建/开始/取消、两用户加入/出价/历史、远端更新、断线恢复、取消释放、延迟旧钱包响应跨登录隔离、第二场自动SOLD、赢家余额890/冻结0、终态出价禁用，均通过，pageerror空。截图仍为取消场景，只作局部视觉证据，不冒称截图展示所有路径。
 
 三个容器最终均healthy。数据库最终SQL对账通过，容器种子重启一致；原生3306仍PID8864。本轮未发现尚未修复的测试失败；第一次浏览器测试失败记录完整保留。自动化通过不等于生产完备或原始评测所有维度通过。
+
+## 本轮修复远端核验完成
+
+2026-10-17实际执行 `git -c credential.interactive=false push origin master` 退出0，d129508→af9f9a6。验收代码提交完整ID：af9f9a676c5cea3f0da130713ef3b1ffef3a3725。`git ls-remote origin refs/heads/master` 返回相同ID；独立克隆fetch退出0。
+
+对独立远端克隆再次检查66个文件，11个关键源码/迁移/测试/验收报告blob与本地提交完全一致，禁止路径或日志数量0；证据.local/comprehensive-remote.json（不发布）。真实.env、.local、target/dist/node_modules和日志均不在远端。提交后安全扫描PASS：5个真实提交、95历史blob、42份本地日志；真实凭据无命中。报告更新另作真实文档提交，不改写上述验收代码提交，最新分支HEAD由git ls-remote核对。
+
+最终测试日志SHA256：0B88285F45AFF6D4766063E653160D348A5E4EECA7A90635A7599FEC4307FEE3；浏览器日志SHA256：B50D00678D4F0D67E8D72BA11264EB7B1CD94DE453AEC59B8051EC7B892EF8E1；模拟日志SHA256：EA0F8369DB4F17EF4489624DEE24E8BFE41D51402AD0B9BFD8A361A9C8F3AF93。日志在本地保留，可重跑生成新结果，不把哈希当作永久运行保证。
+
+最终分类：本地核心与容器自动化PASS，GitHub发布PASS；尚未验证的个人设计归属、全过程早期历史、真实死锁环、宿主机断电/双完整容器故障/大规模压力和线上部署如实保留。人工录屏、本人现场核验、外部提交为OUT OF SCOPE，未执行。

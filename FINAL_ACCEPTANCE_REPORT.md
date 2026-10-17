@@ -106,3 +106,13 @@ GitHub远端发布状态为PASS；正式录屏、本人讲解及评测方外部�
 本轮第一次扩展浏览器脚本报Route is already handled，属于测试拦截器unroute/fulfill竞争；完整失败日志.local/comprehensive-tests-attempt1.log与comprehensive-browser-attempt1.log保留。等待handled后移除，完整attempt2回归退出0，20:28:30完成：4单元/21真实MySQL集成/5前端/64模拟断言，浏览器SOLD/扣款与SQL对账通过；未删减断言。凭据日志与前端包检查新增后的最终运行结果见TEST_EXECUTION_REPORT.md。
 
 真实死锁环未复现，1213是真实事务中的错误注入；实际1205锁超时已由真实MySQL产生。用户本人设计归属不能代签；早期全过程历史不存在；完整容器网络分区/断电/线上部署未验证。正式视频、本人现场核验、评测方外部提交仍按用户要求OUT OF SCOPE。
+
+## 本轮修复远端核验完成
+
+2026-10-17实际执行 `git -c credential.interactive=false push origin master` 退出0，d129508→af9f9a6。验收代码提交完整ID：af9f9a676c5cea3f0da130713ef3b1ffef3a3725。`git ls-remote origin refs/heads/master` 返回相同ID；独立克隆fetch退出0。
+
+对独立远端克隆再次检查66个文件，11个关键源码/迁移/测试/验收报告blob与本地提交完全一致，禁止路径或日志数量0；证据.local/comprehensive-remote.json（不发布）。真实.env、.local、target/dist/node_modules和日志均不在远端。提交后安全扫描PASS：5个真实提交、95历史blob、42份本地日志；真实凭据无命中。报告更新另作真实文档提交，不改写上述验收代码提交，最新分支HEAD由git ls-remote核对。
+
+最终测试日志SHA256：0B88285F45AFF6D4766063E653160D348A5E4EECA7A90635A7599FEC4307FEE3；浏览器日志SHA256：B50D00678D4F0D67E8D72BA11264EB7B1CD94DE453AEC59B8051EC7B892EF8E1；模拟日志SHA256：EA0F8369DB4F17EF4489624DEE24E8BFE41D51402AD0B9BFD8A361A9C8F3AF93。日志在本地保留，可重跑生成新结果，不把哈希当作永久运行保证。
+
+最终分类：本地核心与容器自动化PASS，GitHub发布PASS；尚未验证的个人设计归属、全过程早期历史、真实死锁环、宿主机断电/双完整容器故障/大规模压力和线上部署如实保留。人工录屏、本人现场核验、外部提交为OUT OF SCOPE，未执行。

@@ -1,0 +1,44 @@
+import { spawnSync } from 'node:child_process';
+import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
+
+function git(...args) {
+  const r=spawnSync('git',args,{encoding:null,maxBuffer:64*1024*1024});
+  if(r.status!==0)throw new Error(`git ${args[0]} failed`);
+  return r.stdout;
+}
+const secrets=[];
+for(const file of ['.env','.local/test.env'])if(existsSync(file)) {
+  for(const line of readFileSync(file,'utf8').split(/\r?\n/)) {
+    const match=line.match(/^[A-Z_]*(?:PASSWORD|TOKEN|SECRET|API_KEY)=(.+)$/);
+    if(match&&match[1].length>=8)secrets.push(Buffer.from(match[1]));
+  }
+}
+const patterns=[/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/,/\bgh[pousr]_[A-Za-z0-9]{30,}\b/,/\bgithub_pat_[A-Za-z0-9_]{40,}\b/,/\bAKIA[A-Z0-9]{16}\b/,/["'](?:token|access_token|refresh_token)["']\s*:\s*["'][A-Za-z0-9_-]{32,}["']/i];
+const findings=[];
+const entries=git('rev-list','--objects','--all').toString('utf8').trim().split('\n').filter(Boolean).map(line=>{const [oid,...path]=line.split(' ');return {oid,path:path.join(' ')};});
+const batch=spawnSync('git',['cat-file','--batch'],{input:entries.map(e=>e.oid).join('\n')+'\n',maxBuffer:64*1024*1024});
+if(batch.status!==0)throw new Error('Cannot read history objects');
+let offset=0,blobs=0;
+for(const entry of entries){
+  const end=batch.stdout.indexOf(10,offset),header=batch.stdout.subarray(offset,end).toString().split(' '),size=Number(header[2]);
+  const data=batch.stdout.subarray(end+1,end+1+size);offset=end+size+2;
+  if(header[1]!=='blob')continue;blobs++;
+  if(/(^|\/)(?:\.env(?:\..*)?|\.local|node_modules|target|dist)(\/|$)/.test(entry.path)&&!entry.path.endsWith('.env.example'))findings.push(`${entry.path}: forbidden history path`);
+  if(secrets.some(s=>data.includes(s)))findings.push(`${entry.path}: local credential in history`);
+  if(patterns.some(p=>p.test(data.toString('utf8'))))findings.push(`${entry.path}: credential pattern in history`);
+}
+for(const path of git('ls-files').toString('utf8').trim().split('\n')){
+  if(!existsSync(path))continue;
+  const data=readFileSync(path);
+  if(secrets.some(s=>data.includes(s))||patterns.some(p=>p.test(data.toString('utf8'))))findings.push(`${path}: credential in worktree`);
+}
+let evidenceFiles=0;
+for(const dir of ['.local','backend/target'])if(existsSync(dir))for(const entry of readdirSync(dir,{withFileTypes:true})){
+  if(!entry.isFile()||!entry.name.endsWith('.log'))continue;
+  const data=readFileSync(`${dir}/${entry.name}`);evidenceFiles++;
+  if(secrets.some(s=>data.includes(s))||patterns.some(p=>p.test(data.toString('utf8'))))findings.push(`${dir}/${entry.name}: credential in local evidence`);
+}
+if(findings.length){console.error([...new Set(findings)].join('\n'));process.exit(1);}
+const report={status:'PASS',commits:Number(git('rev-list','--count','--all').toString().trim()),historyBlobs:blobs,knownLocalCredentials:secrets.length,evidenceFiles,checks:['all reachable Git blobs','tracked working files','local evidence logs','forbidden history paths','local credential exact matches','private keys and common access-token patterns'],limitation:'Pattern and known-value checks do not prove absence of every possible secret. Ignored logs and screenshots are excluded from Git and Docker contexts.'};
+writeFileSync('.local/release-security.json',JSON.stringify(report,null,2));
+console.log(JSON.stringify(report));

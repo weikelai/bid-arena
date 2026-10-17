@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
 
 // This script creates isolated test identities and never logs bearer credentials.
 if(process.env.SIMULATION_ALLOW_MUTATION!=='isolated') throw new Error('Use an isolated test environment and set SIMULATION_ALLOW_MUTATION=isolated');
@@ -69,4 +70,18 @@ state=await call(`/auctions/${id}`,admin);
 check(state.status==='FINISHED'&&state.result.length===1&&state.result[0].winner_id===agent.id&&state.result[0].price===price,'automatic unique settlement and Agent winner');
 check((await call(`/auctions/${id}/bids`,users[0].token,{requestId:'late',amount:price+10})).type==='BID_REJECTED','finished auction rejects bids');
 for(const u of users){const w=await call('/wallets/me',u.token);check(w.frozen_balance===0&&w.total_balance===1000,`loser ${u.id} funds released`);}
+// Exercise the separately documented environment-token Agent against isolated data.
+const externalToken=await call('/admin/agent-tokens',admin,{userId:agent.id,auctionId:other.id,permissions:['auction:read','auction:bid'],expiresInSeconds:60,rateLimit:120});
+await call(`/admin/auctions/${other.id}/start`,admin,{});
+const {spawn}=await import('node:child_process');
+const child=spawn(process.execPath,[fileURLToPath(new URL('./auction-agent.mjs',import.meta.url))],{env:{...process.env,AUCTION_AGENT_TOKEN:externalToken.token,AUCTION_ID:String(other.id),AGENT_MAX_AMOUNT:'110',API_BASE_URL:base},stdio:['ignore','ignore','ignore']});
+const exited=new Promise(resolve=>{child.once('error',()=>resolve(-1));child.once('exit',code=>resolve(code));});
+try {
+  let accepted=false;
+  for(let i=0;i<40;i++){const snapshot=await call(`/auctions/${other.id}`,admin);if(snapshot.current_price===110&&snapshot.leader_id===agent.id){accepted=true;break;}await new Promise(r=>setTimeout(r,250));}
+  check(accepted,'standalone environment-token Agent placed a real bid');
+  await call(`/admin/auctions/${other.id}/cancel`,admin,{});
+  const code=await Promise.race([exited,new Promise(resolve=>setTimeout(()=>resolve(-1),5000))]);
+  check(code===0,'standalone Agent reads terminal state and exits');
+} finally {if(child.exitCode===null)child.kill();}
 console.log(JSON.stringify({type:'SIMULATION_SUMMARY',auctionId:id,bots,seed,assertions:checks,winnerId:agent.id,price,status:'PASS'}));

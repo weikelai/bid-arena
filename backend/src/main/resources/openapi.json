@@ -1775,6 +1775,23 @@
           }
         ]
       }
+    },
+    "/api/v1/admin/metrics": {
+      "get": {
+        "summary": "Administrator-only process-local operational metrics",
+        "description": "Bounded histograms and counters since process start; not transactional accounting. Pool acquire duration includes acquisition overhead; lock-statement duration includes database execution and wait. CPU may be unavailable (-1). Counters reset on restart. No identities or credentials.",
+        "responses": {
+          "200": {
+            "description": "Pool active/idle/waiting, acquisition and SQL errors, bid/settlement counters, cumulative latency buckets and JVM heap/CPU"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Human administrator required"
+          }
+        }
+      }
     }
   },
   "components": {

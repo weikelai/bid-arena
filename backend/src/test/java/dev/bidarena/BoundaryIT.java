@@ -82,4 +82,73 @@ class BoundaryIT {
         assertEquals("BID_ACCEPTED",service.bid(id,a,request,110).get("type"));assertEquals(true,service.bid(id,a,request,110).get("replayed"));assertEquals(1,n("SELECT COUNT(*) FROM bids WHERE auction_id=?",id));service.cancel(id);
     }
     int cycle(long first,long second,CyclicBarrier barrier)throws Exception {try(var c=db.connection()){c.setAutoCommit(false);try{one(c,"SELECT user_id FROM wallets WHERE user_id=? FOR UPDATE",first);barrier.await(5,TimeUnit.SECONDS);one(c,"SELECT user_id FROM wallets WHERE user_id=? FOR UPDATE",second);c.rollback();return 0;}catch(SQLException e){c.rollback();if(e.getErrorCode()!=1213)throw e;return e.getErrorCode();}}}
+
+    @Test void realApplicationVictimRetriesFreshTransactionAndExhaustionRecovers()throws Exception {
+        sql("CREATE TABLE deadlock_probe(id INT PRIMARY KEY,value INT NOT NULL) ENGINE=InnoDB");
+        for(int i=1;i<=201;i++)sql("INSERT INTO deadlock_probe VALUES(?,0)",i);
+        try{
+            for(int cycles:new int[]{1,3}){
+                long id=auction();service.start(id);service.bid(id,b,key(),110);String request=key();var attempts=new java.util.concurrent.atomic.AtomicInteger();
+                var contexts=new ArrayList<Connection>();var pool=Executors.newSingleThreadExecutor();
+                long retries=db.metrics.count("bid.retries"),deadlocks=db.metrics.count("sql.deadlocks");
+                var contender=new AuctionService(db,new AuctionService.FaultInjector(){
+                    public void at(String point){}
+                    public void at(String point,Connection app)throws SQLException {
+                        if(!point.equals("bid.afterMoney"))return;
+                        assertFalse(app.getAutoCommit());assertTrue(contexts.stream().allMatch(previous->previous!=app),"each retry must open a fresh logical transaction");contexts.add(app);
+                        int attempt=attempts.incrementAndGet();
+                        // Previous victim's writes must have rolled back, not accumulated.
+                        assertEquals(120,number(one(app,"SELECT frozen_balance FROM wallets WHERE user_id=?",a),"frozen_balance"));
+                        assertEquals(0,number(one(app,"SELECT frozen_balance FROM wallets WHERE user_id=?",b),"frozen_balance"));
+                        assertEquals(2,number(one(app,"SELECT COUNT(*) n FROM wallet_transactions WHERE auction_id=? AND type='FREEZE'",id),"n"));
+                        assertEquals(1,number(one(app,"SELECT COUNT(*) n FROM wallet_transactions WHERE auction_id=? AND type='RELEASE'",id),"n"));
+                        if(attempt>cycles)return;
+                        var held=new CountDownLatch(1);var proceed=new CountDownLatch(1);
+                        var blocker=pool.submit(()->{try(var other=db.connection()){
+                            other.setAutoCommit(false);
+                            try{one(other,"SELECT id FROM deadlock_probe WHERE id=1 FOR UPDATE");
+                                update(other,"UPDATE deadlock_probe SET value=value+1 WHERE id>1");held.countDown();
+                                if(!proceed.await(10,TimeUnit.SECONDS))throw new IllegalStateException("application did not enter cycle");
+                                one(other,"SELECT id FROM auctions WHERE id=? FOR UPDATE",id);other.commit();
+                            }catch(Exception e){other.rollback();throw e;}
+                        }return null;});
+                        try{
+                            assertTrue(held.await(10,TimeUnit.SECONDS));proceed.countDown();
+                            SQLException victim=assertThrows(SQLException.class,()->one(app,"SELECT id FROM deadlock_probe WHERE id=1 FOR UPDATE"));
+                            assertEquals(1213,victim.getErrorCode(),"must be actual MySQL application victim");assertEquals("40001",victim.getSQLState());
+                            blocker.get(10,TimeUnit.SECONDS);
+                            System.out.println("REAL_APP_DEADLOCK auction="+id+" attempt="+attempt+" mysqlCode="+victim.getErrorCode()+" sqlState="+victim.getSQLState());
+                            throw victim; // Propagate the real driver exception into the production retry loop.
+                        }catch(InterruptedException e){Thread.currentThread().interrupt();throw new SQLException("interrupted",e);}
+                        catch(ExecutionException|TimeoutException e){throw new SQLException("deadlock orchestration failed",e);}
+                    }
+                });
+                try{
+                    if(cycles==1){assertEquals("BID_ACCEPTED",contender.bid(id,a,request,120).get("type"));assertEquals(2,attempts.get());assertEquals(1,db.metrics.count("bid.retries")-retries);}
+                    else {assertEquals(1213,assertThrows(SQLException.class,()->contender.bid(id,a,request,120)).getErrorCode());assertEquals(3,attempts.get());assertEquals(2,db.metrics.count("bid.retries")-retries);
+                        assertEquals(1,n("SELECT COUNT(*) FROM wallet_transactions WHERE auction_id=?",id));assertEquals(1,n("SELECT COUNT(*) FROM bids WHERE auction_id=?",id));assertEquals(110,n("SELECT current_price FROM auctions WHERE id=?",id));
+                        assertEquals(110,n("SELECT frozen_balance FROM wallets WHERE user_id=?",b));assertEquals(0,n("SELECT frozen_balance FROM wallets WHERE user_id=?",a));
+                        assertEquals(1,n("SELECT COUNT(*) FROM bid_requests WHERE auction_id=? AND state='PENDING'",id));
+                        service.tick(); // Actual scanner recovers the durable PENDING receipt without client help.
+                    }
+                    assertEquals(cycles,db.metrics.count("sql.deadlocks")-deadlocks);assertTrue(contexts.stream().allMatch(c->{try{return c.isClosed();}catch(SQLException e){return false;}}));
+                    assertEquals(true,service.bid(id,a,request,120).get("replayed"));assertEquals(2,n("SELECT COUNT(*) FROM bids WHERE auction_id=?",id));assertEquals(2,n("SELECT COUNT(*) FROM wallet_transactions WHERE auction_id=? AND type='FREEZE'",id));assertEquals(1,n("SELECT COUNT(*) FROM wallet_transactions WHERE auction_id=? AND type='RELEASE'",id));
+                    assertEquals(a,n("SELECT leader_id FROM auctions WHERE id=?",id));assertEquals(120,n("SELECT amount FROM auction_holds WHERE auction_id=? AND user_id=?",id,a));
+                    sql("UPDATE auctions SET end_at='2020-01-01' WHERE id=?",id);service.tick();service.settle(id);assertEquals(1,n("SELECT COUNT(*) FROM auction_results WHERE auction_id=?",id));assertEquals(120,n("SELECT price FROM auction_results WHERE auction_id=?",id));assertEquals(a,n("SELECT winner_id FROM auction_results WHERE auction_id=?",id));assertEquals(880,n("SELECT total_balance FROM wallets WHERE user_id=?",a));assertEquals(1000,n("SELECT total_balance FROM wallets WHERE user_id=?",b));assertEquals(1,n("SELECT COUNT(*) FROM wallet_transactions WHERE auction_id=? AND type='CAPTURE'",id));assertEquals(0,n("SELECT COUNT(*) FROM bid_requests WHERE auction_id=? AND state='PENDING'",id));checkMoney();
+                    System.out.println("REAL_APP_RECOVERY cycles="+cycles+" attempts="+attempts+" bids=2 freeze=2 release=1 capture=1 pending=0");
+                    // Use a fresh funded identity in the next scenario.
+                    a=identity();b=identity();
+                }finally{pool.shutdownNow();}
+            }
+        }finally{sql("DROP TABLE deadlock_probe");}
+    }
+
+    @Test void unrecoverableSqlAndBusinessRejectionsAreNotRetried()throws Exception {
+        for(int code:new int[]{1062,1146}){
+            long id=auction();service.start(id);var attempts=new java.util.concurrent.atomic.AtomicInteger();long before=db.metrics.count("bid.retries");
+            var failing=new AuctionService(db,p->{if(p.equals("bid.afterMoney")){attempts.incrementAndGet();throw new SQLException("explicit nonrecoverable test","HY000",code);}});
+            assertEquals(code,assertThrows(SQLException.class,()->failing.bid(id,a,key(),110)).getErrorCode());assertEquals(1,attempts.get());assertEquals(before,db.metrics.count("bid.retries"));assertEquals(0,n("SELECT COUNT(*) FROM wallet_transactions WHERE auction_id=?",id));service.cancel(id);
+        }
+        long id=auction();service.start(id);long before=db.metrics.count("bid.retries");assertEquals("BID_TOO_LOW",service.bid(id,a,key(),100).get("error"));assertThrows(Fault.class,()->service.bid(id,a,"invalid request",110));assertEquals(before,db.metrics.count("bid.retries"));service.cancel(id);
+    }
 }

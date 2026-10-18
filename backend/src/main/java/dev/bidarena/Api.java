@@ -20,13 +20,15 @@ public final class Api {
     public Api(Database db){this.db=db;this.auctions=new AuctionService(db);}
     @FunctionalInterface interface Endpoint {Object run(Context c)throws Exception;}
     private void route(SolonApp app,String method,String path,Endpoint handler) {
-        org.noear.solon.core.handle.Handler action=c->{try {Object out=handler.run(c);c.outputAsJson(json(out));}
+        org.noear.solon.core.handle.Handler action=c->{long started=System.nanoTime();try {Object out=handler.run(c);c.outputAsJson(json(out));}
             catch(Fault e){c.status(e.status);c.outputAsJson(json(Map.of("error",e.code)));}
             catch(IllegalArgumentException e){c.status(400);c.outputAsJson(json(Map.of("error","INVALID_REQUEST")));}
-            catch(Exception e){System.err.println("API failure: "+e.getClass().getSimpleName());c.status(500);c.outputAsJson(json(Map.of("error","INTERNAL_ERROR")));}};
+            catch(Exception e){db.metrics.increment("http.systemErrors");System.err.println("API failure: "+e.getClass().getSimpleName());c.status(500);c.outputAsJson(json(Map.of("error","INTERNAL_ERROR")));}
+            finally{db.metrics.observe("http.latency",System.nanoTime()-started);}};
         if(method.equals("GET"))app.get(path,action);else app.post(path,action);
     }
     public void register(SolonApp app) {
+        route(app,"GET","/api/v1/admin/metrics",c->{admin(c);return db.metricsSnapshot();});
         app.get("/api/v1/openapi.json",c->{try(var stream=Api.class.getResourceAsStream("/openapi.json")){c.contentType("application/json");c.output(new String(Objects.requireNonNull(stream).readAllBytes(),StandardCharsets.UTF_8));}});
         route(app,"POST","/api/v1/auth/login",c->login(body(c)));
         route(app,"GET","/api/v1/users/me",c->{var p=human(c);return query("SELECT id,email,role,status,kind FROM users WHERE id=?",p.user).get(0);});

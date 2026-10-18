@@ -109,3 +109,8 @@ docker 不在 PATH：启动已安装 Docker Desktop，在当前终端 PATH 加�
 保留现有安装和启动说明。`node scripts/compose-verify.mjs --integration` 现同时执行前端测试/构建、后端单元及真实 MySQL 测试、HTTP参数/Agent并发边界、20人模拟、Edge多上下文竞态和20/50/100/200逐级压力；一般需数分钟。Windows使用已有Edge，测试创建随机 `bid_arena_it_*` 库和临时用户，绝不将负载指向原演示钱包；测试结束只清理这些隔离资源。必须先启动Compose并配置本机Java17/Maven/Node/npm。日志位于 `.local/` 和 `backend/target/`，不发布。
 
 压力脚本有隔离开关、最大200 workers、每请求15秒超时及失败停止条件；不要对生产或原演示库直接运行。资源采样使用Windows PowerShell读取独立Java进程，以及Docker stats读取共享MySQL容器。短时突发测试不是长期性能/SLA证明。连接池仍8连接，等待上限现30秒；超载时可能超过调用方超时，调用方应以原requestId重试。实际结果与未测项见 [BOUNDARY_TEST_REPORT.md](BOUNDARY_TEST_REPORT.md) 和 [STRESS_TEST_REPORT.md](STRESS_TEST_REPORT.md)，最新回归见TEST_EXECUTION_REPORT。
+# 风险闭环：运行观测与有界持续测试
+
+管理员登录后可用已有Bearer会话读取 `/api/v1/admin/metrics`；请通过安全环境变量/客户端提供凭据，不把Token写入命令或日志。该接口只返回进程内固定标签计数、时延累计桶、池状态及JVM资源，不提供账务修改能力。进程重启归零，锁SQL耗时不等同纯锁等待，详情见DESIGN最新节。
+
+`node scripts/compose-verify.mjs --integration` 还包含真实出价事务死锁受害/重试耗尽恢复、真实30秒连接池耗尽观测、StabilityIT隔离多房间持续负载。持续档位固定20用户120秒、50用户300秒（准备及结算另计），完整验证预计十多分钟；每5秒直接SQL对账，失败立即停止升级并保留日志。不是10/30/60分钟或生产容量认证。测试会真实占用共享Docker MySQL资源，请勿同时运行其他压测；不会访问本机MySQL3306。

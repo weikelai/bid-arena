@@ -8,6 +8,7 @@ import java.sql.SQLException;
 
 public final class Database implements AutoCloseable {
     private final HikariDataSource source;
+    final Metrics metrics=new Metrics();
 
     public Database(AppConfig config) {
         HikariConfig pool = new HikariConfig();
@@ -29,7 +30,22 @@ public final class Database implements AutoCloseable {
                 .validateMigrationNaming(true).validateOnMigrate(true).cleanDisabled(true).load();
     }
 
-    public Connection connection() throws SQLException { return source.getConnection(); }
+    public Connection connection() throws SQLException {
+        long start=System.nanoTime();
+        try{return source.getConnection();}
+        catch(SQLException e){metrics.increment("connection.acquireFailures");if(e instanceof java.sql.SQLTransientConnectionException)metrics.increment("connection.acquireTimeouts");throw e;}
+        finally{metrics.observe("connection.acquire",System.nanoTime()-start);}
+    }
+
+    public java.util.Map<String,Object> metricsSnapshot(){
+        var out=new java.util.LinkedHashMap<String,Object>();var pool=source.getHikariPoolMXBean();
+        out.put("pool",java.util.Map.of("active",pool.getActiveConnections(),"idle",pool.getIdleConnections(),"total",pool.getTotalConnections(),"waiting",pool.getThreadsAwaitingConnection(),"maximum",8));
+        out.put("metrics",metrics.snapshot());out.put("uptimeMs",java.lang.management.ManagementFactory.getRuntimeMXBean().getUptime());
+        var os=java.lang.management.ManagementFactory.getOperatingSystemMXBean();var memory=java.lang.management.ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+        out.put("heapUsedBytes",memory.getUsed());out.put("heapCommittedBytes",memory.getCommitted());
+        if(os instanceof com.sun.management.OperatingSystemMXBean cpu){out.put("processCpuLoad",cpu.getProcessCpuLoad());out.put("processCpuTimeNs",cpu.getProcessCpuTime());}
+        return out;
+    }
 
     @FunctionalInterface
     public interface Work<T> { T run(Connection connection) throws SQLException; }
@@ -42,6 +58,7 @@ public final class Database implements AutoCloseable {
                 connection.commit();
                 return result;
             } catch (SQLException | RuntimeException | Error e) {
+                if(e instanceof SQLException sql){if(sql.getErrorCode()==1213)metrics.increment("sql.deadlocks");if(sql.getErrorCode()==1205)metrics.increment("sql.lockTimeouts");}
                 try { connection.rollback(); } catch (SQLException rollbackError) { e.addSuppressed(rollbackError); }
                 throw e;
             }

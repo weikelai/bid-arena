@@ -1,3 +1,13 @@
+# 风险闭环补充：真实应用死锁（2026-10-18，最新）
+
+本节为2026-10-18风险闭环最新状态，取代下方历史当前结论，但保留旧日志和失败。最终 `node scripts/compose-verify.mjs --integration` 退出0：后端4单元、36真实MySQL集成（AuctionIT15、BoundaryIT11、DatabaseIT7、HttpSimulationIT1、StabilityIT1、StressIT1），失败/错误/跳过0；前端7、HTTP49、模拟65断言、Edge多会话及四档压力通过。脱敏指标与原始日志哈希见docs/RISK_RUN_20261018.json。
+
+BoundaryIT新增realApplicationVictimRetriesFreshTransactionAndExhaustionRecovers和unrecoverableSqlAndBusinessRejectionsAreNotRetried。真实驱动1213/40001，而非注入：旧领先110→新领先120，已写冻结/释放后受害回滚；一次受害重试成功，三次耗尽后正常tick恢复。每次新事务上下文、一次目标出价/释放/冻结及唯一成交扣款均断言。独立真实死锁环与此前错误注入仍保留，明确区分证据。DatabaseIT真实8连接耗尽/30秒超时、等待gauge及测试账号权限检查通过。详细构造/计数/日志见RISK_CLOSURE_REPORT.md。
+
+NOT VERIFIED：建议的20用户10分钟、50用户30分钟、100用户60分钟及多机/生产容量；纯锁等待的逐请求归因；完整容器网络分区、宿主机断电、生产TLS/管理员安全引导/登录限流完善性、全面渗透、早期全过程Git历史及可选线上部署。OUT OF SCOPE：正式录屏、本人现场讲解/临时修改、评测方外部提交，均未执行。
+
+---
+
 # 边界测试报告（2026-10-18）
 
 本轮使用 Compose MySQL 8.4.8 的 3307 端口、随机 `bid_arena_it_*` 数据库和独立 Java 进程。测试身份、钱包及拍卖仅存在于隔离库，结束后由测试释放；本机 MySQL 3306、原演示库及历史流水未重置。原始依据为《全栈评测-拍卖间.md》；PDF、此前失败和历史验收记录保留。

@@ -1,3 +1,20 @@
+# 2026-10-18 风险闭环最新状态
+
+本节为2026-10-18风险闭环最新状态，取代下方历史当前结论，但保留旧日志和失败。最终 `node scripts/compose-verify.mjs --integration` 退出0：后端4单元、36真实MySQL集成（AuctionIT15、BoundaryIT11、DatabaseIT7、HttpSimulationIT1、StabilityIT1、StressIT1），失败/错误/跳过0；前端7、HTTP49、模拟65断言、Edge多会话及四档压力通过。脱敏指标与原始日志哈希见docs/RISK_RUN_20261018.json。
+
+| 风险/要求 | 状态与证据 |
+|---|---|
+| 真实MySQL应用死锁重试及耗尽恢复 | PASS：BoundaryIT真实4次1213/40001，旧领先释放与新冻结回滚/新事务重试、tick恢复、幂等与唯一成交；final-run.log REAL_APP行 |
+| 不盲目重试业务或不可恢复SQL | PASS：BoundaryIT处理阶段1062/1146与非法输入/低价断言，接收唯一键范围才重试1062 |
+| 池状态/获取耗时/超时与SQL故障 | PASS（所列范围）：管理员metrics/固定桶、DatabaseIT真实30秒耗尽、StabilityIT实际采样与全局锁等待；纯等待归因和未导出的全局死锁数NOT VERIFIED |
+| 持续多房间资金正确性 | PASS（有界）：20用户120秒、50用户300秒，5秒实时SQL及最终唯一结果/扣款；非10/30/60分钟验收 |
+| 前后端/核心业务/Agent/Compose/四档压力 | PASS：本轮4/36/7、HTTP49/模拟65/Edge与逐档SQL，详细原需求映射继承下方并引用本轮证据 |
+| GitHub当前发布 | 以GITHUB_RELEASE_REPORT最新节实际推送/独立克隆为准，不沿用旧提交 |
+
+NOT VERIFIED：建议的20用户10分钟、50用户30分钟、100用户60分钟及多机/生产容量；纯锁等待的逐请求归因；完整容器网络分区、宿主机断电、生产TLS/管理员安全引导/登录限流完善性、全面渗透、早期全过程Git历史及可选线上部署。OUT OF SCOPE：正式录屏、本人现场讲解/临时修改、评测方外部提交，均未执行。
+
+---
+
 # 2026-10-18 当前验证状态补充（优先于历史状态）
 
 本节为2026-10-18当前结果，优先于下方保留的历史“当前”声明。完整回归结束于11:05:03+08:00，命令 node scripts/compose-verify.mjs --integration，退出0：后端单元4/4、真实MySQL集成32/32（AuctionIT15、BoundaryIT9、DatabaseIT6、HttpSimulationIT1、StressIT1），失败/错误/跳过均0；前端7/7及TypeScript/Vite生产构建通过。HTTP边界49项、20人seed42模拟65断言、Edge多上下文及20/50/100/200人四档压力全部通过。公开脱敏计数、压力指标和原始日志SHA256见 docs/BOUNDARY_RUN_20261018.json；原始日志保留本地，不发布。

@@ -1,3 +1,9 @@
+# 最新风险闭环交接（2026-10-18）
+
+一键启动与原操作说明保留；完整验证 node scripts/compose-verify.mjs --integration 现含真实死锁、30秒池超时及20/50有界持续档，需十多分钟。最终结果4单元/36真实MySQL/7前端，详细口径与未验证项见RISK_CLOSURE_REPORT.md；指标端点仅管理员读取。最新远端发布见GITHUB_RELEASE_REPORT，不将旧HEAD视为新修复发布。
+
+---
+
 # Bid Arena 最终交付
 
 仓库：https://github.com/weikelai/bid-arena.git ，分支 `master`。

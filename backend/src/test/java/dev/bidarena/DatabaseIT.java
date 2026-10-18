@@ -8,6 +8,23 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** Requires a real MySQL server and CREATE DATABASE permission. Never touches the application schema. */
 class DatabaseIT {
+    @Test void poolWaitGaugeAndRealAcquireTimeoutAreObservable()throws Exception {
+        try(var c=database.connection();var statement=c.createStatement()){
+            SQLException denied=assertThrows(SQLException.class,()->statement.executeQuery("SELECT User FROM mysql.user LIMIT 0"));
+            assertTrue(Set.of(1044,1142).contains(denied.getErrorCode()),"test identity must not read system accounts");
+        }
+        var held=new ArrayList<Connection>();var executor=Executors.newSingleThreadExecutor();
+        long timeouts=database.metrics.count("connection.acquireTimeouts");
+        try{
+            for(int i=0;i<8;i++)held.add(database.connection());
+            var waiter=executor.submit(()->{try(var c=database.connection()){return 0;}catch(SQLException e){assertInstanceOf(SQLTransientConnectionException.class,e);return 1;}});
+            long until=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);boolean queued=false;
+            while(System.nanoTime()<until){var pool=(Map<?,?>)database.metricsSnapshot().get("pool");if(((Number)pool.get("waiting")).intValue()==1){assertEquals(8,((Number)pool.get("active")).intValue());queued=true;break;}Thread.sleep(20);}
+            assertTrue(queued,"actual pool waiter must be observable");assertEquals(1,waiter.get(40,TimeUnit.SECONDS));assertEquals(timeouts+1,database.metrics.count("connection.acquireTimeouts"));
+            System.out.println("POOL_REAL_TIMEOUT active=8 waitingObserved=1 acquireTimeoutDelta=1 budgetMs=30000");
+        }finally{for(var c:held)c.close();executor.shutdownNow();}
+        assertEquals(0,((Number)((Map<?,?>)database.metricsSnapshot().get("pool")).get("waiting")).intValue());
+    }
     private static Database database;
     private static String schema;
     private static String adminUrl;

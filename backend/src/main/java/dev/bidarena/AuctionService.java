@@ -8,7 +8,10 @@ import static dev.bidarena.Sql.*;
 /** All mutations lock auction first, then wallets in ascending user ID order. */
 public final class AuctionService {
     private final Database db;
-    @FunctionalInterface interface FaultInjector {void at(String point)throws SQLException;}
+    @FunctionalInterface interface FaultInjector {
+        void at(String point)throws SQLException;
+        default void at(String point,Connection connection)throws SQLException{at(point);}
+    }
     private final FaultInjector faults;
     public AuctionService(Database db){this(db,point->{});}
     AuctionService(Database db,FaultInjector faults){this.db=db;this.faults=faults;}
@@ -48,8 +51,15 @@ public final class AuctionService {
     }
 
     public Map<String,Object> bid(long auction,long user,String request,long amount)throws SQLException {
+        long started=System.nanoTime();
+        try{var result=bidWithRetry(auction,user,request,amount);db.metrics.increment("bid."+("BID_ACCEPTED".equals(result.get("type"))?"acceptedResponses":"rejectedResponses"));return result;}
+        catch(Fault e){db.metrics.increment("bid.businessFaults");throw e;}
+        catch(SQLException|RuntimeException e){db.metrics.increment("bid.systemErrors");throw e;}
+        finally{db.metrics.observe("bid.latency",System.nanoTime()-started);}
+    }
+    private Map<String,Object> bidWithRetry(long auction,long user,String request,long amount)throws SQLException {
         if(request==null||!request.matches("[A-Za-z0-9_.:-]{1,64}")||amount<=0||amount>9_000_000_000_000L)throw new Fault(400,"INVALID_BID");
-        for(int attempt=0;;attempt++)try {
+        for(int attempt=0;;attempt++){boolean intake=true;try {
             db.transaction(c->{
                 one(c,"SELECT auction_id FROM auction_intake WHERE auction_id=? FOR UPDATE",auction);
                 var prior=rows(c,"SELECT payload_hash FROM bid_requests WHERE user_id=? AND request_id=? FOR UPDATE",user,request);
@@ -58,11 +68,12 @@ public final class AuctionService {
                 update(c,"INSERT INTO bid_requests(user_id,request_id,auction_id,payload_hash,received_at,amount) VALUES(?,?,?,?,?,?)",user,request,auction,Api.digest(auction+":"+amount),Timestamp.from(received),amount);
                 return null;
             });
+            intake=false;
             return db.transaction(c->{lock(c,auction);var old=one(c,"SELECT state FROM bid_requests WHERE user_id=? AND request_id=?",user,request);boolean replay=!"PENDING".equals(old.get("state"));drain(c,auction);
                 var saved=one(c,"SELECT response_json FROM bid_requests WHERE user_id=? AND request_id=?",user,request);
                 Map<String,Object> result=org.noear.snack4.ONode.deserialize((String)saved.get("response_json"),Map.class);result.put("replayed",replay);return result;
             });
-        } catch(SQLException e){if(attempt>=2||!(e.getErrorCode()==1213||e.getErrorCode()==1205||e.getErrorCode()==1062))throw e;}
+        } catch(SQLException e){boolean recoverable=e.getErrorCode()==1213||e.getErrorCode()==1205||(intake&&e.getErrorCode()==1062);if(attempt>=2||!recoverable){if(recoverable)db.metrics.increment("bid.retryExhausted");throw e;}db.metrics.increment("bid.retries");}}
     }
 
     private void drain(Connection c,long auction)throws SQLException {
@@ -103,7 +114,7 @@ public final class AuctionService {
             String key="bid/"+user+"/"+request;
             if(leader>0&&leader!=user){long old=hold(c,auction,leader);money(c,leader,auction,request,key+"/release",0,-old);setHold(c,auction,leader,0);}
             money(c,user,auction,request,key+"/freeze",0,amount-held);setHold(c,auction,user,amount);
-            faults.at("bid.afterMoney");
+            faults.at("bid.afterMoney",c);
             boolean extend=number(a,"extension_count")<3&&!received.isBefore(end.minusSeconds(5));
             update(c,"UPDATE auctions SET current_price=?,leader_id=?,end_at=?,extension_count=extension_count+?,version=version+1 WHERE id=?",amount,user,Timestamp.from(extend?end.plusSeconds(10):end),extend?1:0,auction);
             long seq=event(c,auction,"BID_ACCEPTED",Map.of("userId",user,"amount",amount,"requestId",request));
@@ -118,6 +129,11 @@ public final class AuctionService {
     public void cancel(long id)throws SQLException {finish(id,true);}
     public void settle(long id)throws SQLException {finish(id,false);}
     private void finish(long id,boolean cancel)throws SQLException {
+        long started=System.nanoTime();db.metrics.increment("settlement.attempts");
+        try{finishTransaction(id,cancel);}catch(SQLException|RuntimeException e){db.metrics.increment("settlement.failures");throw e;}
+        finally{db.metrics.observe("settlement.latency",System.nanoTime()-started);}
+    }
+    private void finishTransaction(long id,boolean cancel)throws SQLException {
         db.transaction(c->{one(c,"SELECT auction_id FROM auction_intake WHERE auction_id=? FOR UPDATE",id);lock(c,id);drain(c,id);var a=lock(c,id);String state=(String)a.get("status");
             if(cancel&&!Set.of("DRAFT","RUNNING").contains(state))throw new Fault(409,"INVALID_STATE");
             if(!cancel&&!("SETTLING".equals(state)||("RUNNING".equals(state)&&!now(c).isBefore(Instant.parse((String)a.get("end_at"))))))return null;
@@ -137,9 +153,9 @@ public final class AuctionService {
         try(var c=db.connection()){due=rows(c,"SELECT id FROM auctions WHERE (status='RUNNING' AND end_at<=UTC_TIMESTAMP(6)) OR status='SETTLING' OR EXISTS(SELECT 1 FROM bid_requests b WHERE b.auction_id=auctions.id AND b.state='PENDING') ORDER BY id LIMIT 100");}
         for(var a:due)try{settle(number(a,"id"));}catch(SQLException failure){System.err.println("Settlement retry required for auction "+number(a,"id")+", SQLState="+failure.getSQLState());}
     }
-    private static Map<String,Object> lock(Connection c,long id)throws SQLException{return one(c,"SELECT * FROM auctions WHERE id=? FOR UPDATE",id);}
+    private Map<String,Object> lock(Connection c,long id)throws SQLException{long started=System.nanoTime();try{return one(c,"SELECT * FROM auctions WHERE id=? FOR UPDATE",id);}finally{db.metrics.observe("sql.auctionLockStatement",System.nanoTime()-started);}}
     private static Instant now(Connection c)throws SQLException {try(var p=c.createStatement();var r=p.executeQuery("SELECT UTC_TIMESTAMP(6)")){r.next();return r.getTimestamp(1).toInstant();}}
-    private static void lockWallets(Connection c,List<Long> users)throws SQLException {for(long id:new TreeSet<>(users))one(c,"SELECT user_id FROM wallets WHERE user_id=? FOR UPDATE",id);}
+    private void lockWallets(Connection c,List<Long> users)throws SQLException {for(long id:new TreeSet<>(users)){long started=System.nanoTime();try{one(c,"SELECT user_id FROM wallets WHERE user_id=? FOR UPDATE",id);}finally{db.metrics.observe("sql.walletLockStatement",System.nanoTime()-started);}}}
     private static long hold(Connection c,long a,long u)throws SQLException {var h=rows(c,"SELECT amount FROM auction_holds WHERE auction_id=? AND user_id=?",a,u);return h.isEmpty()?0:number(h.get(0),"amount");}
     private static void setHold(Connection c,long a,long u,long amount)throws SQLException {update(c,"INSERT INTO auction_holds(auction_id,user_id,amount) VALUES(?,?,?) ON DUPLICATE KEY UPDATE amount=VALUES(amount)",a,u,amount);}
     private static void money(Connection c,long u,long a,String req,String key,long total,long frozen)throws SQLException {

@@ -1,3 +1,13 @@
+# 用户版 README 发布核验（2026-10-18，最新记录）
+
+PASS：用户要求停止继续安全排查并尽快发布README，已执行。仓库 https://github.com/weikelai/bid-arena.git ，分支 master；实际正常推送命令 git -c credential.interactive=false -c credential.https://github.com.username=weikelai push origin master 退出0，无强推。
+
+已独立克隆核验的内容提交：9aa67a3c047c999bcf53a1b5d09ccb57cc25a7a0，树 1f626b0be184af9ab7ba8471061aa0a6d11e54e0，128文件、18项必需路径、禁止路径0；README及代码、迁移、测试、脚本和文档均包含在同一完整文件树。用户教程已重写，旧维护内容在docs/DEVELOPMENT.md。本报告记录后另做真实文档提交并再次正常推送、独立克隆，最终HEAD以GitHub master及最终会话核验为准，避免报告自引用提交ID。
+
+本轮发布前敏感信息扫描退出0，真实.env、本地日志、Token、数据库文件未加入Git。前端7测试及类型/构建通过；首次44IT有1连接重置错误，针对性修正通过；最终长回归按用户新指示中止，NOT VERIFIED，未宣称全量通过。生产风险仍未闭合，不可公开上线。完整真实记录见docs/CLOSEOUT_AUDIT.md及docs/CLOSEOUT_EVIDENCE_20261018.json。
+
+---
+
 # 生产安全加固发布核验（2026-10-18，本轮状态）
 
 本轮从 master 基线 `95422f85c84f07baa169586965ee57d65d87bbfe` 开始，保留真实历史，不强推。最新源码完整回归于20:11:07+08:00结束，退出0：4单元、44真实MySQL集成、7前端，HTTP49、模拟65断言、浏览器及四档压力/默认持续通过；另分次完成20/600、50/1800、100/3600持续档，资金SQL无差异。脱敏证据为 docs/PRODUCTION_HARDENING_20261018.json，真实失败保留于本地日志和DEBUG_LOG。

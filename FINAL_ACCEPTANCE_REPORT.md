@@ -1,3 +1,5 @@
+> 本轮GitHub发布已核验PASS：已测试代码24457f59499cab0814d60bfbf3940f2acf8a55ac，独立克隆74文件/完整树一致/禁止路径0；详见GITHUB_RELEASE_REPORT最新节。后续仅补充真实发布记录，不改变已测试实现。
+
 # 2026-10-18 最新验收基线
 
 本节为2026-10-18当前结果，优先于下方保留的历史“当前”声明。完整回归结束于11:05:03+08:00，命令 node scripts/compose-verify.mjs --integration，退出0：后端单元4/4、真实MySQL集成32/32（AuctionIT15、BoundaryIT9、DatabaseIT6、HttpSimulationIT1、StressIT1），失败/错误/跳过均0；前端7/7及TypeScript/Vite生产构建通过。HTTP边界49项、20人seed42模拟65断言、Edge多上下文及20/50/100/200人四档压力全部通过。公开脱敏计数、压力指标和原始日志SHA256见 docs/BOUNDARY_RUN_20261018.json；原始日志保留本地，不发布。

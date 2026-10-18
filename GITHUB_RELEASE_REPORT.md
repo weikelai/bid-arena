@@ -1,3 +1,17 @@
+# 2026-10-18 本轮发布已核验：PASS
+
+远端：https://github.com/weikelai/bid-arena.git；分支master。已测试代码提交：24457f59499cab0814d60bfbf3940f2acf8a55ac。实际执行 git -c credential.interactive=false push origin master，退出0，8993dc0..24457f5，未强制推送。git ls-remote origin refs/heads/master 返回同一完整ID。
+
+随后实际独立克隆：git -c credential.interactive=false clone --no-checkout --single-branch --branch master https://github.com/weikelai/bid-arena.git .local/boundary-20261018/remote-check，退出0。node .local/boundary-20261018/verify-remote.cjs 退出0：本地、远端及独立克隆HEAD一致，完整Git树一致（6b576eab02f27795ef59849b82b6ff3ff6853e91），74个文件、13项关键源码/测试/报告及V1/V2/V3迁移均存在，禁止路径0，工作区干净。证据：.local/boundary-20261018/remote-verification.json。
+
+安全：提交前后 node scripts/verify-secrets.mjs、node scripts/audit-release.mjs 均退出0；提交后审计9个提交、130个历史blob、72份本地证据、3项已知本地凭据匹配来源，未命中泄漏。真实.env、本地日志、Token、测试数据库及构建产物未发布；.env.example仅安全占位。扫描不证明不存在所有未知秘密。
+
+此发布记录作为后续真实文档提交，不改变上述已测试代码；文档提交后再次正常推送并从独立克隆fetch核验完整树。最终分支HEAD应由git rev-parse HEAD与git ls-remote origin refs/heads/master比较，不嵌入包含本文自身的提交ID。历史记录在下方保留；其中“本轮尚未发布”等旧状态已被本节取代。
+
+剩余问题与范围以FINAL_ACCEPTANCE_REPORT最新节为准；正式录屏、本人现场核验、外部提交仍OUT OF SCOPE，未执行。
+
+---
+
 # 2026-10-18 本轮发布记录（最新）
 
 本轮发布开始前远端master为8993dc03fa44bb106ea5af9871dc46be5d066a2e。当前改动是实际钱包/界面修复、边界修复、测试和报告，不重写历史。最终测试见TEST_EXECUTION_REPORT最新节（4单元/32真实MySQL/7前端/49HTTP/65模拟/四档压力）。本节后续追加本轮实际推送及独立克隆结果；下方旧发布不代表本轮改动已发布。

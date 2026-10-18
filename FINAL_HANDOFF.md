@@ -1,3 +1,15 @@
+# 生产加固交接更新（2026-10-18）
+
+当前已验证实现提交 ea266ee1475d9c047b35b0b6effa4c9f59161c62，GitHub master 已正常推送并独立克隆核验；最终文档HEAD见GITHUB_RELEASE_REPORT及实际git/ls-remote。最新源码完整回归20:11:07+08:00退出0：4单元、44真实MySQL集成、7前端，HTTP49、模拟65、Edge、四档短时压力及默认持续通过；本轮另分次完成20/600、50/1800、100/3600，资金SQL无差异。命令、失败历史与限制见TEST_EXECUTION_REPORT及PRODUCTION_HARDENING_REPORT。
+
+开发启动：npm run setup:env → docker compose build → docker compose up -d --wait；前端127.0.0.1:5173，后端8080，项目MySQL3307。宿主3306不动。停止用docker compose stop，保留卷。测试推荐npm run test:compose，或node scripts/test-isolated.mjs；前端npm --prefix frontend test和run build。迁移V1–V4自动执行、开发种子幂等，DRAFT手动开始。
+
+生产准备：先阅读README生产教程，独立配置/账号/卷；生产禁公开种子，管理员一次性CLI，Runtime无迁移凭据，独立TLS入口。当前不能公开上线：MySQL镜像4严重/35高危公告未闭合，容器门禁FAIL；真实域名/证书/续期/服务器、异地备份和外部告警BLOCKED，生产备份适配/ACL/数据库链路TLS/灾难恢复仍NOT VERIFIED。正式录屏、本人现场讲解/临时修改及评测方外部提交OUT OF SCOPE。
+
+以下保留历史交接基线，不代表最新状态。
+
+---
+
 # 最新风险闭环交接（2026-10-18）
 
 一键启动与原操作说明保留；完整验证 node scripts/compose-verify.mjs --integration 现含真实死锁、30秒池超时及20/50有界持续档，需十多分钟。最终结果4单元/36真实MySQL/7前端，详细口径与未验证项见RISK_CLOSURE_REPORT.md；指标端点仅管理员读取。最新远端发布见GITHUB_RELEASE_REPORT，不将旧HEAD视为新修复发布。

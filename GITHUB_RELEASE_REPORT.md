@@ -2,7 +2,11 @@
 
 本轮从 master 基线 `95422f85c84f07baa169586965ee57d65d87bbfe` 开始，保留真实历史，不强推。最新源码完整回归于20:11:07+08:00结束，退出0：4单元、44真实MySQL集成、7前端，HTTP49、模拟65断言、浏览器及四档压力/默认持续通过；另分次完成20/600、50/1800、100/3600持续档，资金SQL无差异。脱敏证据为 docs/PRODUCTION_HARDENING_20261018.json，真实失败保留于本地日志和DEBUG_LOG。
 
-本节创建时尚待提交、推送及独立克隆；不能使用下方旧核验代替本轮发布。后续仅在真实命令完成后更新本节。发布范围包括安全实现、V4迁移、生产模板、测试、脚本和脱敏报告；真实.env、.local日志/备份/私钥及构建产物均保持忽略。
+**GitHub源码交付：PASS。** 实际实现与完整测试证据提交 `ea266ee1475d9c047b35b0b6effa4c9f59161c62`，实际命令 `git -c credential.interactive=false push origin master` 退出0，从95422f8正常前进到ea266ee。随后 `node scripts/verify-remote.mjs` 退出0，20:17:03+08:00独立克隆核验本地/远端master/克隆HEAD一致，完整树 `f1ab4110b60349b86399b40928cdf46083f4ecc4` 一致；123文件、18项必需文件存在，禁止路径0，工作区干净。原命令和记录在忽略的 `.local/hardening-push.log`、`.local/hardening-remote-verification.log` 和 `.local/github-release-verification.json`。
+
+提交后 `node scripts/audit-release.mjs` 实际退出0，扫描15个真实提交、242历史blob、549份文本证据，3项已知本地凭据来源无命中；`verify-secrets`退出0。模式与已知值检查不保证发现所有未知秘密。发布范围包括安全实现、V4迁移、生产模板、测试、脚本和脱敏报告；独立克隆确实含预期文件，不含真实.env、.local日志/备份/私钥、数据库或构建产物。
+
+本节是随后真实发布核验文档更新，将正常提交推送并再次独立克隆；不伪造包含本节自身的提交ID。最终交付HEAD由最终 `git rev-parse HEAD`、`git ls-remote origin refs/heads/master` 及独立克隆相互核验，已测试实现提交为上述ea266ee。
 
 本地评测与生产发布是不同结论：运行镜像扫描实际退出1，生产MySQL4严重/35高危公告未闭合，生产公开上线FAIL；真实域名/证书/异地备份/告警资源BLOCKED。正式录屏、本人现场讲解/临时修改及评测方外部提交OUT OF SCOPE。
 

@@ -1,3 +1,19 @@
+# 2026-10-18 风险闭环发布核验（最新）
+
+仓库：https://github.com/weikelai/bid-arena.git，分支master。本轮已测试实现与证据提交 **164aa9e23d6b2950e268317edf0666764673da60**，从52448b738dadd8a169e742547fdd2341544f4406正常推进；没有强推、删除历史或空提交。
+
+实际执行 git -c credential.interactive=false push origin master，退出0，52448b7..164aa9e。随后 git -c credential.interactive=false clone --no-checkout --single-branch --branch master https://github.com/weikelai/bid-arena.git .local/risk-20261018/remote-check 退出0；node .local/risk-20261018/verify-remote.cjs 退出0（2026-10-18 11:47:21+08:00）。本地、远端ls-remote及独立克隆HEAD均为上述完整ID，完整树3f1727d216bad695f09f1bc7f9b59fc13fc3f968一致：79文件、17项必需源码/测试/报告、V1/V2/V3迁移均存在，禁止路径0，工作区干净。证据push.log、clone.log、remote-verification.json均在忽略目录.local/risk-20261018。
+
+本轮完整回归11:45:28+08:00结束，退出0：4单元、36真实MySQL集成、7前端、49HTTP、65模拟断言、Edge状态/断网、20/50/100/200四档短时压力及20/50有界持续测试通过；真实应用1213四次及耗尽恢复、30秒池超时通过。详细命令/限制/哈希见RISK_CLOSURE_REPORT.md与docs/RISK_RUN_20261018.json，不将短时结果称作长期或生产认证。
+
+发布前后verify-secrets/audit-release均退出0；提交后扫描11个真实提交、153历史blob、75份脚本所覆盖证据、3项已知本地凭据来源，无命中。另递归检查本轮/target嵌套证据93份无命中，模式与已知值扫描不保证绝对安全。发布范围仅受控源码、迁移、测试、脚本、配置模板和脱敏报告；真实.env、Token、原始本地日志、数据库和构建产物均未发布。
+
+本节是随后真实文档提交，将正常推送后从独立克隆fetch再次校验完整树。本文不嵌入包含自身的提交ID；最终交付HEAD以最终git rev-parse HEAD与git ls-remote origin refs/heads/master及remote-verification.json相同值为准，已测试实现提交如上。
+
+剩余NOT VERIFIED：10/30/60分钟持续档、生产TLS/管理员初始化/登录防护完整性、纯锁等待归因、未导出的MySQL全局死锁数、完整容器网络分区/宿主机断电、早期全过程历史、可选线上部署等。正式录屏、本人现场讲解/临时修改及评测方外部提交均OUT OF SCOPE，未执行。无当前已知未处理严重缺陷；不宣称原始评分全部通过。下方历史保持原样。
+
+---
+
 # 2026-10-18 本轮发布已核验：PASS
 
 远端：https://github.com/weikelai/bid-arena.git；分支master。已测试代码提交：24457f59499cab0814d60bfbf3940f2acf8a55ac。实际执行 git -c credential.interactive=false push origin master，退出0，8993dc0..24457f5，未强制推送。git ls-remote origin refs/heads/master 返回同一完整ID。

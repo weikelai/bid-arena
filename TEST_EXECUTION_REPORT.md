@@ -1,3 +1,25 @@
+# 2026-10-18 最终边界与并发回归（最新）
+
+本节为2026-10-18当前结果，优先于下方保留的历史“当前”声明。完整回归结束于11:05:03+08:00，命令 node scripts/compose-verify.mjs --integration，退出0：后端单元4/4、真实MySQL集成32/32（AuctionIT15、BoundaryIT9、DatabaseIT6、HttpSimulationIT1、StressIT1），失败/错误/跳过均0；前端7/7及TypeScript/Vite生产构建通过。HTTP边界49项、20人seed42模拟65断言、Edge多上下文及20/50/100/200人四档压力全部通过。公开脱敏计数、压力指标和原始日志SHA256见 docs/BOUNDARY_RUN_20261018.json；原始日志保留本地，不发布。
+
+| 实际命令 | 退出码/结果 | 本地日志 |
+|---|---|---|
+| docker compose config --quiet | 0 | 本轮终端 |
+| docker compose build | 0 | .local/boundary-20261018/final-build.log |
+| docker compose up -d --wait | 0 | .local/boundary-20261018/final-up.log |
+| docker compose ps / logs | 0，三容器healthy | final-ps.log / final-container.log（同目录） |
+| node scripts/compose-verify.mjs --integration | 0，以上全部测试通过 | .local/boundary-20261018/final-run.log |
+| HTTP边界/模拟/浏览器子进程（由JUnit调用并断言退出码） | 0，各49检查/65断言/多上下文通过 | backend/target/http-boundaries.log、http-simulation.log、browser-acceptance.log |
+| node .local/boundary-20261018/check-original.cjs | 0，原库只读资金对账差异0 | .local/boundary-20261018/original-funds-sql.log |
+
+每档压力SQL均 inconsistent=0、pending=0、orphanBid=0、duplicateCapture=0；成交唯一、赢家扣200、余800、其他钱包1000、全部冻结0。原库重启前后数据逐字一致；本机3306仍PID8864，未停止或改写。Compose仅映射loopback3307/8080/5173；两个入口health均UP/database=UP。
+
+历史失败保留：首轮完整套件退出1（浏览器错误选择器、200人池等待5秒超时）；修正后第二轮退出0/31项IT；再新增重试耗尽测试与时长溢出400回归后，本轮最终退出0/32项IT。不得以第二轮或旧报告替代本次结果。首次HTTP端口提取探针失败亦保留，见DEBUG_LOG。
+
+NOT VERIFIED：真实死锁受害业务事务自动重试端到端链（实际MySQL两连接死锁1213已复现；应用重试含明确注入测试）、每档连接池等待时长/锁等待与死锁计数、长时间及多机容量、完整容器网络分区、宿主机断电、生产TLS/管理员引导/登录防护完善性、完整安全渗透、早期全过程Git历史与可选线上部署。OUT OF SCOPE：正式录屏、本人现场讲解/临时修改、评测方外部提交，均未执行。不能据此宣称原始评测全部通过。
+
+---
+
 # 全面验收执行记录（2026-10-17）
 
 ## 最后一次冻结回归（本节为当前证据）
@@ -96,3 +118,20 @@ Edge浏览器三独立上下文：管理员创建/开始/取消、两用户加�
 最终测试日志SHA256：0B88285F45AFF6D4766063E653160D348A5E4EECA7A90635A7599FEC4307FEE3；浏览器日志SHA256：B50D00678D4F0D67E8D72BA11264EB7B1CD94DE453AEC59B8051EC7B892EF8E1；模拟日志SHA256：EA0F8369DB4F17EF4489624DEE24E8BFE41D51402AD0B9BFD8A361A9C8F3AF93。日志在本地保留，可重跑生成新结果，不把哈希当作永久运行保证。
 
 最终分类：本地核心与容器自动化PASS，GitHub发布PASS；尚未验证的个人设计归属、全过程早期历史、真实死锁环、宿主机断电/双完整容器故障/大规模压力和线上部署如实保留。人工录屏、本人现场核验、外部提交为OUT OF SCOPE，未执行。
+## 2026-10-17 21:31 双用户与资金实时一致性回归（最新）
+
+本节替代此前冻结基线的当前有效性声明，历史记录保留。实际修复：App.vue、room.ts 防低seq/旧房间/旧登录响应；区分接受、领先、被超过与最终成交；Api.java 同一REPEATABLE READ事务读取本人钱包、流水、hold；OpenAPI同步扩充。AuctionIT新增1项，前端新增2项，浏览器增加真实响应延迟及双用户最终赢家断言。未改动竞价、结算写入事务。
+
+| 实际命令 | 退出码及结果 | 本地日志 |
+|---|---|---|
+| docker compose build | 0，镜像构建成功 | .local/incident-build-retry.log |
+| docker compose up -d --wait | 0，三个服务healthy | .local/incident-up-retry.log |
+| node scripts/compose-verify.mjs --integration | 0，21:31:17+08:00完成；单元4、真实MySQL集成22、前端7均通过，失败/错误/跳过0；20人模拟65断言，Edge浏览器通过 | .local/incident-tests-retry.log；backend/target/http-simulation.log；backend/target/browser-acceptance.log |
+| node .local/wallet-incident.cjs | 0，钱包/流水/hold不一致0 | .local/incident-post-sql.log |
+| node scripts/verify-secrets.mjs；node scripts/audit-release.mjs | 均0，已知凭据与常见模式未命中；不是绝对无泄露证明 | 终端及.local/release-security.json |
+
+浏览器隔离数据：A110→B130（提交真实完成、响应延迟，seq5）→A140；释放B的旧响应后，B显示被超过，A领先。继续A150→B160，再释放旧快照，B保持160领先；B断线期间A170，重连一致。取消后冻结释放。另一场B110自动成交，B总余额890/冻结0，A断线后重连显示其他用户成交、总余额1000；独立登录及延迟退出响应不串账。SQL与65断言核对真实流水及唯一成交。
+
+原库排查：用户2总额120来自另一场880扣款；用户3总额0来自不同两场130和870扣款，未确认账务损坏，未修改历史资金。此前仅提示成功与允许旧快照覆盖属于代码确认风险，不伪称已复现用户截图的全部网络时序。第一轮完整回归通过；新增最终断线测试首次失败保存在 .local/incident-tests-final.log，原因为断网早于房间加载；添加加载断言后本轮重跑通过。跨房间旧响应及结束后旧RUNNING快照有单元断言，本轮未单独实现这两种精确网络时序的浏览器拦截测试。
+
+测试库使用随机隔离库，未触及原生3306；本地证据和截图继续忽略，不纳入发布。历史开发全过程、真实死锁环、断电/完整网络分区、大规模压力及生产安全仍按此前NOT VERIFIED；人工演示/外部提交仍OUT OF SCOPE。

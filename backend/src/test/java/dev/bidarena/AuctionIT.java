@@ -147,6 +147,18 @@ class AuctionIT {
         assertEquals(2,count.get());assertEquals(1,scalar("SELECT COUNT(*) FROM bids WHERE auction_id=?",id));
         assertEquals(1,scalar("SELECT COUNT(*) FROM wallet_transactions WHERE auction_id=? AND type='FREEZE'",id));service.cancel(id);reconcile();
     }
+    @Test void privateWalletSnapshotKeepsLedgerAndHoldInOneVersion()throws Exception {
+        long id=auction();service.start(id);service.bid(id,a,key(),110);
+        var api=new Api(db);var before=api.walletSnapshot(a);assertEquals(a,number(before,"user_id"));
+        service.bid(id,b,key(),120);var after=api.walletSnapshot(a);
+        assertEquals(number(before,"total_balance"),number(after,"total_balance"));
+        assertTrue(number(after,"version")>number(before,"version"));
+        var ledger=(List<Map<String,Object>>)after.get("transactions");
+        assertTrue(ledger.stream().allMatch(t->number(t,"user_id")==a));
+        assertEquals(number(after,"total_balance"),ledger.stream().mapToLong(t->number(t,"delta_total")).sum());
+        assertEquals(number(after,"frozen_balance"),ledger.stream().mapToLong(t->number(t,"delta_frozen")).sum());
+        service.cancel(id);reconcile();
+    }
     void reconcile()throws Exception {
         assertEquals(0,scalar("SELECT COUNT(*) FROM wallets w WHERE frozen_balance<>(SELECT COALESCE(SUM(amount),0) FROM auction_holds h WHERE h.user_id=w.user_id) OR total_balance<>(SELECT SUM(delta_total) FROM wallet_transactions t WHERE t.user_id=w.user_id) OR frozen_balance<>(SELECT SUM(delta_frozen) FROM wallet_transactions t WHERE t.user_id=w.user_id)"));
     }

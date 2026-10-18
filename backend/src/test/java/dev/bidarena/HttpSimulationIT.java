@@ -22,6 +22,10 @@ class HttpSimulationIT {
             boolean ready=false;var client=java.net.http.HttpClient.newHttpClient();
             for(int i=0;i<150&&backend.isAlive();i++) {try{if(client.send(java.net.http.HttpRequest.newBuilder(java.net.URI.create("http://127.0.0.1:"+port+"/api/v1/health")).build(),java.net.http.HttpResponse.BodyHandlers.ofString()).statusCode()==200){ready=true;break;}}catch(Exception ignored){}Thread.sleep(100);}
             assertTrue(ready,"HTTP backend failed: target/http-simulation-backend.log");
+            ProcessBuilder boundaries=new ProcessBuilder("node","../scripts/http-boundaries.mjs");
+            boundaries.environment().putAll(Map.of("API_BASE_URL","http://127.0.0.1:"+port+"/api/v1","SIMULATION_ALLOW_MUTATION","isolated"));
+            Process probe=boundaries.redirectErrorStream(true).redirectOutput(new java.io.File("target/http-boundaries.log")).start();
+            try{assertTrue(probe.waitFor(60,TimeUnit.SECONDS),"HTTP boundaries timed out");assertEquals(0,probe.exitValue(),"Inspect target/http-boundaries.log");}finally{if(probe.isAlive())probe.destroyForcibly();}
             ProcessBuilder sim=new ProcessBuilder("node","../scripts/simulate-auction.mjs","--bots=20","--seed=42");
             sim.environment().putAll(Map.of("API_BASE_URL","http://127.0.0.1:"+port+"/api/v1","SIMULATION_ALLOW_MUTATION","isolated","VERIFY_LOCAL_ARTIFACTS","true"));
             Process script=sim.redirectErrorStream(true).redirectOutput(new java.io.File("target/http-simulation.log")).start();

@@ -2117,6 +2117,29 @@
             "items": {
               "$ref": "#/components/schemas/WalletTransaction"
             }
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Monotonic per-user wallet version"
+          },
+          "server_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "holds": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "auction_id": {
+                  "type": "integer"
+                },
+                "amount": {
+                  "type": "integer"
+                }
+              }
+            }
           }
         }
       },

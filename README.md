@@ -104,3 +104,8 @@ docker 不在 PATH：启动已安装 Docker Desktop，在当前终端 PATH 加�
 ## 最终全面回归证据
 
 2026-10-17 20:31:00+08:00，完整回归退出0：4单元、21真实MySQL集成、5前端测试，失败/错误/跳过均0；20人seed42模拟65断言，winner24 price370；新增动态凭据在后端日志及前端包中不存在的检查通过。Edge扩展测试包括旧钱包响应跨登录隔离、出价历史、自动SOLD及余额890/冻结0。详见TEST_EXECUTION_REPORT.md及需求矩阵新附表。原始MySQL3306仍PID8864，三个容器healthy。
+# 2026-10-18 边界与压力测试补充
+
+保留现有安装和启动说明。`node scripts/compose-verify.mjs --integration` 现同时执行前端测试/构建、后端单元及真实 MySQL 测试、HTTP参数/Agent并发边界、20人模拟、Edge多上下文竞态和20/50/100/200逐级压力；一般需数分钟。Windows使用已有Edge，测试创建随机 `bid_arena_it_*` 库和临时用户，绝不将负载指向原演示钱包；测试结束只清理这些隔离资源。必须先启动Compose并配置本机Java17/Maven/Node/npm。日志位于 `.local/` 和 `backend/target/`，不发布。
+
+压力脚本有隔离开关、最大200 workers、每请求15秒超时及失败停止条件；不要对生产或原演示库直接运行。资源采样使用Windows PowerShell读取独立Java进程，以及Docker stats读取共享MySQL容器。短时突发测试不是长期性能/SLA证明。连接池仍8连接，等待上限现30秒；超载时可能超过调用方超时，调用方应以原requestId重试。实际结果与未测项见 [BOUNDARY_TEST_REPORT.md](BOUNDARY_TEST_REPORT.md) 和 [STRESS_TEST_REPORT.md](STRESS_TEST_REPORT.md)，最新回归见TEST_EXECUTION_REPORT。

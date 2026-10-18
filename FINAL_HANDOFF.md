@@ -63,3 +63,6 @@ PASS仅覆盖实际测试及证据，不能推导整个原题评分通过。当�
 无需为冻结扩大实现范围；上述项目如未来启动，应单独规划和验证。安全扫描只证明未发现已知凭据或已配置模式命中，不是不存在所有未知秘密的保证。真实.env、.local、日志、截图、数据库及构建产物不发布。
 
 最终结果以FINAL_ACCEPTANCE_REPORT.md冻结附节为准；逐项原题状态见REQUIREMENTS_MATRIX.md最新矩阵。历史失败及此前验收记录保留，不把旧结果冒充本轮结果。
+# 2026-10-18 最新交付索引
+
+本轮新增真实MySQL微秒截止、死锁环、105场结算批次、Agent并发与逐级压力测试。下方为保留的历史交付内容；最新测试数量/运行时间/发布提交以TEST_EXECUTION_REPORT和GITHUB_RELEASE_REPORT最新附节为准。新增详细报告：BOUNDARY_TEST_REPORT.md、STRESS_TEST_REPORT.md。启动仍为 `docker compose up -d --wait`，完整隔离验证为 `node scripts/compose-verify.mjs --integration`；原生MySQL3306不变，项目MySQL3307/后端8080/前端5173均仅loopback。

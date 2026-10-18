@@ -16,7 +16,9 @@ public final class Database implements AutoCloseable {
         pool.setPassword(config.databasePassword());
         pool.setMaximumPoolSize(8);
         pool.setMinimumIdle(1);
-        pool.setConnectionTimeout(5000);
+        // A burst can queue behind an auction's row lock. Keep the bounded pool,
+        // but allow the normal Hikari wait budget instead of failing at 5 seconds.
+        pool.setConnectionTimeout(30000);
         pool.setTransactionIsolation("TRANSACTION_READ_COMMITTED");
         pool.setConnectionInitSql("SET time_zone = '+00:00'");
         source = new HikariDataSource(pool);

@@ -40,3 +40,14 @@
 ## 最终全面回归证据
 
 2026-10-17 20:31:00+08:00，完整回归退出0：4单元、21真实MySQL集成、5前端测试，失败/错误/跳过均0；20人seed42模拟65断言，winner24 price370；新增动态凭据在后端日志及前端包中不存在的检查通过。Edge扩展测试包括旧钱包响应跨登录隔离、出价历史、自动SOLD及余额890/冻结0。详见TEST_EXECUTION_REPORT.md及需求矩阵新附表。原始MySQL3306仍PID8864，三个容器healthy。
+## 2026-10-17 双用户状态与钱包排查
+
+只读查询现有容器数据库及后端日志，钱包总额/冻结与流水/hold 不一致计数为0。用户3的130和870为不同拍卖的成交扣款，未发现需要修复的历史账务，未修改已有余额或流水。
+
+代码审查确认界面没有拒绝低seq快照，出价接受提示容易误认为最终获胜，钱包及流水原先分次查询。已添加快照代次与seq防护、明确领先/被超过/最终成交文案及钱包一致性读取。浏览器用真实提交延迟响应、旧快照延迟交付验证乱序；首次完整回归通过后，新增断线最终赢家场景首次失败（房间未加载即断网），保留 .local/incident-tests-final.log 和 .local/incident-browser-final-failed.log，补充房间RUNNING加载断言后重新回归。没有删除业务断言或改动竞价资金写入逻辑。
+# 2026-10-18 边界与压力实际问题（最新）
+
+1. `.local/boundary-20261018/first-run.log` 退出1（31集成、2失败）：浏览器新增选择器误用中文演示名，真实种子为Bid Arena Demo；修正测试选择器，所有断言保留。200人首轮HTTP500，后端记录SQLTransientConnectionException；见first-evidence/stress-200.log与stress-backend.log。未增加更高档位。
+2. 保持8连接/事务锁规则，将Hikari获取等待5秒改为30秒。second-run.log退出0（31集成）：四档资金对账均0差异；200人1801请求，HTTP错误0/超时0，p95 3202.129ms，p99 4358.840ms。该结果是第二轮，不冒充最终回归。
+3. HTTP隔离探针实际复现超大durationSeconds=2147483648返回500，预期400，证据http-real-probe.log。定位Math.toIntExact异常落入500处理；在转换前显式校验1..86400。http-boundaries.mjs覆盖并发Token/参数/限流，最终结果记录见TEST_EXECUTION_REPORT。
+4. 两次临时PowerShell诊断正则未提取端口，产生一次连接127.0.0.1:80拒绝和一次退出2；随后改用[0-9]正则成功复现真实HTTP500。不是应用无法启动，保留http-before-fix/http-probe日志。

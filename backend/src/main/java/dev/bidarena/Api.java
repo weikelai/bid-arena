@@ -30,14 +30,14 @@ public final class Api {
         app.get("/api/v1/openapi.json",c->{try(var stream=Api.class.getResourceAsStream("/openapi.json")){c.contentType("application/json");c.output(new String(Objects.requireNonNull(stream).readAllBytes(),StandardCharsets.UTF_8));}});
         route(app,"POST","/api/v1/auth/login",c->login(body(c)));
         route(app,"GET","/api/v1/users/me",c->{var p=human(c);return query("SELECT id,email,role,status,kind FROM users WHERE id=?",p.user).get(0);});
-        route(app,"GET","/api/v1/wallets/me",c->{var p=human(c);var w=query("SELECT *,total_balance-frozen_balance available_balance FROM wallets WHERE user_id=?",p.user).get(0);w.put("transactions",query("SELECT * FROM wallet_transactions WHERE user_id=? ORDER BY id DESC LIMIT 200",p.user));return w;});
+        route(app,"GET","/api/v1/wallets/me",c->{var p=human(c);return walletSnapshot(p.user);});
         route(app,"GET","/api/v1/auctions",c->{human(c);return query("SELECT * FROM auctions ORDER BY id DESC LIMIT 200");});
         route(app,"GET","/api/v1/auctions/{id}",c->{permit(c,id(c),"auction:read");return auctions.snapshot(id(c));});
         route(app,"GET","/api/v1/auctions/{id}/bids",c->{permit(c,id(c),"auction:read");return query("SELECT * FROM bids WHERE auction_id=? ORDER BY seq LIMIT 1000",id(c));});
         route(app,"GET","/api/v1/auctions/{id}/events",c->{var principal=permit(c,id(c),"auction:read");long after=Long.parseLong(c.paramOrDefault("after","0"));var events=query("SELECT auction_id auctionId,seq,type,server_time serverTime,payload FROM auction_events WHERE auction_id=? AND seq>? AND (visibility='PUBLIC' OR user_id=?) ORDER BY seq LIMIT 200",id(c),after,principal.user);long watermark=number(query("SELECT seq FROM auctions WHERE id=?",id(c)).get(0),"seq");return Map.of("events",events,"connectionState","CONNECTED","auctionId",id(c),"seq",watermark,"type","CONNECTION_STATE","serverTime",Instant.now().toString());});
         route(app,"POST","/api/v1/auctions/{id}/join",c->{var p=permit(c,id(c),"auction:bid");auctions.join(id(c),p.user);return Map.of("joined",true);});
         route(app,"POST","/api/v1/auctions/{id}/bids",c->{var p=permit(c,id(c),"auction:bid");var b=body(c);return auctions.bid(id(c),p.user,text(b,"requestId"),integer(b,"amount"));});
-        route(app,"POST","/api/v1/admin/auctions",c->{var p=admin(c);var b=body(c);return Map.of("id",auctions.create(p.user,text(b,"title"),b.containsKey("durationSeconds")?Math.toIntExact(integer(b,"durationSeconds")):180));});
+        route(app,"POST","/api/v1/admin/auctions",c->{var p=admin(c);var b=body(c);long duration=b.containsKey("durationSeconds")?integer(b,"durationSeconds"):180;if(duration<1||duration>86400)throw new Fault(400,"INVALID_AUCTION");return Map.of("id",auctions.create(p.user,text(b,"title"),(int)duration));});
         route(app,"POST","/api/v1/admin/auctions/{id}/start",c->{admin(c);auctions.start(id(c));return auctions.snapshot(id(c));});
         route(app,"POST","/api/v1/admin/auctions/{id}/cancel",c->{admin(c);auctions.cancel(id(c));return auctions.snapshot(id(c));});
         route(app,"POST","/api/v1/admin/agent-tokens",c->{admin(c);return issue(body(c));});
@@ -45,6 +45,15 @@ public final class Api {
         route(app,"POST","/api/v1/admin/agent-tokens/{id}/revoke",c->{admin(c);db.transaction(x->{update(x,"UPDATE agent_tokens SET revoked_at=UTC_TIMESTAMP(6) WHERE id=?",id(c));return null;});return Map.of("revoked",true);});
         jobs.scheduleWithFixedDelay(()->{try{auctions.tick();}catch(Exception e){System.err.println("Settlement scan failed: "+e.getClass().getSimpleName());}},1,1,TimeUnit.SECONDS);
         Runtime.getRuntime().addShutdownHook(new Thread(jobs::shutdownNow));
+    }
+    Map<String,Object> walletSnapshot(long user)throws SQLException {
+        try(var c=db.connection()){
+            c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);c.setAutoCommit(false);
+            var w=one(c,"SELECT *,total_balance-frozen_balance available_balance,UTC_TIMESTAMP(6) server_time FROM wallets WHERE user_id=?",user);
+            w.put("transactions",rows(c,"SELECT * FROM wallet_transactions WHERE user_id=? ORDER BY id DESC LIMIT 200",user));
+            w.put("holds",rows(c,"SELECT auction_id,amount FROM auction_holds WHERE user_id=? AND amount>0",user));
+            c.commit();return w;
+        }
     }
     private Object login(Map<String,Object> b)throws SQLException {
         String email=text(b,"email"),password=text(b,"password");

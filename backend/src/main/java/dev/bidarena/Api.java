@@ -22,7 +22,12 @@ public final class Api {
     public Api(Database db,boolean production){this.db=db;this.auctions=new AuctionService(db);this.security=new SecurityService(db,production);}
     @FunctionalInterface interface Endpoint {Object run(Context c)throws Exception;}
     private void route(SolonApp app,String method,String path,Endpoint handler) {
-        org.noear.solon.core.handle.Handler action=c->{long started=System.nanoTime();c.headerSet("Cache-Control","no-store");try {Object out=handler.run(c);c.outputAsJson(json(out));}
+        org.noear.solon.core.handle.Handler action=c->{long started=System.nanoTime();c.headerSet("Cache-Control","no-store");try {
+                // Consume/cache POST data even when authorization rejects before
+                // the endpoint reads JSON. Closing with unread request bytes can
+                // reset the socket and hide the intended 401/403 response.
+                if(method.equals("POST"))c.body();
+                Object out=handler.run(c);c.outputAsJson(json(out));}
             catch(Fault e){c.status(e.status);c.outputAsJson(json(Map.of("error",e.code)));}
             catch(IllegalArgumentException e){c.status(400);c.outputAsJson(json(Map.of("error","INVALID_REQUEST")));}
             catch(Exception e){db.metrics.increment("http.systemErrors");System.err.println("API failure: "+e.getClass().getSimpleName());c.status(500);c.outputAsJson(json(Map.of("error","INTERNAL_ERROR")));}

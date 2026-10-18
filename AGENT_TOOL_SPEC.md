@@ -1,5 +1,25 @@
 # 竞拍 Agent 工具契约
 
+## 当前界面的边界与维护者启动方式
+
+界面可创建 Agent、填入用户 ID、给当前拍卖签发 read/bid Token，并隐藏本次明文；没有 Token 列表或吊销按钮。管理员吊销需受控调用下文 POST 接口，保留签发响应中的 Token 记录 ID；若只使用页面且未保留记录 ID，请维护者在授权环境只读查询凭证元数据定位，不查询或输出摘要。停止程序不会撤销已接受的出价或立即释放领先冻结。
+
+维护者在仓库根目录的可信 PowerShell 终端运行（关闭录制/转录，不将输入粘贴到提示文字中）：
+
+```powershell
+$agentSecret = Read-Host '请输入本次签发的 Agent Token' -AsSecureString
+$env:AUCTION_AGENT_TOKEN = [System.Net.NetworkCredential]::new('', $agentSecret).Password
+$env:AUCTION_ID = Read-Host '请输入拍卖编号'
+$env:AGENT_MAX_AMOUNT = Read-Host '请输入最高报价（至少110）'
+try { node scripts/auction-agent.mjs }
+finally {
+    Remove-Item Env:AUCTION_AGENT_TOKEN,Env:AUCTION_ID,Env:AGENT_MAX_AMOUNT -ErrorAction SilentlyContinue
+    Remove-Variable agentSecret -ErrorAction SilentlyContinue
+}
+```
+
+Read-Host 引号内是提示文字，真正的值在随后提示时输入。终端 Ctrl+C 停止，确保 finally 清理；不确定时手动移除上述环境变量。示例每3秒轮询、最多300轮，可能对自己的领先价继续加价，401/403/429会退出而不自动退避；到预算后继续观察直到终态或轮数上限。不额外需要模型服务 API Key。默认连接本机演示入口，其他地址由维护者配置可信 HTTPS API_BASE_URL。
+
 只通过 HTTP API 操作。OpenAPI：GET /api/v1/openapi.json。MySQL、管理凭据、他人钱包不属于 Agent 工具。
 
 管理员在浏览器创建 kind=AGENT 用户，初始积分 1000；为指定 auctionId 签发 Token，权限选择 auction:read、auction:bid，配置 expiresInSeconds 和 rateLimit（每分钟固定窗口）。Token 明文仅本次签发返回，界面可隐藏；不要录屏、写入仓库或命令参数。通过安全环境变量 AUCTION_AGENT_TOKEN 交给 Agent；数据库仅存 SHA-256 摘要。

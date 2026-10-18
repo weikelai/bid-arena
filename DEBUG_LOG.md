@@ -85,3 +85,6 @@
 - 最终开发容器复核发现前端仍运行旧镜像 b5cad0c1e57f，当前构建/扫描镜像为2b6f49d86d77；普通 `up -d --wait` 未替换它，健康检查不能证明版本一致。仅对frontend执行 `up -d --no-deps --force-recreate --wait frontend`，再比较容器.Image与镜像.Id并重跑代理/TLS。日志 `.local/hardening-frontend-latest-recreate.log`；没有删除卷或重建数据库。
 
 ---
+# 2026-10-18 收尾复核：真实失败保留
+
+本轮首次全量44IT中SecurityHttpIT的POST权限拒绝响应发生Connection reset，退出1；独立原样复测通过，未声称确定底层网络根因。路由此前可能在消费POST请求体前完成授权拒绝，现先缓存请求体，避免未消费字节关闭连接的风险；增加20次完整403及FORBIDDEN响应断言，没有重试失败请求或修改资金业务。针对性通过，最终完整回归与生产演练见docs/CLOSEOUT_AUDIT.md。生产测试网络地址池耗尽失败也保留；只清本轮自己的停止容器/网络，数据卷和日志保留，没有全局prune。

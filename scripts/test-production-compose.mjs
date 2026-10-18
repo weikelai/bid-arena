@@ -64,7 +64,30 @@ try {
  r=await https('/auctions/'+cancelled+'/bids',bidder,{requestId:'production-runtime-cancel',amount:110});assert.equal(JSON.parse(r.body).type,'BID_ACCEPTED');
  assert.equal((await https('/admin/auctions/'+cancelled+'/cancel',token,{})).status,200);
  assert.equal(JSON.parse((await https('/wallets/me',bidder)).body).frozen_balance,0);
+ // Snapshot immutable money facts before a graceful full project stop/restart.
+ function moneyFacts(){return compose(['exec','-T','mysql','sh','-c','MYSQL_PWD="$MYSQL_ROOT_PASSWORD" exec mysql -uroot "$MYSQL_DATABASE" -N -B'],`SELECT user_id,total_balance,frozen_balance FROM wallets ORDER BY user_id;
+ SELECT id,auction_id,type,delta_total,delta_frozen FROM wallet_transactions ORDER BY id;
+ SELECT auction_id,winner_id,price,reason FROM auction_results ORDER BY auction_id;
+ SELECT id,amount FROM bids ORDER BY id;`);}
+ const beforeRestart=moneyFacts();
+ compose(['stop']);compose(['up','-d','--wait']);
+ let restored;
+ for(let i=0;i<30;i++){try{restored=await https('/health');if(restored.status===200)break;}catch(e){if(!['ECONNREFUSED','ECONNRESET'].includes(e.code))throw e;}await new Promise(r=>setTimeout(r,1000));}
+ assert.equal(restored?.status,200,'healthy after graceful stop/restart');
+ await new Promise(r=>setTimeout(r,3000));
+ assert.equal(moneyFacts(),beforeRestart,'persistent money facts and unique settlement unchanged across restart/scanner reruns');
+ const reconciliation=compose(['exec','-T','mysql','sh','-c','MYSQL_PWD="$MYSQL_ROOT_PASSWORD" exec mysql -uroot "$MYSQL_DATABASE" -N -B'],`SELECT COUNT(*) FROM wallets w WHERE w.total_balance<>COALESCE((SELECT SUM(t.delta_total) FROM wallet_transactions t WHERE t.user_id=w.user_id),0) OR w.frozen_balance<>COALESCE((SELECT SUM(t.delta_frozen) FROM wallet_transactions t WHERE t.user_id=w.user_id),0) OR w.total_balance<0 OR w.frozen_balance<0 OR w.total_balance<w.frozen_balance;
+ SELECT COUNT(*) FROM (SELECT auction_id FROM auction_results GROUP BY auction_id HAVING COUNT(*)>1) duplicated;
+ SELECT COUNT(*) FROM auction_results WHERE reason='SOLD';`);
+ assert.deepEqual(reconciliation.trim().split(/\s+/),['0','0','1'],'zero ledger/wallet discrepancies, unique result and exactly one sale');
+ writeFileSync('.local/production-lifecycle-result.json',JSON.stringify({at:new Date().toISOString(),status:'PASS',project,checks:['graceful stop and full restart','wallet/ledger/bid/result persistence','no duplicate automatic settlement after restart','SQL wallet equals ledger totals and frozen deltas','exactly one sale'],sql:reconciliation.trim()},null,2));
  assert.equal((await https('/auth/logout',token,{})).status,200);assert.equal((await https('/users/me',token)).status,401);
  const report={status:'PASS',at:new Date().toISOString(),project,port,checks:['separate production project and volume','no mysql/backend host ports','migration identity separate from runtime','runtime cannot update/delete append-only ledger, bids, results, events or security audit','one-time CLI bootstrap through stdin','production runtime validates migrations without DDL','no demo auction or initial credits','trusted local TLS health/login/logout','two-leader release, same-leader delta freeze, unique automatic capture and cancellation release'],limits:'Local CA only. Volume retained, project stopped after test. Public deployment, renewal and external backup/alerts not verified.'};
  writeFileSync('.local/production-compose-result.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report));
-} finally {if(started)compose(['stop']);}
+} finally {if(started){
+ // Keep test evidence and named database volumes, but do not exhaust Desktop's
+ // address pools with networks belonging to this disposable test project.
+ compose(['stop']);
+ writeFileSync('.local/production-compose-lifecycle.log',compose(['logs','--no-color','--tail=200']));
+ compose(['down']); // Deliberately no -v: retained isolated database is not reset.
+}}

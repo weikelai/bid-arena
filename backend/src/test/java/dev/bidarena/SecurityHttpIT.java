@@ -37,7 +37,11 @@ class SecurityHttpIT {
             // Fixtures only: production process itself must not seed or migrate.
             try(var db=new Database(new AppConfig(jdbc,user,password,"development",true))){db.migrations().migrate();new DemoSeeder().initialize(db);}
             start(jdbc);String a=login("bidder_a@example.com","Test123456!"),admin=login("admin@example.com","Admin123456!");
-            assertEquals(403,call("/admin/users/2/revoke-sessions",a,"{}").statusCode());
+            for(int i=0;i<20;i++){
+                var denied=call("/admin/users/2/revoke-sessions",a,"{}");
+                assertEquals(403,denied.statusCode());
+                assertTrue(denied.body().contains("FORBIDDEN"),"authorization rejection must deliver its JSON body, not reset the connection");
+            }
             assertEquals(200,call("/auth/logout",a,"{}").statusCode());assertTrue(call("/users/me",a,null).body().contains("SESSION_REVOKED"));
             stop();start(jdbc);assertEquals(401,call("/users/me",a,null).statusCode());
             String b=login("bidder_b@example.com","Test123456!");long bid;

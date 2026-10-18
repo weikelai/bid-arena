@@ -1,3 +1,11 @@
-FROM mysql:8.4.8
+FROM mysql:8.4.11@sha256:24989179f58856db763f418010c1169fecc944e3ec1ea7e921572d83eb070f70
+# Official 8.4 LTS patch release, evaluated only with a fresh isolated volume.
+# Keep upstream gosu and entrypoint intact; Go advisory matches remain a release gate.
 # Patch identified OS packages without changing the MySQL server package/version.
 RUN microdnf update -y curl libcurl openssl openssl-libs pcre2 pcre2-syntax sqlite sqlite-libs gnutls krb5-libs libcap acl libacl glib2 libevent libxml2 && microdnf clean all
+# mysqlsh is an unused administrative Python/JS client, not the mysql CLI used
+# by upstream initialization/health/provisioning. Remove the entire optional
+# package rather than replacing its bundled Python dependencies independently.
+RUN microdnf remove -y mysql-shell && microdnf clean all \
+    && test -x /usr/local/bin/gosu && command -v mysql \
+    && mysqld --version && gosu nobody true

@@ -71,3 +71,17 @@
 新增真实应用死锁测试：两真实连接形成probe/auction环，应用已写新冻结和旧释放后实际收到驱动1213/40001，原异常交给生产重试。一次受害新事务成功、三次耗尽扫描恢复，两者均检查回滚/关闭/幂等及唯一成交；错误注入旧测试保留并与真实受害区分。新增真实8连接耗尽、30秒获取超时及权限拒绝检查。
 
 首轮完整回归full-run.log退出0（35集成），随后增强旧领先释放场景、实际池超时和成交金额/赢家SQL检查，最终完整回归以risk-20261018/final-run.log为准，不能用首轮代替最终证据。PowerShell将Java INFO标准错误流包装为NativeCommandError文本，不是测试失败；以实际退出码及Failsafe结果判断。日志全部本地忽略，最终汇总见RISK_CLOSURE_REPORT.md。
+# 2026-10-18 生产加固补充
+
+在95422f8基线上增加独立安全服务，未重构竞价核心。实际失败：PowerShell拆分Maven参数；Java HTTP默认协议升级/连接重置；开发压力登录被生产PBKDF2并发槽误限；TLS临时CA用途与证书目录错误；nginx动态模块锁旧包、发行配置变化导致启动失败；生产入口就绪前502。分别修正引号、显式HTTP1.1、仅production严格哈希槽、CA扩展/目录选择、删未用模块及显式nginx主配置、前端健康依赖/有界探测。原日志保留，未删除断言。最终全量结果见最新TEST_EXECUTION_REPORT与脱敏证据。
+
+容器扫描首次实际发现高危/严重命中；nginx/系统包最小补丁消除入口高危/严重，但生产MySQL残留gosu内嵌Go严重公告。禁止将Scout退出0说成安全通过；公开上线仍FAIL。3306未写、原开发MySQL镜像/数据卷未升级或删除。
+# 2026-10-18 生产加固接续复核
+
+- 账号限流绕过：真实 MySQL 的不区分重音邮箱排序规则把不同字符串匹配到同一用户，原按邮箱字符串计数可绕过账号额度。隔离探针先复现 `expected=429 actual=401`，修复后 `expected=429 actual=429`。现有账号按数据库用户 ID 计数，成功登录清同一账号窗口；新增 `databaseEquivalentEmailAliasesShareAdmissionAndSuccessReset`，不改拍卖业务。证据：`.local/canonical-account-before.log`、`.local/canonical-account-after.log`；最新针对性和全量结果见 TEST_EXECUTION_REPORT。
+- 接续工具会话的 PowerShell 未继承 Docker CLI 路径，一次命令未被识别；该次 `$LASTEXITCODE` 是残留值，不能视为配置检查成功。只将已安装 Desktop 的 resources/bin 加入后续命令会话 PATH，未修改系统设置；重新执行配置及容器检查。
+- 本地报告生成器的模板字符串存在未转义反引号，`node --check` 实际报 SyntaxError，尚未写入报告。修正后语法检查通过；生成步骤仍要求最终回归真实成功才执行。
+- 生产模板最新镜像复测返回1，首次 HTTPS 健康请求 `ECONNREFUSED`；入口没有 Compose healthcheck，`up --wait` 不保证监听已完成。原有30次健康等待只处理HTTP状态，未处理连接尚未就绪。仅在初始健康探测对连接拒绝/重置有界重试，TLS校验错误立即失败，业务请求和断言不重试。日志 `.local/production-compose-runtime-latest.log`、入口日志 `.local/production-latest-readiness-failure.log`、重测 `.local/production-compose-runtime-latest-retry.log`；探测尝试单独保存，不把启动重试隐藏为一次成功。
+- 最终开发容器复核发现前端仍运行旧镜像 b5cad0c1e57f，当前构建/扫描镜像为2b6f49d86d77；普通 `up -d --wait` 未替换它，健康检查不能证明版本一致。仅对frontend执行 `up -d --no-deps --force-recreate --wait frontend`，再比较容器.Image与镜像.Id并重跑代理/TLS。日志 `.local/hardening-frontend-latest-recreate.log`；没有删除卷或重建数据库。
+
+---

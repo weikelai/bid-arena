@@ -1,4 +1,22 @@
-# 2026-10-18 最终上线前审计（最新，取代下方当前状态）
+# 生产安全加固最终验证（2026-10-18 20:12:49+08:00，当前状态）
+
+最新源码标准全量于20:11:07+08:00结束：命令 `node scripts/test-isolated.mjs`，退出0，单元4/4、集成44/44，失败/错误/跳过0。之前延长档全量于19:52:19结束，退出0，43IT（当时SecurityIT为4项）；之后最新安全针对性于19:53:27结束，退出0，5IT。不得把不同编译版本的数量混为一次运行。
+
+最终开发容器均healthy且只绑定127.0.0.1：frontend 5173、backend 8080、mysql 3307。实际backend镜像5f3cfd742c57、frontend镜像2b6f49d86d77与本轮扫描一致；MySQL开发镜像维持原8.4.8。普通up未替换旧前端后，单独执行 `docker compose up -d --no-deps --force-recreate --wait frontend` 退出0，再次代理24检查与本地TLS均退出0，日志 `.local/hardening-frontend-latest-recreate.log`、`deployment-patched.log`、`local-tls-patched-final.log`。宿主3306仍为原PID8864，未连接其数据。
+
+本轮完整回归 STABILITY_EXTENDED=resume100 node scripts/test-isolated.mjs 实际退出0；其后按最新源码补跑安全与全量短档回归，具体命令和日志见本节追加记录。最新后端单元4、真实MySQL集成44，失败/错误/跳过均0；前端7测试、vue-tsc类型检查及Vite构建退出0。HTTP49、20人模拟65断言、Edge多会话/异步状态/断线恢复、Agent权限及四档短时压力通过。真实应用死锁与连接池超时用例仍保留，SQL资金对账无差异。
+
+持续负载分别完成20用户600秒、50用户1800秒、100用户3600秒。20档来自本轮较早完整运行（仅后续压力夹具失败），50档来自随后运行（100档中断），100档在本次最终全量中恢复执行；不能宣称一次进程连续跑完三档。完成摘要、实时SQL、源码/配置/日志SHA256见docs/PRODUCTION_HARDENING_20261018.json，不用历史评测基线替代本轮。共享Windows主机与开发登录模式的结果不认证生产登录配额或容量/SLA。
+
+生产加固：一次性管理员CLI、生产禁种子、数据库登录准入/有限哈希并发、持久会话吊销/换密、Migration/Runtime分离、本地校验证书的TLS入口、隔离加密恢复及运维探针均有本轮证据。独立生产Compose使用精确逐表权限完成双领先者/差额冻结/成交/取消，运行账号不能改写追加表。生产环境文件生成器不覆盖旧配置、不打印秘密；UTF-8/UTF-16LE发布扫描阻断探针通过。
+
+**生产公开上线：FAIL。** 生产MySQL镜像仍有4严重/35高危公告命中；后端37、前端/入口各2公告未闭合。容器扫描实际退出1，不能写为通过。真实公网域名/证书/续期/服务器、异地备份及外部告警BLOCKED。生产schema备份适配/保留、Windows ACL、生产SQL定时核对、数据库链路TLS、旧账号权限收窄、密码找回和灾难恢复NOT VERIFIED。正式录屏、本人讲解/临时修改及评测外部提交OUT OF SCOPE，未执行。GitHub最新状态以GITHUB_RELEASE_REPORT.md最新实核为准。
+
+---
+
+#以下保留此前审计与失败记录；其中历史的当前状态、未执行说明或较旧测试数量不代表本轮最终状态，最新结论以上方及本轮脱敏证据为准。
+
+ 2026-10-18 最终上线前审计（最新，取代下方当前状态）
 
 本轮最终实际执行 node scripts/compose-verify.mjs --integration，退出0；后端单元4、真实MySQL集成36、前端7，失败/错误/跳过均0；HTTP49、20人模拟65断言、真实Edge多会话/四种状态/字体/断网/旧响应、四档短时及20/50有界持续通过。包含Jackson2.21.7补丁、nginx安全头及UI当前实现，未改资金事务。原始日志.local/preflight/final-regression.log；脱敏指标、实际源码与日志SHA256见docs/PREFLIGHT_RUN_20261018.json，逐项映射见FUNCTIONAL_AUDIT_REPORT。
 
@@ -175,3 +193,24 @@ Edge浏览器三独立上下文：管理员创建/开始/取消、两用户加�
 - 原演示SQL只读：0，original-sql.log，差异/重复CAPTURE/PENDING均0；无3306写入。
 - node scripts/verify-secrets.mjs、node scripts/audit-release.mjs：实际结果见发布前后证据。
 - git diff --check：0；工作区及远端提交以发布核验为准。
+
+## 本轮最终命令与实际结果
+
+| 命令 | 实际结果 | 本地证据 |
+|---|---|---|
+| docker compose build；up -d --wait；node scripts/compose-verify.mjs | 均0；最新镜像三服务healthy，重启前后种子/钱包/拍卖事实一致；此前旧前端已单独修正 | hardening-compose-latest-build.log / hardening-compose-latest-up.log / hardening-seed-latest.log |
+| STABILITY_EXTENDED=resume100 node scripts/test-isolated.mjs | 0；包含恢复执行100/3600，较早编译的安全IT为4项，不冒充最新5项 | hardening-regression-resumed.log |
+| node scripts/test-isolated.mjs '-Dit.test=SecurityIT' | 0；最新5安全IT，含重音别名限流与成功重置 | hardening-latest-security.log |
+| node scripts/test-isolated.mjs | 0，最新4单元/44真实集成，失败/错误/跳过0；默认20/120及50/300持续档再次执行 | hardening-latest-full-regression.log / target/*-reports |
+| npm --prefix frontend test；run build | 各0，7测试，类型/Vite通过 | hardening-ui-final-test.log / hardening-ui-final-build.log |
+| node scripts/test-production-compose.mjs | 最新首次1：入口连接尚未就绪；仅完善有界启动探测后0，精确逐表Runtime/TLS/引导/双用户资金及取消验证 | production-compose-runtime-latest.log / production-compose-runtime-latest-retry.log |
+| node scripts/test-local-tls.mjs | 0，本地CA显式信任/主机名/拒绝未信任/安全头 | local-tls-patched-final.log |
+| node scripts/verify-deployment.mjs | 0，24检查 | deployment-patched.log |
+| node scripts/test-ops.mjs | 0，健康/磁盘检查及模拟健康失败、登录/结算失败、陈旧备份；外部投递仍未验证 | ops-probe-tests.log |
+| node scripts/audit-dependencies.mjs；npm --prefix frontend audit --json | 各0，41 Maven坐标无命中；npm0 | hardening-dependencies-final.log / hardening-npm-final.json |
+| node scripts/audit-containers.mjs | 1，生产MySQL严重4/高危35，门禁FAIL | hardening-container-final.log / container-audit.json |
+| node scripts/test-release-audit.mjs | 0，两种编码的合成凭据模式阻止发布，不回显 | release-audit-encoding-test.log |
+| node .local/test-setup-production.mjs | 0，5检查；只生成随机隔离配置，不覆盖用户.env | setup-production-probe.log |
+| node scripts/verify-secrets.mjs；node scripts/audit-release.mjs | 最终扫描结果在发布记录，不把CVE失败冒充凭据泄露 | hardening-secret-final.log / hardening-allhistory-final.log |
+
+以上日志均位于忽略目录.local，JUnit/脚本子日志位于backend/target；原始日志、凭据、备份和证书私钥不发布。脱敏摘要及SHA256在docs/PRODUCTION_HARDENING_20261018.json。真实失败及中断保留，不伪造其退出码。

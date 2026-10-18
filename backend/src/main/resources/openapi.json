@@ -18,7 +18,7 @@
   "paths": {
     "/api/v1/auth/login": {
       "post": {
-        "summary": "Human login; opaque token expires after 8 hours",
+        "summary": "Human login with database account/source/global admission limits; session expires after 8 hours",
         "operationId": "post__auth_login",
         "responses": {
           "200": {
@@ -82,7 +82,7 @@
             }
           },
           "429": {
-            "description": "Agent rate limit",
+            "description": "LOGIN_RATE_LIMITED or LOGIN_BUSY; wait before retrying",
             "content": {
               "application/json": {
                 "schema": {
@@ -1791,6 +1791,110 @@
             "description": "Human administrator required"
           }
         }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "summary": "Revoke current human session",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Completed"
+          },
+          "401": {
+            "description": "Unauthorized, SESSION_EXPIRED or SESSION_REVOKED"
+          },
+          "403": {
+            "description": "Permission denied"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/change-password": {
+      "post": {
+        "summary": "Rotate password and revoke all sessions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Completed"
+          },
+          "400": {
+            "description": "INVALID_REQUEST or WEAK_PASSWORD; new password must contain 16 to 128 characters"
+          },
+          "401": {
+            "description": "Unauthorized, SESSION_EXPIRED or SESSION_REVOKED"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "429": {
+            "description": "LOGIN_BUSY; bounded password hashing capacity is full"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "currentPassword",
+                  "newPassword"
+                ],
+                "properties": {
+                  "currentPassword": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 128
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/{id}/revoke-sessions": {
+      "post": {
+        "summary": "Administrator revokes human sessions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Completed"
+          },
+          "401": {
+            "description": "Unauthorized, SESSION_EXPIRED or SESSION_REVOKED"
+          },
+          "403": {
+            "description": "Permission denied"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ]
       }
     }
   },

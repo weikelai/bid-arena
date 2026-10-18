@@ -1,0 +1,3569 @@
+{
+  "at": "2026-10-18T12:15:21.232Z",
+  "baseCommit": "95422f85c84f07baa169586965ee57d65d87bbfe",
+  "note": "Generated before release commit. Final commit recorded separately; source file hashes bind this evidence to implementation.",
+  "logs": [
+    {
+      "file": ".local/hardening-regression-resumed.log",
+      "sha256": "0d168ba7580cf89ca6cbb311bdbc0fe3e59005361baf1ecd4aea49f9ddafd3b3",
+      "results": [
+        "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.051 s -- in dev.bidarena.AppConfigTest",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.678 s -- in dev.bidarena.PasswordHasherTest",
+        "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0",
+        "[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.12 s -- in dev.bidarena.AuctionIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.191 s -- in dev.bidarena.BackupIT",
+        "[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.055 s -- in dev.bidarena.BoundaryIT",
+        "[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 36.37 s -- in dev.bidarena.DatabaseIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 87.68 s -- in dev.bidarena.HttpSimulationIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.406 s -- in dev.bidarena.RuntimePermissionsIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.058 s -- in dev.bidarena.SecurityHttpIT",
+        "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.381 s -- in dev.bidarena.SecurityIT",
+        "STABILITY_SQL users=100 requestedSeconds=3600 liveChecks=728 inconsistent=0 pending=0 duplicateCapture=0 uniqueResults=true",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3661 s -- in dev.bidarena.StabilityIT",
+        "STRESS_SQL users=20 inconsistent=0 pending=0 orphanBid=0 duplicateCapture=0",
+        "STRESS_SQL users=50 inconsistent=0 pending=0 orphanBid=0 duplicateCapture=0",
+        "STRESS_SQL users=100 inconsistent=0 pending=0 orphanBid=0 duplicateCapture=0",
+        "STRESS_SQL users=200 inconsistent=0 pending=0 orphanBid=0 duplicateCapture=0",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 396.5 s -- in dev.bidarena.StressIT",
+        "[INFO] Tests run: 43, Failures: 0, Errors: 0, Skipped: 0",
+        "[INFO] BUILD SUCCESS",
+        "[INFO] Finished at: 2026-10-18T19:52:19+08:00"
+      ]
+    },
+    {
+      "file": ".local/hardening-interrupted-regression.log",
+      "sha256": "00cbe5b72cd01c29fa98c036ef0f6b79a0ec50d3212fbd4d7721c0e874b14dc0",
+      "results": [
+        "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.065 s -- in dev.bidarena.AppConfigTest",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.695 s -- in dev.bidarena.PasswordHasherTest",
+        "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0",
+        "[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 14.14 s -- in dev.bidarena.AuctionIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.619 s -- in dev.bidarena.BackupIT",
+        "[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.469 s -- in dev.bidarena.BoundaryIT",
+        "[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 35.78 s -- in dev.bidarena.DatabaseIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 88.10 s -- in dev.bidarena.HttpSimulationIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.134 s -- in dev.bidarena.RuntimePermissionsIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.229 s -- in dev.bidarena.SecurityHttpIT",
+        "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.916 s -- in dev.bidarena.SecurityIT",
+        "STABILITY_SQL users=50 requestedSeconds=1800 liveChecks=363 inconsistent=0 pending=0 duplicateCapture=0 uniqueResults=true"
+      ]
+    },
+    {
+      "file": ".local/hardening-final-regression.log",
+      "sha256": "4d4bef97d9def11b62e17d135211521ca24f18ad04266133ac1b6e2613cb671d",
+      "results": [
+        "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.067 s -- in dev.bidarena.AppConfigTest",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.076 s -- in dev.bidarena.PasswordHasherTest",
+        "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0",
+        "[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 13.57 s -- in dev.bidarena.AuctionIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.516 s -- in dev.bidarena.BackupIT",
+        "[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.487 s -- in dev.bidarena.BoundaryIT",
+        "[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 36.42 s -- in dev.bidarena.DatabaseIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 90.46 s -- in dev.bidarena.HttpSimulationIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.704 s -- in dev.bidarena.RuntimePermissionsIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.260 s -- in dev.bidarena.SecurityHttpIT",
+        "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.139 s -- in dev.bidarena.SecurityIT",
+        "STABILITY_SQL users=20 requestedSeconds=600 liveChecks=121 inconsistent=0 pending=0 duplicateCapture=0 uniqueResults=true",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 616.6 s -- in dev.bidarena.StabilityIT",
+        "STRESS_SQL users=20 inconsistent=0 pending=0 orphanBid=0 duplicateCapture=0",
+        "STRESS_SQL users=50 inconsistent=0 pending=0 orphanBid=0 duplicateCapture=0",
+        "STRESS_SQL users=100 inconsistent=0 pending=0 orphanBid=0 duplicateCapture=0",
+        "[ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 179.3 s <<< FAILURE! -- in dev.bidarena.StressIT",
+        "[ERROR] Tests run: 43, Failures: 1, Errors: 0, Skipped: 0",
+        "[INFO] BUILD FAILURE",
+        "[INFO] Finished at: 2026-10-18T17:57:21+08:00"
+      ]
+    },
+    {
+      "file": ".local/hardening-full-regression.log",
+      "sha256": "c1cafcae0ba244884c36509efe09838cc20534e55d14b1f0b08785c0d286b669",
+      "results": [
+        "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.062 s -- in dev.bidarena.AppConfigTest",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.966 s -- in dev.bidarena.PasswordHasherTest",
+        "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0",
+        "[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 14.81 s -- in dev.bidarena.AuctionIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.037 s -- in dev.bidarena.BackupIT",
+        "[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.260 s -- in dev.bidarena.BoundaryIT",
+        "[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 35.94 s -- in dev.bidarena.DatabaseIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 84.30 s -- in dev.bidarena.HttpSimulationIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.527 s -- in dev.bidarena.RuntimePermissionsIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.479 s -- in dev.bidarena.SecurityHttpIT",
+        "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.937 s -- in dev.bidarena.SecurityIT",
+        "STABILITY_SQL users=20 requestedSeconds=120 liveChecks=30 inconsistent=0 pending=0 duplicateCapture=0 uniqueResults=true",
+        "STABILITY_SQL users=50 requestedSeconds=300 liveChecks=65 inconsistent=0 pending=0 duplicateCapture=0 uniqueResults=true",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 482.5 s -- in dev.bidarena.StabilityIT",
+        "[ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 10.12 s <<< FAILURE! -- in dev.bidarena.StressIT",
+        "[ERROR] Tests run: 42, Failures: 1, Errors: 0, Skipped: 0",
+        "[INFO] BUILD FAILURE",
+        "[INFO] Finished at: 2026-10-18T17:22:38+08:00"
+      ]
+    },
+    {
+      "file": ".local/hardening-full-regression-retry.log",
+      "sha256": "997b6ffffc9cbd13a73e257ab3e3b119e44fc6cc5e6429a93b2da4f4c6ff8cde",
+      "results": [
+        "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.043 s -- in dev.bidarena.AppConfigTest",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.676 s -- in dev.bidarena.PasswordHasherTest",
+        "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0",
+        "[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 14.17 s -- in dev.bidarena.AuctionIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.674 s -- in dev.bidarena.BackupIT",
+        "[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.33 s -- in dev.bidarena.BoundaryIT",
+        "[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 37.44 s -- in dev.bidarena.DatabaseIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 103.1 s -- in dev.bidarena.HttpSimulationIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.402 s -- in dev.bidarena.RuntimePermissionsIT",
+        "[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 5.369 s <<< FAILURE! -- in dev.bidarena.SecurityHttpIT",
+        "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.669 s -- in dev.bidarena.SecurityIT",
+        "STABILITY_SQL users=20 requestedSeconds=120 liveChecks=31 inconsistent=0 pending=0 duplicateCapture=0 uniqueResults=true",
+        "STABILITY_SQL users=50 requestedSeconds=300 liveChecks=68 inconsistent=0 pending=0 duplicateCapture=0 uniqueResults=true",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 506.5 s -- in dev.bidarena.StabilityIT",
+        "STRESS_SQL users=20 inconsistent=0 pending=0 orphanBid=0 duplicateCapture=0",
+        "STRESS_SQL users=50 inconsistent=0 pending=0 orphanBid=0 duplicateCapture=0",
+        "STRESS_SQL users=100 inconsistent=0 pending=0 orphanBid=0 duplicateCapture=0",
+        "STRESS_SQL users=200 inconsistent=0 pending=0 orphanBid=0 duplicateCapture=0",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 209.9 s -- in dev.bidarena.StressIT",
+        "[ERROR] Tests run: 43, Failures: 0, Errors: 1, Skipped: 0",
+        "[INFO] BUILD FAILURE",
+        "[INFO] Finished at: 2026-10-18T17:39:27+08:00"
+      ]
+    },
+    {
+      "file": ".local/hardening-final-unit.log",
+      "sha256": "cace00b623aa727b0f6c9c40248cb49e5e3debad57df0615436219b295ac94c1",
+      "results": [
+        "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.088 s -- in dev.bidarena.AppConfigTest",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.191 s -- in dev.bidarena.PasswordHasherTest",
+        "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0",
+        "[INFO] BUILD SUCCESS",
+        "[INFO] Finished at: 2026-10-18T17:49:10+08:00"
+      ]
+    },
+    {
+      "file": ".local/hardening-ui-final-test.log",
+      "sha256": "d53c8ed2d8b8b85fe5b9d43e3d098484fade68a90f3870484c7d61172b77cf0e",
+      "results": []
+    },
+    {
+      "file": ".local/hardening-ui-final-build.log",
+      "sha256": "ed3f4454c25021e5c7f0d5edb6daba7e8ddd976176e3a2f7d264d88536b97014",
+      "results": []
+    },
+    {
+      "file": ".local/production-compose-runtime-final.log",
+      "sha256": "e7d29d02c7cfeac0925f22f074e25a6c5446fd96e745de1c4d9a11577d9c8a6d",
+      "results": []
+    },
+    {
+      "file": ".local/runtime-lock-privilege-failure.log",
+      "sha256": "40d14948b2c17fc22d16fe75603faf8b461543804cd54059d2bdb827fadca9e6",
+      "results": []
+    },
+    {
+      "file": ".local/production-compose-runtime-retry.log",
+      "sha256": "ae0c62bf1285ea65af6d2900d693ac2d86c6e363925e3a54be3c0742c69ab2fe",
+      "results": []
+    },
+    {
+      "file": ".local/deployment-patched.log",
+      "sha256": "d871ed0c8dbcdea5b425ff87d7c3895e562f0652e7dea1078c157cc1b07c3039",
+      "results": []
+    },
+    {
+      "file": ".local/local-tls-patched-final.log",
+      "sha256": "c404fe7c0a081998afe190d49a613f74aebd37faed0173462b352fcbd8c8f489",
+      "results": []
+    },
+    {
+      "file": ".local/hardening-secret-final.log",
+      "sha256": "7e35f4acdb1a360faf5b3ae3689b7fb6c3429a78bd67d755f5eb5db836a39696",
+      "results": []
+    },
+    {
+      "file": ".local/ops-probe-tests.log",
+      "sha256": "cdcf691e938a287fcba3f13097d5ba12321e29588c872d1268010b94a18b05f2",
+      "results": []
+    },
+    {
+      "file": ".local/release-audit-encoding-test.log",
+      "sha256": "f7c24ff8df65a1455925f86efa8088f12832960014a732240437387d9af65cc4",
+      "results": []
+    },
+    {
+      "file": ".local/hardening-container-final.log",
+      "sha256": "f07b3a7fbf3a4c9991cbd0f27f207f0359c31c43ae63fe17197d7e6e2bc70133",
+      "results": []
+    },
+    {
+      "file": ".local/hardening-latest-full-regression.log",
+      "sha256": "73c919a191dafa92d0ff19e3a3781fad63f3a22617f13cf5c4fb5bd1903b692d",
+      "results": [
+        "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.067 s -- in dev.bidarena.AppConfigTest",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.177 s -- in dev.bidarena.PasswordHasherTest",
+        "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0",
+        "[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 15.19 s -- in dev.bidarena.AuctionIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.663 s -- in dev.bidarena.BackupIT",
+        "[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.19 s -- in dev.bidarena.BoundaryIT",
+        "[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 38.36 s -- in dev.bidarena.DatabaseIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 99.47 s -- in dev.bidarena.HttpSimulationIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.404 s -- in dev.bidarena.RuntimePermissionsIT",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.639 s -- in dev.bidarena.SecurityHttpIT",
+        "[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.164 s -- in dev.bidarena.SecurityIT",
+        "STABILITY_SQL users=20 requestedSeconds=120 liveChecks=29 inconsistent=0 pending=0 duplicateCapture=0 uniqueResults=true",
+        "STABILITY_SQL users=50 requestedSeconds=300 liveChecks=66 inconsistent=0 pending=0 duplicateCapture=0 uniqueResults=true",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 485.9 s -- in dev.bidarena.StabilityIT",
+        "STRESS_SQL users=20 inconsistent=0 pending=0 orphanBid=0 duplicateCapture=0",
+        "STRESS_SQL users=50 inconsistent=0 pending=0 orphanBid=0 duplicateCapture=0",
+        "STRESS_SQL users=100 inconsistent=0 pending=0 orphanBid=0 duplicateCapture=0",
+        "STRESS_SQL users=200 inconsistent=0 pending=0 orphanBid=0 duplicateCapture=0",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 369.3 s -- in dev.bidarena.StressIT",
+        "[INFO] Tests run: 44, Failures: 0, Errors: 0, Skipped: 0",
+        "[INFO] BUILD SUCCESS",
+        "[INFO] Finished at: 2026-10-18T20:11:07+08:00"
+      ]
+    },
+    {
+      "file": ".local/hardening-latest-security.log",
+      "sha256": "3bfa0f8b6c6e0d9517e315e4791fd33b615f06e0cbf618547ba4e4102aa2e01c",
+      "results": [
+        "[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.076 s -- in dev.bidarena.AppConfigTest",
+        "[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.242 s -- in dev.bidarena.PasswordHasherTest",
+        "[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0",
+        "[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 10.24 s -- in dev.bidarena.SecurityIT",
+        "[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0",
+        "[INFO] BUILD SUCCESS",
+        "[INFO] Finished at: 2026-10-18T19:53:27+08:00"
+      ]
+    },
+    {
+      "file": ".local/canonical-account-before.log",
+      "sha256": "69430a0d3d742414004506f46d2ee9b6d776d3bb909855393c8e41d40a1fb01f",
+      "results": []
+    },
+    {
+      "file": ".local/canonical-account-after.log",
+      "sha256": "26c6ead7cb8fc3f6786aa82b86a0105459944f8c7c350a4488a5215c7e6cead9",
+      "results": []
+    },
+    {
+      "file": ".local/production-compose-runtime-latest.log",
+      "sha256": "d5e0dfd70abf94fe1c8275b4b230cfc35c47f21b6db277b1d675b1022d17e063",
+      "results": []
+    },
+    {
+      "file": ".local/production-latest-readiness-failure.log",
+      "sha256": "94ee440d933a9f0618bab6eb99186ca55b4bce2d6e7b5aeaf5893e9b9d1c6555",
+      "results": []
+    },
+    {
+      "file": ".local/production-compose-runtime-latest-retry.log",
+      "sha256": "f9bcf57c3352176af69978bf27e69719b453206fc730ef7953ae7bd0b79dbcaf",
+      "results": []
+    },
+    {
+      "file": ".local/hardening-compose-latest-build.log",
+      "sha256": "0d41c0b710f57649cc564ed46ae1e0bcbbe5a86d637853f2a5f57dbc8adeec67",
+      "results": [
+        "#30 23.11 [INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.501 s -- in dev.bidarena.PasswordHasherTest",
+        "#30 23.12 [INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 s -- in dev.bidarena.AppConfigTest",
+        "#30 23.14 [INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0",
+        "#30 24.94 [INFO] BUILD SUCCESS",
+        "#30 24.94 [INFO] Finished at: 2026-10-18T11:43:27Z"
+      ]
+    },
+    {
+      "file": ".local/hardening-compose-latest-up.log",
+      "sha256": "b7b304e88b1fd5868e40a54226d1ba196d1bd35e9a89c876340a040ac77d5e59",
+      "results": []
+    },
+    {
+      "file": ".local/hardening-seed-latest.log",
+      "sha256": "9923820fcc5f20880c92651592637e210fc31a0e8199df1ae22053fff0ebf577",
+      "results": []
+    },
+    {
+      "file": "backend/target/http-boundaries.log",
+      "sha256": "211362c9524efae4a5df9ecf5bc934bf4b684db749b5a72a05c83fdab931fef9",
+      "results": []
+    },
+    {
+      "file": "backend/target/http-simulation.log",
+      "sha256": "08cd3c10eacad1d27fd90aa7306b1a6d39b621d30c58fefd1260d92520eedf80",
+      "results": []
+    },
+    {
+      "file": "backend/target/browser-acceptance.log",
+      "sha256": "2c452f0b358e76ce9c44c84a1f73637bb414738598d60124a05ec50d1dbfc73c",
+      "results": []
+    },
+    {
+      "file": "backend/target/backup-restore.log",
+      "sha256": "7b50aaac11b688ae6af7a7ab0a92f00d63386299158ecaf500d81c065cf8a0de",
+      "results": []
+    },
+    {
+      "file": ".local/source-address-bytecode.log",
+      "sha256": "ea5711e696a51f29a6bc6150fc20d04fa611988fb25084c2c83f7e05f4b076a5",
+      "results": []
+    },
+    {
+      "file": ".local/hardening-frontend-latest-recreate.log",
+      "sha256": "b9344d82fac92285c7c776df0092b6a437d4677c17214e0494e8343f5f323723",
+      "results": []
+    }
+  ],
+  "snapshots": [
+    {
+      "file": "backend/target/stress-20.json",
+      "measuredFile": "backend/target/stress-20.json",
+      "sha256": "ab9c4fa0b39519ccc08c4f59ea20a05ee134d520f7c58c829edc29a2e1107a1d",
+      "status": "PASS",
+      "users": 20,
+      "maximumWorkers": 20,
+      "auctionId": 2,
+      "requests": 181,
+      "acceptedBidResponses": 24,
+      "rejectedBidResponses": 76,
+      "httpErrors": 0,
+      "timeouts": 0,
+      "loadSeconds": 2.8243634999999996,
+      "requestsPerSecond": 64.08523548757093,
+      "p50ms": 130.55019999999968,
+      "p95ms": 602.6437999999998,
+      "p99ms": 712.4922999999999,
+      "winnerId": 11,
+      "price": 200,
+      "totalSeconds": 64.5249312,
+      "sampledJavaRssPeakBytes": 350007296,
+      "sampledJavaCpuPeakPercent": 197.4421209858103,
+      "resourceSamples": 16,
+      "poolWaitMetric": "NOT INSTRUMENTED"
+    },
+    {
+      "file": "backend/target/stress-50.json",
+      "measuredFile": "backend/target/stress-50.json",
+      "sha256": "ba92c950048804168b2d27b04be9b6439e67fb25acab3af497f6a6f588a93e14",
+      "status": "PASS",
+      "users": 50,
+      "maximumWorkers": 50,
+      "auctionId": 3,
+      "requests": 451,
+      "acceptedBidResponses": 55,
+      "rejectedBidResponses": 195,
+      "httpErrors": 0,
+      "timeouts": 0,
+      "loadSeconds": 5.005640299999999,
+      "requestsPerSecond": 90.09836363991238,
+      "p50ms": 281.7794000000031,
+      "p95ms": 1082.833700000001,
+      "p99ms": 1239.6850000000013,
+      "winnerId": 55,
+      "price": 200,
+      "totalSeconds": 65.0573505,
+      "sampledJavaRssPeakBytes": 261099520,
+      "sampledJavaCpuPeakPercent": 446.94380326704544,
+      "resourceSamples": 19,
+      "poolWaitMetric": "NOT INSTRUMENTED"
+    },
+    {
+      "file": "backend/target/stress-100.json",
+      "measuredFile": "backend/target/stress-100.json",
+      "sha256": "5716d3343c2d15e513900e63f40452b1398d0b8ef3c29c365243e8371bd7f59e",
+      "status": "PASS",
+      "users": 100,
+      "maximumWorkers": 100,
+      "auctionId": 4,
+      "requests": 901,
+      "acceptedBidResponses": 104,
+      "rejectedBidResponses": 396,
+      "httpErrors": 0,
+      "timeouts": 0,
+      "loadSeconds": 9.256466000000003,
+      "requestsPerSecond": 97.33736395725968,
+      "p50ms": 532.0930000000008,
+      "p95ms": 2029.3306999999986,
+      "p99ms": 2710.8853000000017,
+      "winnerId": 81,
+      "price": 200,
+      "totalSeconds": 65.3488098,
+      "sampledJavaRssPeakBytes": 313380864,
+      "sampledJavaCpuPeakPercent": 584.5391942725397,
+      "resourceSamples": 19,
+      "poolWaitMetric": "NOT INSTRUMENTED"
+    },
+    {
+      "file": "backend/target/stress-200.json",
+      "measuredFile": "backend/target/stress-200.json",
+      "sha256": "b7064471d8e231a2ff451de8658c6078a771da3b8c0a3965299239f957312941",
+      "status": "PASS",
+      "users": 200,
+      "maximumWorkers": 200,
+      "auctionId": 5,
+      "requests": 1801,
+      "acceptedBidResponses": 204,
+      "rejectedBidResponses": 796,
+      "httpErrors": 0,
+      "timeouts": 0,
+      "loadSeconds": 24.139381600000007,
+      "requestsPerSecond": 74.60837356330617,
+      "p50ms": 1391.3551999999981,
+      "p95ms": 5050.371899999998,
+      "p99ms": 7295.814099999989,
+      "winnerId": 229,
+      "price": 200,
+      "totalSeconds": 69.0341561,
+      "sampledJavaRssPeakBytes": 299995136,
+      "sampledJavaCpuPeakPercent": 937.9355400696865,
+      "resourceSamples": 24,
+      "poolWaitMetric": "NOT INSTRUMENTED"
+    },
+    {
+      "file": "backend/target/stability-20.json",
+      "measuredFile": ".local/hardening-extended/stability-20.json",
+      "sha256": "7952146d30e8090a83c2d49175c58a64394ade606eb35bdc85ef5949c7a4af48",
+      "status": "PASS",
+      "users": 20,
+      "requestedSeconds": 600,
+      "loadSeconds": 600.3647389,
+      "totalSeconds": 603.7262628999999,
+      "requests": 11663,
+      "httpSuccess": 11663,
+      "acceptedBidResponses": 726,
+      "expectedBusinessRejections": 3434,
+      "httpErrors": 0,
+      "timeouts": 0,
+      "requestsPerSecond": 19.426523985018132,
+      "p50ms": 6.997499999997672,
+      "p95ms": 159.47499999997672,
+      "p99ms": 252.04649999999674,
+      "rooms": 52,
+      "reconnects": 1560,
+      "maximumPoolWaiting": 12,
+      "maximumPoolActive": 8,
+      "before": {
+        "pool": {
+          "total": 1,
+          "maximum": 8,
+          "active": 0,
+          "idle": 1,
+          "waiting": 0
+        },
+        "metrics": {
+          "connection.acquire": {
+            "count": 114,
+            "totalMs": 5.061,
+            "buckets": {
+              "le1Ms": 112,
+              "le5Ms": 114,
+              "le10Ms": 114,
+              "le50Ms": 114,
+              "le100Ms": 114,
+              "le500Ms": 114,
+              "le1000Ms": 114,
+              "le5000Ms": 114,
+              "le15000Ms": 114,
+              "le30000Ms": 114,
+              "infinity": 114
+            }
+          },
+          "http.latency": {
+            "count": 44,
+            "totalMs": 6795.2989,
+            "buckets": {
+              "le1Ms": 2,
+              "le5Ms": 3,
+              "le10Ms": 3,
+              "le50Ms": 3,
+              "le100Ms": 3,
+              "le500Ms": 44,
+              "le1000Ms": 44,
+              "le5000Ms": 44,
+              "le15000Ms": 44,
+              "le30000Ms": 44,
+              "infinity": 44
+            }
+          }
+        },
+        "uptimeMs": 11415,
+        "heapUsedBytes": 16984192,
+        "heapCommittedBytes": 58720256,
+        "processCpuLoad": 0.051797697806429656,
+        "processCpuTimeNs": 14328125000
+      },
+      "after": {
+        "pool": {
+          "total": 8,
+          "maximum": 8,
+          "active": 0,
+          "idle": 8,
+          "waiting": 0
+        },
+        "metrics": {
+          "bid.acceptedResponses": 726,
+          "bid.latency": {
+            "count": 4160,
+            "totalMs": 170170.696,
+            "buckets": {
+              "le1Ms": 0,
+              "le5Ms": 1393,
+              "le10Ms": 2064,
+              "le50Ms": 2948,
+              "le100Ms": 3602,
+              "le500Ms": 4160,
+              "le1000Ms": 4160,
+              "le5000Ms": 4160,
+              "le15000Ms": 4160,
+              "le30000Ms": 4160,
+              "infinity": 4160
+            }
+          },
+          "bid.rejectedResponses": 3434,
+          "connection.acquire": {
+            "count": 29910,
+            "totalMs": 146281.1197,
+            "buckets": {
+              "le1Ms": 24856,
+              "le5Ms": 26219,
+              "le10Ms": 26670,
+              "le50Ms": 28972,
+              "le100Ms": 29685,
+              "le500Ms": 29910,
+              "le1000Ms": 29910,
+              "le5000Ms": 29910,
+              "le15000Ms": 29910,
+              "le30000Ms": 29910,
+              "infinity": 29910
+            }
+          },
+          "http.latency": {
+            "count": 11781,
+            "totalMs": 372254.4242,
+            "buckets": {
+              "le1Ms": 26,
+              "le5Ms": 4976,
+              "le10Ms": 7670,
+              "le50Ms": 9349,
+              "le100Ms": 10456,
+              "le500Ms": 11780,
+              "le1000Ms": 11780,
+              "le5000Ms": 11781,
+              "le15000Ms": 11781,
+              "le30000Ms": 11781,
+              "infinity": 11781
+            }
+          },
+          "settlement.attempts": 63,
+          "settlement.latency": {
+            "count": 63,
+            "totalMs": 1565.6565,
+            "buckets": {
+              "le1Ms": 0,
+              "le5Ms": 1,
+              "le10Ms": 10,
+              "le50Ms": 57,
+              "le100Ms": 61,
+              "le500Ms": 63,
+              "le1000Ms": 63,
+              "le5000Ms": 63,
+              "le15000Ms": 63,
+              "le30000Ms": 63,
+              "infinity": 63
+            }
+          },
+          "sql.auctionLockStatement": {
+            "count": 6938,
+            "totalMs": 53253.9925,
+            "buckets": {
+              "le1Ms": 4812,
+              "le5Ms": 5362,
+              "le10Ms": 5634,
+              "le50Ms": 6571,
+              "le100Ms": 6928,
+              "le500Ms": 6938,
+              "le1000Ms": 6938,
+              "le5000Ms": 6938,
+              "le15000Ms": 6938,
+              "le30000Ms": 6938,
+              "infinity": 6938
+            }
+          },
+          "sql.walletLockStatement": {
+            "count": 389,
+            "totalMs": 179.0109,
+            "buckets": {
+              "le1Ms": 385,
+              "le5Ms": 389,
+              "le10Ms": 389,
+              "le50Ms": 389,
+              "le100Ms": 389,
+              "le500Ms": 389,
+              "le1000Ms": 389,
+              "le5000Ms": 389,
+              "le15000Ms": 389,
+              "le30000Ms": 389,
+              "infinity": 389
+            }
+          }
+        },
+        "uptimeMs": 616282,
+        "heapUsedBytes": 22445328,
+        "heapCommittedBytes": 58720256,
+        "processCpuLoad": 0.0010064373666329588,
+        "processCpuTimeNs": 55859375000
+      },
+      "resourceSamples": 120,
+      "peakJavaRssBytes": 200089600,
+      "peakJavaCpuPercent": 18.14264022865309,
+      "cpuDefinition": "Sum of cores, may exceed 100%; sampled deltas, not whole-run maximum",
+      "mysqlStatus": [
+        [
+          {
+            "Variable_name": "Innodb_row_lock_current_waits",
+            "Value": "0"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_time",
+            "Value": "3170900"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_waits",
+            "Value": "96731"
+          }
+        ],
+        [
+          {
+            "Variable_name": "Innodb_row_lock_current_waits",
+            "Value": "0"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_time",
+            "Value": "3282786"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_waits",
+            "Value": "101589"
+          }
+        ]
+      ]
+    },
+    {
+      "file": "backend/target/stability-50.json",
+      "measuredFile": ".local/hardening-extended/stability-50.json",
+      "sha256": "c3e63d47776b0b1af22d58e64b11b923576a4bcd5399bd8569aedc1952607bee",
+      "status": "PASS",
+      "users": 50,
+      "requestedSeconds": 1800,
+      "loadSeconds": 1801.2309613999998,
+      "totalSeconds": 1804.3661365,
+      "requests": 82883,
+      "httpSuccess": 82883,
+      "acceptedBidResponses": 2106,
+      "expectedBusinessRejections": 27894,
+      "httpErrors": 0,
+      "timeouts": 0,
+      "requestsPerSecond": 46.01464319466256,
+      "p50ms": 6.650000000023283,
+      "p95ms": 387.32620000001043,
+      "p99ms": 592.0592000000179,
+      "rooms": 150,
+      "reconnects": 10977,
+      "maximumPoolWaiting": 42,
+      "maximumPoolActive": 8,
+      "before": {
+        "pool": {
+          "waiting": 0,
+          "total": 1,
+          "maximum": 8,
+          "active": 0,
+          "idle": 1
+        },
+        "metrics": {
+          "connection.acquire": {
+            "count": 274,
+            "totalMs": 6.5081,
+            "buckets": {
+              "le1Ms": 273,
+              "le5Ms": 274,
+              "le10Ms": 274,
+              "le50Ms": 274,
+              "le100Ms": 274,
+              "le500Ms": 274,
+              "le1000Ms": 274,
+              "le5000Ms": 274,
+              "le15000Ms": 274,
+              "le30000Ms": 274,
+              "infinity": 274
+            }
+          },
+          "http.latency": {
+            "count": 104,
+            "totalMs": 17400.5934,
+            "buckets": {
+              "le1Ms": 3,
+              "le5Ms": 3,
+              "le10Ms": 3,
+              "le50Ms": 3,
+              "le100Ms": 3,
+              "le500Ms": 104,
+              "le1000Ms": 104,
+              "le5000Ms": 104,
+              "le15000Ms": 104,
+              "le30000Ms": 104,
+              "infinity": 104
+            }
+          }
+        },
+        "uptimeMs": 20565,
+        "heapUsedBytes": 117638912,
+        "heapCommittedBytes": 297795584,
+        "processCpuLoad": 0.04651903633397245,
+        "processCpuTimeNs": 23234375000
+      },
+      "after": {
+        "pool": {
+          "waiting": 0,
+          "total": 8,
+          "maximum": 8,
+          "active": 0,
+          "idle": 8
+        },
+        "metrics": {
+          "bid.acceptedResponses": 2106,
+          "bid.latency": {
+            "count": 30000,
+            "totalMs": 2060475.6517,
+            "buckets": {
+              "le1Ms": 0,
+              "le5Ms": 8745,
+              "le10Ms": 14549,
+              "le50Ms": 19600,
+              "le100Ms": 23450,
+              "le500Ms": 29625,
+              "le1000Ms": 30000,
+              "le5000Ms": 30000,
+              "le15000Ms": 30000,
+              "le30000Ms": 30000,
+              "infinity": 30000
+            }
+          },
+          "bid.rejectedResponses": 27894,
+          "connection.acquire": {
+            "count": 209494,
+            "totalMs": 3729994.2628,
+            "buckets": {
+              "le1Ms": 172364,
+              "le5Ms": 176526,
+              "le10Ms": 177885,
+              "le50Ms": 187526,
+              "le100Ms": 195786,
+              "le500Ms": 209188,
+              "le1000Ms": 209494,
+              "le5000Ms": 209494,
+              "le15000Ms": 209494,
+              "le30000Ms": 209494,
+              "infinity": 209494
+            }
+          },
+          "http.latency": {
+            "count": 83189,
+            "totalMs": 5311242.0861,
+            "buckets": {
+              "le1Ms": 149,
+              "le5Ms": 35468,
+              "le10Ms": 55535,
+              "le50Ms": 63959,
+              "le100Ms": 67715,
+              "le500Ms": 81466,
+              "le1000Ms": 83184,
+              "le5000Ms": 83189,
+              "le15000Ms": 83189,
+              "le30000Ms": 83189,
+              "infinity": 83189
+            }
+          },
+          "settlement.attempts": 209,
+          "settlement.latency": {
+            "count": 209,
+            "totalMs": 5588.8471,
+            "buckets": {
+              "le1Ms": 0,
+              "le5Ms": 5,
+              "le10Ms": 27,
+              "le50Ms": 182,
+              "le100Ms": 200,
+              "le500Ms": 209,
+              "le1000Ms": 209,
+              "le5000Ms": 209,
+              "le15000Ms": 209,
+              "le30000Ms": 209,
+              "infinity": 209
+            }
+          },
+          "sql.auctionLockStatement": {
+            "count": 49318,
+            "totalMs": 462755.8443,
+            "buckets": {
+              "le1Ms": 33599,
+              "le5Ms": 37001,
+              "le10Ms": 38570,
+              "le50Ms": 45771,
+              "le100Ms": 49218,
+              "le500Ms": 49318,
+              "le1000Ms": 49318,
+              "le5000Ms": 49318,
+              "le15000Ms": 49318,
+              "le30000Ms": 49318,
+              "infinity": 49318
+            }
+          },
+          "sql.walletLockStatement": {
+            "count": 1938,
+            "totalMs": 1006.7599,
+            "buckets": {
+              "le1Ms": 1840,
+              "le5Ms": 1938,
+              "le10Ms": 1938,
+              "le50Ms": 1938,
+              "le100Ms": 1938,
+              "le500Ms": 1938,
+              "le1000Ms": 1938,
+              "le5000Ms": 1938,
+              "le15000Ms": 1938,
+              "le30000Ms": 1938,
+              "infinity": 1938
+            }
+          }
+        },
+        "uptimeMs": 1825832,
+        "heapUsedBytes": 119841360,
+        "heapCommittedBytes": 297795584,
+        "processCpuLoad": 0.001557373127663731,
+        "processCpuTimeNs": 199625000000
+      },
+      "resourceSamples": 360,
+      "peakJavaRssBytes": 381022208,
+      "peakJavaCpuPercent": 57.22159940209268,
+      "cpuDefinition": "Sum of cores, may exceed 100%; sampled deltas, not whole-run maximum",
+      "mysqlStatus": [
+        [
+          {
+            "Variable_name": "Innodb_row_lock_current_waits",
+            "Value": "0"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_time",
+            "Value": "3537726"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_waits",
+            "Value": "106271"
+          }
+        ],
+        [
+          {
+            "Variable_name": "Innodb_row_lock_current_waits",
+            "Value": "0"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_time",
+            "Value": "4404672"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_waits",
+            "Value": "141930"
+          }
+        ]
+      ]
+    },
+    {
+      "file": "backend/target/stability-100.json",
+      "measuredFile": ".local/hardening-extended/stability-100.json",
+      "sha256": "918fb8030b678ac9944e78516f52e25817ba759d421cde080a8e0efe803cbca6",
+      "status": "PASS",
+      "users": 100,
+      "requestedSeconds": 3600,
+      "loadSeconds": 3600.7521034,
+      "totalSeconds": 3609.9415351,
+      "requests": 304510,
+      "httpSuccess": 304510,
+      "acceptedBidResponses": 4180,
+      "expectedBusinessRejections": 110720,
+      "httpErrors": 0,
+      "timeouts": 0,
+      "requestsPerSecond": 84.56844327396692,
+      "p50ms": 7.898800000024494,
+      "p95ms": 868.7825000002049,
+      "p99ms": 1349.075400000438,
+      "rooms": 288,
+      "reconnects": 33023,
+      "maximumPoolWaiting": 94,
+      "maximumPoolActive": 8,
+      "before": {
+        "pool": {
+          "active": 0,
+          "maximum": 8,
+          "total": 2,
+          "waiting": 0,
+          "idle": 2
+        },
+        "metrics": {
+          "connection.acquire": {
+            "count": 551,
+            "totalMs": 61.0544,
+            "buckets": {
+              "le1Ms": 532,
+              "le5Ms": 550,
+              "le10Ms": 550,
+              "le50Ms": 551,
+              "le100Ms": 551,
+              "le500Ms": 551,
+              "le1000Ms": 551,
+              "le5000Ms": 551,
+              "le15000Ms": 551,
+              "le30000Ms": 551,
+              "infinity": 551
+            }
+          },
+          "http.latency": {
+            "count": 204,
+            "totalMs": 43624.6633,
+            "buckets": {
+              "le1Ms": 2,
+              "le5Ms": 3,
+              "le10Ms": 3,
+              "le50Ms": 3,
+              "le100Ms": 3,
+              "le500Ms": 204,
+              "le1000Ms": 204,
+              "le5000Ms": 204,
+              "le15000Ms": 204,
+              "le30000Ms": 204,
+              "infinity": 204
+            }
+          }
+        },
+        "uptimeMs": 48695,
+        "heapUsedBytes": 25496736,
+        "heapCommittedBytes": 297795584,
+        "processCpuLoad": 0.05133737680202993,
+        "processCpuTimeNs": 48703125000
+      },
+      "after": {
+        "pool": {
+          "active": 0,
+          "maximum": 8,
+          "total": 8,
+          "waiting": 0,
+          "idle": 8
+        },
+        "metrics": {
+          "bid.acceptedResponses": 4180,
+          "bid.latency": {
+            "count": 114900,
+            "totalMs": 16417426.401,
+            "buckets": {
+              "le1Ms": 0,
+              "le5Ms": 15422,
+              "le10Ms": 46772,
+              "le50Ms": 66359,
+              "le100Ms": 75867,
+              "le500Ms": 105362,
+              "le1000Ms": 112773,
+              "le5000Ms": 114900,
+              "le15000Ms": 114900,
+              "le30000Ms": 114900,
+              "infinity": 114900
+            }
+          },
+          "bid.rejectedResponses": 110720,
+          "connection.acquire": {
+            "count": 769381,
+            "totalMs": 36768500.7486,
+            "buckets": {
+              "le1Ms": 611171,
+              "le5Ms": 621820,
+              "le10Ms": 626777,
+              "le50Ms": 650576,
+              "le100Ms": 673570,
+              "le500Ms": 749035,
+              "le1000Ms": 766511,
+              "le5000Ms": 769381,
+              "le15000Ms": 769381,
+              "le30000Ms": 769381,
+              "infinity": 769381
+            }
+          },
+          "http.latency": {
+            "count": 305123,
+            "totalMs": 43771534.0989,
+            "buckets": {
+              "le1Ms": 378,
+              "le5Ms": 102287,
+              "le10Ms": 190811,
+              "le50Ms": 224133,
+              "le100Ms": 232203,
+              "le500Ms": 270252,
+              "le1000Ms": 295224,
+              "le5000Ms": 305123,
+              "le15000Ms": 305123,
+              "le30000Ms": 305123,
+              "infinity": 305123
+            }
+          },
+          "settlement.attempts": 560,
+          "settlement.latency": {
+            "count": 560,
+            "totalMs": 29609.7919,
+            "buckets": {
+              "le1Ms": 0,
+              "le5Ms": 19,
+              "le10Ms": 71,
+              "le50Ms": 411,
+              "le100Ms": 477,
+              "le500Ms": 555,
+              "le1000Ms": 560,
+              "le5000Ms": 560,
+              "le15000Ms": 560,
+              "le30000Ms": 560,
+              "infinity": 560
+            }
+          },
+          "sql.auctionLockStatement": {
+            "count": 188208,
+            "totalMs": 2196218.4612,
+            "buckets": {
+              "le1Ms": 112318,
+              "le5Ms": 132961,
+              "le10Ms": 138654,
+              "le50Ms": 172561,
+              "le100Ms": 186855,
+              "le500Ms": 188208,
+              "le1000Ms": 188208,
+              "le5000Ms": 188208,
+              "le15000Ms": 188208,
+              "le30000Ms": 188208,
+              "infinity": 188208
+            }
+          },
+          "sql.walletLockStatement": {
+            "count": 5683,
+            "totalMs": 3567.8609,
+            "buckets": {
+              "le1Ms": 5207,
+              "le5Ms": 5683,
+              "le10Ms": 5683,
+              "le50Ms": 5683,
+              "le100Ms": 5683,
+              "le500Ms": 5683,
+              "le1000Ms": 5683,
+              "le5000Ms": 5683,
+              "le15000Ms": 5683,
+              "le30000Ms": 5683,
+              "infinity": 5683
+            }
+          }
+        },
+        "uptimeMs": 3660049,
+        "heapUsedBytes": 83960064,
+        "heapCommittedBytes": 297795584,
+        "processCpuLoad": 0.0011811883601579006,
+        "processCpuTimeNs": 696578125000
+      },
+      "resourceSamples": 710,
+      "peakJavaRssBytes": 385392640,
+      "peakJavaCpuPercent": 126.37649515853427,
+      "cpuDefinition": "Sum of cores, may exceed 100%; sampled deltas, not whole-run maximum",
+      "mysqlStatus": [
+        [
+          {
+            "Variable_name": "Innodb_row_lock_current_waits",
+            "Value": "0"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_time",
+            "Value": "4713152"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_waits",
+            "Value": "151449"
+          }
+        ],
+        [
+          {
+            "Variable_name": "Innodb_row_lock_current_waits",
+            "Value": "0"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_time",
+            "Value": "8903118"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_waits",
+            "Value": "298981"
+          }
+        ]
+      ]
+    }
+  ],
+  "sourceHashes": [
+    {
+      "file": "backend/src/main/java/dev/bidarena/SecurityService.java",
+      "sha256": "3faed4a6b801acaba92f34b46eb57c247a7011776708c8aa56eda0e0326f5e29"
+    },
+    {
+      "file": "backend/src/test/java/dev/bidarena/BackupIT.java",
+      "sha256": "aa09ec77027d8177347a7250685e6f3b329d53f5f5d7db7617ff658e81317f86"
+    },
+    {
+      "file": "backend/src/test/java/dev/bidarena/RuntimePermissionsIT.java",
+      "sha256": "9ae2fe1d44b938ec76d427c1c62edbbee5d31c703c93abf24b4983a7a083e5ca"
+    },
+    {
+      "file": "backend/src/test/java/dev/bidarena/SecurityHttpIT.java",
+      "sha256": "4f6277aa241d687e0603a2a57619a530da8fd57436a3fbc7a6d812e73db015ed"
+    },
+    {
+      "file": "backend/src/test/java/dev/bidarena/SecurityIT.java",
+      "sha256": "73c82d880e86dcbee01a1f7ad13e713a1c281d4d1f74ad5282bf0c87250309d8"
+    },
+    {
+      "file": "database/migrations/V4__production_security.sql",
+      "sha256": "76b8c43a048876b394cfa4e9c0fb7bea430ca24ac51aca361a4a7cf2059b3c19"
+    },
+    {
+      "file": "deploy/Dockerfile.ingress",
+      "sha256": "e2f464b504bd57463a4bab6b9d461ccb4d4f57bb58bcdc242a63c30c30d726ee"
+    },
+    {
+      "file": "deploy/Dockerfile.mysql",
+      "sha256": "c32279b4bf8b91af9c042bfdfc818d55299ec7856df6160f448f5fd35a01a57f"
+    },
+    {
+      "file": "deploy/nginx-main.conf",
+      "sha256": "a71f2b410eb381775998ca94cf1b1b11da6002da635379c85d2429587d52fe1e"
+    },
+    {
+      "file": "deploy/nginx-tls.conf",
+      "sha256": "db5247f4ba4fce70e518c652d809d0e0b2085ab3602311e7cda6088600a4b1f1"
+    },
+    {
+      "file": "deploy/production.env.example",
+      "sha256": "2c8f062fc6552d1fa67919dcc61a1bced7e6ff317fedb4e4839b0104c935a0ad"
+    },
+    {
+      "file": "scripts/audit-containers.mjs",
+      "sha256": "a910179776ff3cac615e812c28bbca3778bd9b74b00958cdc604104b693f9125"
+    },
+    {
+      "file": "scripts/encrypted-backup.mjs",
+      "sha256": "45e1d786ccb5eab2e54ad7768d897f32e37bd226772e6f92050b34b46b204520"
+    },
+    {
+      "file": "scripts/hardening-evidence.mjs",
+      "sha256": "26b9dbdf4bb3f6fb5ede7c7e80c08c01959c2caef0d9db59a4592282cab6134e"
+    },
+    {
+      "file": "scripts/ops-check.mjs",
+      "sha256": "edd9e3f631eec964e37a7848eb71d3020ccf1d8b542d2b9d118d6456c46bb346"
+    },
+    {
+      "file": "scripts/provision-production.mjs",
+      "sha256": "e3bb1d771918372e8733a3c4831f3e3a2146c4c416a355df265367d26b2fb75c"
+    },
+    {
+      "file": "scripts/setup-production-env.mjs",
+      "sha256": "e879c77cde9bbb7a1b8b573532f4f00f5ab47e5ed6e3c0fe57b2524025ee2b95"
+    },
+    {
+      "file": "scripts/test-isolated.mjs",
+      "sha256": "ee5a4de5e93c781449b37f79dc581856b17a2e85d74dc5441b88c88d70468ac4"
+    },
+    {
+      "file": "scripts/test-local-tls.mjs",
+      "sha256": "ee8e85f359c5d96a6d49eb736b913fec456361849e53f9d476db80825e48da63"
+    },
+    {
+      "file": "scripts/test-ops.mjs",
+      "sha256": "9dc2c89118d7f55db829479ef853759164be37633a50c2cdaea5eb81f07154f9"
+    },
+    {
+      "file": "scripts/test-production-compose.mjs",
+      "sha256": "1cfdb7db36779066facbd79999e9360349e61ebd6017e1f38c474f06386ca176"
+    },
+    {
+      "file": "scripts/test-release-audit.mjs",
+      "sha256": "11fa931da4ce344529adec6a52313b6ae4994c14cf32122a1468423f6bd2bf43"
+    },
+    {
+      "file": "scripts/verify-remote.mjs",
+      "sha256": "bea65dbcc1423735ec47d82914ab41ad0444d97eeaeb4d38109036152d91c93f"
+    },
+    {
+      "file": "backend/src/main/java/dev/bidarena/Api.java",
+      "sha256": "9b1c850282a2159020e4d7a16d54a673af4ed60856fe4dcb3c95f78804082787"
+    },
+    {
+      "file": "backend/src/main/java/dev/bidarena/AppConfig.java",
+      "sha256": "3fa7728cefbb812294988e7aff552aff5452a80e12addf0746160cb4e5e99ef1"
+    },
+    {
+      "file": "backend/src/main/java/dev/bidarena/Application.java",
+      "sha256": "6b8a37fa5fdb1ab599d2a5e2381fecea5881e9ab6deb9a1ff9127126c5d465e8"
+    },
+    {
+      "file": "backend/src/main/java/dev/bidarena/AuctionService.java",
+      "sha256": "bda8222a6077d52f493e3de0e5e82b3fb605ca2d414571e94340204595487c72"
+    },
+    {
+      "file": "backend/src/main/java/dev/bidarena/Database.java",
+      "sha256": "a03aea16dee9fd55e28e099695f275a13faf39befe6b10f1371b7ca60e8e3ce3"
+    },
+    {
+      "file": "backend/src/main/java/dev/bidarena/DemoSeeder.java",
+      "sha256": "50e3915e738d082573cea4231c34ccb166edeca4323506730a2a4d9015bc037a"
+    },
+    {
+      "file": "backend/src/main/java/dev/bidarena/Metrics.java",
+      "sha256": "8ccb9293240190eaf98d44cee952aac8e57853f3d70bc376d2f867386c1738e2"
+    },
+    {
+      "file": "backend/src/main/java/dev/bidarena/PasswordHasher.java",
+      "sha256": "15ddeca32bb8aeaea30d7012cf2cd2be379c8f4e4cd52a937a4228beb77c207a"
+    },
+    {
+      "file": "backend/src/main/java/dev/bidarena/Sql.java",
+      "sha256": "3529e91567a69778fadd15ad518c9b2c0a918e430944198c97bea26ffba835bb"
+    },
+    {
+      "file": "backend/src/main/resources/app.yml",
+      "sha256": "d12c5516bf1e16863592f7712e521b90311f9099b0006e9975dca17c280b6769"
+    },
+    {
+      "file": "backend/src/main/resources/openapi.json",
+      "sha256": "999da0f06354636df39fd508ee74854708cea6f4f70ba545b754c7aaef370b29"
+    },
+    {
+      "file": "backend/src/test/java/dev/bidarena/AppConfigTest.java",
+      "sha256": "dff9cc32ea1dec9ff4c3afd89db3b665ac62e24de268c93c9b5d8416f0f805d4"
+    },
+    {
+      "file": "backend/src/test/java/dev/bidarena/AuctionIT.java",
+      "sha256": "b5a878c7267832c2f79c24d241cdc342f2789eb14766ccb13f82c585106795c5"
+    },
+    {
+      "file": "backend/src/test/java/dev/bidarena/BoundaryIT.java",
+      "sha256": "4bdb8fcea126cfc44326c5ebeb38ed38410fdda2b92ac70f9f0ef86eb54b7b72"
+    },
+    {
+      "file": "backend/src/test/java/dev/bidarena/DatabaseIT.java",
+      "sha256": "9966a91332796fa5b6c77ce1a259efd1889449b2c0af62283eadb6afd63c21c2"
+    },
+    {
+      "file": "backend/src/test/java/dev/bidarena/HttpSimulationIT.java",
+      "sha256": "7491671b1d8a65e2fe3b32ddef55214fbb8da9bdb3facbc47a27d1357eb2b11d"
+    },
+    {
+      "file": "backend/src/test/java/dev/bidarena/PasswordHasherTest.java",
+      "sha256": "4fedde6c9bd03870bb64cd06fe8c8c0244af7426587e9145928ed340053033a9"
+    },
+    {
+      "file": "backend/src/test/java/dev/bidarena/StabilityIT.java",
+      "sha256": "4963512ec81b2357c86545b8262d55bf33c7f983232376872a8355cc856af099"
+    },
+    {
+      "file": "backend/src/test/java/dev/bidarena/StressIT.java",
+      "sha256": "40d8f518a10c27dba86e06b7ab1f124010bdc6f04d08baffe38866f503fccc55"
+    },
+    {
+      "file": "database/migrations/V1__initial_schema.sql",
+      "sha256": "d0f9cba5362e7d8565037612a7e19d27f77a45f45c5c471793f8255ef9028bf6"
+    },
+    {
+      "file": "database/migrations/V2__authentication_sessions.sql",
+      "sha256": "b2e6c8bf986edf3424cd6591a620300f27f226253b4041370252ad3de7bd7274"
+    },
+    {
+      "file": "database/migrations/V3__durable_bid_intake.sql",
+      "sha256": "169592a3306a9c0e667002f10d1968902dfe17c1c254c10ecc2ab99edc3f09f7"
+    },
+    {
+      "file": "frontend/src/App.vue",
+      "sha256": "08d83e1f412ea81cf533ef09400f10e42c6574ff1e29fce66cf8b89d8c0168df"
+    },
+    {
+      "file": "frontend/src/components/AuctionMainPanel.vue",
+      "sha256": "24bd4c07f64fb93c19fa59a8bae46158e502a77a33db065c3d8538bcccd3ab77"
+    },
+    {
+      "file": "frontend/src/components/BidHistoryTable.vue",
+      "sha256": "b800337df136aad949d52e6a0d85462ef1793c225dc455773a1e0a9ceedbf72e"
+    },
+    {
+      "file": "frontend/src/components/LedgerTable.vue",
+      "sha256": "995f8f33da2cf73150cd0e4f137c9459220d7f8f8d002b0201dfc5920a353f92"
+    },
+    {
+      "file": "frontend/src/components/RightInspector.vue",
+      "sha256": "6899bc2d8b8fbdacb13c471976f82cf7ad1bc5931daa44d497cebe19035793e9"
+    },
+    {
+      "file": "frontend/src/components/WalletSummary.vue",
+      "sha256": "676a3e12f4b376b4e0eaf4a2f2ad4571c8bdbeb2ec2809ffdab339bb288a9585"
+    },
+    {
+      "file": "frontend/src/console.css",
+      "sha256": "202a040ea1d4c8315e6d131ac4db57c84bbe8cc993846de364ee424cc5009fe8"
+    },
+    {
+      "file": "frontend/src/health.test.ts",
+      "sha256": "f0059bc1abc7c1834d95a887d1edd2b837f3ed4ab71300906036326ab092718f"
+    },
+    {
+      "file": "frontend/src/health.ts",
+      "sha256": "0f874f80b1130ff1d72f23bf716dbcd9caf85ddba1e6066d47fc9053d389447f"
+    },
+    {
+      "file": "frontend/src/main.ts",
+      "sha256": "fc77d6694de55892ab09e6957b93c62c0c1b1e0d99803099f4d16755f2540810"
+    },
+    {
+      "file": "frontend/src/room.test.ts",
+      "sha256": "dfbd1455d49c5fa0a8e026ed6c0759611e604bf37bef61a4b1c792fb041da1b1"
+    },
+    {
+      "file": "frontend/src/room.ts",
+      "sha256": "84a81d1ab49e2694156f8ce83bce2857c19cfee2a98e462196c3b365bd63c049"
+    },
+    {
+      "file": "frontend/src/theme.css",
+      "sha256": "eb5f4838df97e1e5de8ec02a6e276327f695057f15cdc9c423c98d6de8db50d3"
+    },
+    {
+      "file": "frontend/src/typography.css",
+      "sha256": "feaa186d68a28bf7b9984917184c28b4577edbeb4b06e6e47dde76763543c6da"
+    },
+    {
+      "file": "scripts/auction-agent.mjs",
+      "sha256": "beeb362dc651b6cdc05313e9f441ab7028a0a4c332479896e3f21bf7775f4989"
+    },
+    {
+      "file": "scripts/audit-dependencies.mjs",
+      "sha256": "4256c3a9a4ecee72e95c3b488d43b6c06a832c80f8c0f30871b9c96f522a5a64"
+    },
+    {
+      "file": "scripts/audit-release.mjs",
+      "sha256": "83ebec3fdd4762a7e4802b127254f34c3ee2c2f35f6f327c8cc58265dac7978c"
+    },
+    {
+      "file": "scripts/compose-verify.mjs",
+      "sha256": "6cbbef0b436381265d02e20e6e8eac27911796b208f5dca2293e90caf861fa79"
+    },
+    {
+      "file": "scripts/http-boundaries.mjs",
+      "sha256": "1a7db045e5e158c321bc4b4db76fd39f193342857346c975b14e4ebf1ae2e4fb"
+    },
+    {
+      "file": "scripts/local-mysql.ps1",
+      "sha256": "6ab958773fad7a6385225cb4b5d5aed841e6a7b2940185b815b0840f87539a47"
+    },
+    {
+      "file": "scripts/setup-env.mjs",
+      "sha256": "e1cf9094f553f81b4d3bd51e710447ea87441ee5698ba700d4b3c4ec2142ec53"
+    },
+    {
+      "file": "scripts/simulate-auction.mjs",
+      "sha256": "060cb4d1d8ff7f8ea4e05ec79d1b209912a2ba31e106efe9209809e942edf783"
+    },
+    {
+      "file": "scripts/smoke.mjs",
+      "sha256": "04bfd49f36896714dcc7d1b3508a52e58ee67e769e75dfecc806901b7f2885c8"
+    },
+    {
+      "file": "scripts/stability-auction.mjs",
+      "sha256": "579878d2f45a43dc51c4f5c8995b8e9ded0c5a7843f87353305bc7459309f204"
+    },
+    {
+      "file": "scripts/stress-auction.mjs",
+      "sha256": "5495bfb0e16f08d56051436f9a8ce341b939a916fa998ae9394636c995c0bf49"
+    },
+    {
+      "file": "scripts/tasks.mjs",
+      "sha256": "780937ea2eb6073f01f7c7408f1c5f13f8c973382c453a6d56174ddad8bd3641"
+    },
+    {
+      "file": "scripts/verify-deployment.mjs",
+      "sha256": "3de8f2a243e483277ccf8f557673b6a1603666429d234e086e8f4a96a08d69a2"
+    },
+    {
+      "file": "scripts/verify-secrets.mjs",
+      "sha256": "b3f182de47535bb182a811969786bf96502113c1374f891eebeb067178691602"
+    },
+    {
+      "file": "backend/pom.xml",
+      "sha256": "377906ab96a4634fab887320058ad8bed7a7af870604ae34720d3376b7dbfd62"
+    },
+    {
+      "file": "backend/Dockerfile",
+      "sha256": "518c4d98044016b06d4bd0853a5f69cf7ad20c0907bdffc03b02451f110ae605"
+    },
+    {
+      "file": "frontend/Dockerfile",
+      "sha256": "9922d95d6c07ed7b0f76846b09e9739f44763532d32e4e34191578387979dccd"
+    },
+    {
+      "file": "frontend/nginx.conf",
+      "sha256": "ac375682baf4fc4ee9f478431ebdad99d50103d5fa870e7aaf3702d380d60106"
+    },
+    {
+      "file": "frontend/browser-check.mjs",
+      "sha256": "2b321bf026532cef7ce6b67a34d46fcff26f5fb2355d85d38e4cfb912af73573"
+    },
+    {
+      "file": "frontend/package.json",
+      "sha256": "652a7eeb08664952c956a8a57296ff633cabc7ed68b400fc4c9357ba9f2c1b20"
+    },
+    {
+      "file": "frontend/package-lock.json",
+      "sha256": "8ba1085e2a9624a5424426c420c38108bd0d9bb583624a23b9dba083801946ca"
+    },
+    {
+      "file": "compose.yaml",
+      "sha256": "c2da67293eda8c9e0e8b0f79a58d2e92cf62b0ab96e0092db4a92ec71158b207"
+    },
+    {
+      "file": "compose.production.yaml",
+      "sha256": "3bbf5e4a1422241e5cdcc8666bf5c56dd59ec83d67cd4ead27af15272aef6f9a"
+    }
+  ],
+  "tls": {
+    "status": "PASS",
+    "at": "2026-10-18T12:10:46.942Z",
+    "checks": [
+      "local CA explicitly trusted; certificate and hostname verified",
+      "untrusted client rejects certificate",
+      "TLS proxy health and frontend 200",
+      "HSTS/CSP/nosniff/referrer/permissions headers present"
+    ],
+    "limitation": "Local test CA only. No public certificate, renewal, public DNS or cloud deployment validated."
+  },
+  "productionCompose": {
+    "status": "PASS",
+    "at": "2026-10-18T11:29:29.233Z",
+    "project": "bid-arena-prodtest-122e538ea2",
+    "port": 33038,
+    "checks": [
+      "separate production project and volume",
+      "no mysql/backend host ports",
+      "migration identity separate from runtime",
+      "runtime cannot update/delete append-only ledger, bids, results, events or security audit",
+      "one-time CLI bootstrap through stdin",
+      "production runtime validates migrations without DDL",
+      "no demo auction or initial credits",
+      "trusted local TLS health/login/logout",
+      "two-leader release, same-leader delta freeze, unique automatic capture and cancellation release"
+    ],
+    "limits": "Local CA only. Volume retained, project stopped after test. Public deployment, renewal and external backup/alerts not verified."
+  },
+  "containerScan": {
+    "at": "2026-10-18T11:52:13.910Z",
+    "status": "FAIL",
+    "reports": [
+      {
+        "image": "bid-arena-backend",
+        "imageId": "sha256:5f3cfd742c57ec6026a52aef9437aeb0045ca6673665041f5dcd94d2306f7fa4",
+        "status": "FAIL",
+        "toolExitCode": 0,
+        "counts": {
+          "LOW": 15,
+          "MEDIUM": 22
+        },
+        "findings": [
+          {
+            "id": "CVE-2024-56433",
+            "severity": "LOW",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/shadow@1%3A4.8.1-2ubuntu2.2?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-86409",
+            "severity": "LOW",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/curl@7.81.0-1ubuntu1.30?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-86414",
+            "severity": "LOW",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/curl@7.81.0-1ubuntu1.30?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-87862",
+            "severity": "LOW",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/curl@7.81.0-1ubuntu1.30?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-87864",
+            "severity": "LOW",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/curl@7.81.0-1ubuntu1.30?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-92388",
+            "severity": "LOW",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/curl@7.81.0-1ubuntu1.30?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-92389",
+            "severity": "LOW",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/curl@7.81.0-1ubuntu1.30?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-92391",
+            "severity": "LOW",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/curl@7.81.0-1ubuntu1.30?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-94266",
+            "severity": "LOW",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/curl@7.81.0-1ubuntu1.30?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2023-29383",
+            "severity": "LOW",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/shadow@1%3A4.8.1-2ubuntu2.2?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-40228",
+            "severity": "LOW",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/systemd@249.11-0ubuntu3.22?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2022-27943",
+            "severity": "LOW",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/gcc-12@12.3.0-1ubuntu1~22.04.3?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2023-50495",
+            "severity": "LOW",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/ncurses@6.3-2ubuntu0.3?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2022-41409",
+            "severity": "LOW",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/pcre2@10.39-3ubuntu0.1?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2022-4899",
+            "severity": "LOW",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/libzstd@1.4.8%2Bdfsg-3build1?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-102473",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/dash@0.5.11%2Bgit20210903%2B057cd650a4ed-3build1?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-102474",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/dash@0.5.11%2Bgit20210903%2B057cd650a4ed-3build1?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-103111",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/pcre2@10.39-3ubuntu0.1?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-107161",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/cyrus-sasl2@2.1.27%2Bdfsg2-3ubuntu1.2?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-18374",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/glibc@2.35-0ubuntu3.15?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-18477",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/tar@1.34%2Bdfsg-1ubuntu0.1.22.04.6?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-18508",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/tar@1.34%2Bdfsg-1ubuntu0.1.22.04.6?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-67693",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/gnutls28@3.7.3-4ubuntu1.9?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-85091",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/zlib@1%3A1.2.11.dfsg-2ubuntu9.2?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-86145",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/pcre2@10.39-3ubuntu0.1?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-88647",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/gnutls28@3.7.3-4ubuntu1.9?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-89092",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/glibc@2.35-0ubuntu3.15?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-95184",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/gnutls28@3.7.3-4ubuntu1.9?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-95209",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/gnutls28@3.7.3-4ubuntu1.9?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-95210",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/gnutls28@3.7.3-4ubuntu1.9?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2025-66382",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/expat@2.4.7-1ubuntu0.9?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-89156",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/pcre2@10.39-3ubuntu0.1?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2021-31879",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/wget@1.21.2-2ubuntu1.5?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-89158",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/pcre2@10.39-3ubuntu0.1?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-89160",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/pcre2@10.39-3ubuntu0.1?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-89157",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/pcre2@10.39-3ubuntu0.1?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          },
+          {
+            "id": "CVE-2026-89161",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:deb/ubuntu/pcre2@10.39-3ubuntu0.1?os_distro=jammy&os_name=ubuntu&os_version=22.04"
+            ]
+          }
+        ]
+      },
+      {
+        "image": "bid-arena-frontend",
+        "imageId": "sha256:2b6f49d86d77aab27837d9a51537447f279f16d8190560fd61fef02955747782",
+        "status": "FAIL",
+        "toolExitCode": 0,
+        "counts": {
+          "UNSPECIFIED": 1,
+          "MEDIUM": 1
+        },
+        "findings": [
+          {
+            "id": "CVE-2026-58055",
+            "severity": "UNSPECIFIED",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:apk/alpine/nghttp2@1.69.0-r0?os_name=alpine&os_version=3.23"
+            ]
+          },
+          {
+            "id": "CVE-2025-60876",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:apk/alpine/busybox@1.37.0-r30?os_name=alpine&os_version=3.23"
+            ]
+          }
+        ]
+      },
+      {
+        "image": "bid-arena-ingress",
+        "imageId": "sha256:3d151bd52844a10680b54d407ffe8b866c7055e4e1409f19d483a6ccb82aa27f",
+        "status": "FAIL",
+        "toolExitCode": 0,
+        "counts": {
+          "UNSPECIFIED": 1,
+          "MEDIUM": 1
+        },
+        "findings": [
+          {
+            "id": "CVE-2026-58055",
+            "severity": "UNSPECIFIED",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:apk/alpine/nghttp2@1.69.0-r0?os_name=alpine&os_version=3.23"
+            ]
+          },
+          {
+            "id": "CVE-2025-60876",
+            "severity": "MEDIUM",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:apk/alpine/busybox@1.37.0-r30?os_name=alpine&os_version=3.23"
+            ]
+          }
+        ]
+      },
+      {
+        "image": "bid-arena-mysql-production",
+        "imageId": "sha256:4fb9518d3949891d6dd3554f1c233bdbc8a1d04291162507dd16c3185a520a90",
+        "status": "FAIL",
+        "toolExitCode": 0,
+        "counts": {
+          "LOW": 7,
+          "MEDIUM": 72,
+          "HIGH": 35,
+          "CRITICAL": 4
+        },
+        "findings": [
+          {
+            "id": "CVE-2025-13151",
+            "severity": "LOW",
+            "fixedVersion": "0:4.16.0-10.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/libtasn1@4.16.0-9.el9?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-27448",
+            "severity": "LOW",
+            "fixedVersion": "26.0.0",
+            "packages": [
+              "pkg:pypi/pyopenssl@25.1.0"
+            ]
+          },
+          {
+            "id": "CVE-2026-34073",
+            "severity": "LOW",
+            "fixedVersion": "46.0.6",
+            "packages": [
+              "pkg:pypi/cryptography@45.0.7"
+            ]
+          },
+          {
+            "id": "CVE-2026-1703",
+            "severity": "LOW",
+            "fixedVersion": "26.0",
+            "packages": [
+              "pkg:pypi/pip@25.2"
+            ]
+          },
+          {
+            "id": "CVE-2026-27139",
+            "severity": "LOW",
+            "fixedVersion": "1.25.8",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-39824",
+            "severity": "LOW",
+            "fixedVersion": "0.44.0",
+            "packages": [
+              "pkg:golang/golang.org/x/sys@0.1.0"
+            ]
+          },
+          {
+            "id": "CVE-2026-44405",
+            "severity": "LOW",
+            "fixedVersion": "not fixed",
+            "packages": [
+              "pkg:pypi/paramiko@4.0.0"
+            ]
+          },
+          {
+            "id": "CVE-2025-4877",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.10.4-18.el9",
+            "packages": [
+              "pkg:rpm/oraclelinux/libssh-config@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libssh@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2025-4878",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.10.4-18.el9",
+            "packages": [
+              "pkg:rpm/oraclelinux/libssh-config@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libssh@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2025-5278",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:8.32-41.0.1.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/coreutils-single@8.32-39.0.1.el9?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/coreutils@8.32-39.0.1.el9?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2025-5351",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.10.4-18.el9",
+            "packages": [
+              "pkg:rpm/oraclelinux/libssh-config@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libssh@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2025-8114",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.10.4-18.el9",
+            "packages": [
+              "pkg:rpm/oraclelinux/libssh-config@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libssh@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2025-8277",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.10.4-18.el9",
+            "packages": [
+              "pkg:rpm/oraclelinux/libssh-config@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libssh@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-0964",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.10.4-18.el9",
+            "packages": [
+              "pkg:rpm/oraclelinux/libssh-config@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libssh@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-0965",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.10.4-18.el9",
+            "packages": [
+              "pkg:rpm/oraclelinux/libssh-config@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libssh@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-0966",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.10.4-18.el9",
+            "packages": [
+              "pkg:rpm/oraclelinux/libssh-config@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libssh@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-0967",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.10.4-18.el9",
+            "packages": [
+              "pkg:rpm/oraclelinux/libssh-config@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libssh@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-0968",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.10.4-18.el9",
+            "packages": [
+              "pkg:rpm/oraclelinux/libssh-config@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libssh@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-13757",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.26.4-1.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/p11-kit-trust@0.25.3-3.el9_5?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/p11-kit@0.25.3-3.el9_5?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-14164",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:3.5.3-11.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/libarchive@3.5.3-9.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-18477",
+            "severity": "MEDIUM",
+            "fixedVersion": "2:1.34-13.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/tar@2%3A1.34-9.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-18508",
+            "severity": "MEDIUM",
+            "fixedVersion": "2:1.34-13.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/tar@2%3A1.34-9.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-2100",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.26.2-1.el9",
+            "packages": [
+              "pkg:rpm/oraclelinux/p11-kit-trust@0.25.3-3.el9_5?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/p11-kit@0.25.3-3.el9_5?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-29111",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:252-55.0.3.el9_7.9",
+            "packages": [
+              "pkg:rpm/oraclelinux/systemd-libs@252-55.0.3.el9_7.8?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/systemd@252-55.0.3.el9_7.8?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-31790",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:3.0.7-11.0.1.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/openssl-fips-provider-so@3.0.7-8.0.1.el9?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/openssl-fips-provider@3.0.7-8.0.1.el9?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-4046",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:2.34-270.0.1.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/glibc-common@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/glibc-minimal-langpack@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/glibc@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-40467",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:5.1.0-6.el9_8.1",
+            "packages": [
+              "pkg:rpm/oraclelinux/gawk@5.1.0-6.el9?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-41989",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:1.10.0-13.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/libgcrypt@1.10.0-11.el9?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-41992",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:1.12-2.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/gzip@1.12-1.el9?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-4437",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:2.34-270.0.1.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/glibc-common@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/glibc-minimal-langpack@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/glibc@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-4438",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:2.34-270.0.1.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/glibc-common@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/glibc-minimal-langpack@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/glibc@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-48864",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.7.24-6.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/libsolv@0.7.24-3.el9?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-5435",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:2.34-274.0.1.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/glibc-common@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/glibc-minimal-langpack@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/glibc@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-54371",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:2.6.0-1.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/attr@2.5.1-3.el9?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libattr@2.5.1-3.el9?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-5450",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:2.34-272.0.1.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/glibc-common@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/glibc-minimal-langpack@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/glibc@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-56392",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:8.32-41.0.1.el9_8.1",
+            "packages": [
+              "pkg:rpm/oraclelinux/coreutils-single@8.32-39.0.1.el9?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/coreutils@8.32-39.0.1.el9?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-5704",
+            "severity": "MEDIUM",
+            "fixedVersion": "2:1.34-13.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/tar@2%3A1.34-9.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-58055",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:1.43.0-6.el9_8.2",
+            "packages": [
+              "pkg:rpm/oraclelinux/libnghttp2@1.43.0-6.el9_7.1?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/nghttp2@1.43.0-6.el9_7.1?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-5928",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:2.34-274.0.1.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/glibc-common@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/glibc-minimal-langpack@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/glibc@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-59843",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.10.4-19.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/libssh-config@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libssh@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-59844",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.10.4-19.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/libssh-config@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libssh@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-59845",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.10.4-19.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/libssh-config@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libssh@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-59846",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.10.4-19.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/libssh-config@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libssh@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-59847",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.10.4-19.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/libssh-config@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libssh@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-59848",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.10.4-19.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/libssh-config@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libssh@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-59850",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:0.10.4-19.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/libssh-config@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/libssh@0.10.4-17.el9_7?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-6238",
+            "severity": "MEDIUM",
+            "fixedVersion": "0:2.34-274.0.1.el9_8",
+            "packages": [
+              "pkg:rpm/oraclelinux/glibc-common@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/glibc-minimal-langpack@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9",
+              "pkg:rpm/oraclelinux/glibc@2.34-231.0.1.el9_7.10?os_name=oraclelinux&os_version=9"
+            ]
+          },
+          {
+            "id": "CVE-2026-8643",
+            "severity": "MEDIUM",
+            "fixedVersion": "26.1.2",
+            "packages": [
+              "pkg:pypi/pip@25.2"
+            ]
+          },
+          {
+            "id": "CVE-2025-58183",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.24.8",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2025-69277",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.6.2",
+            "packages": [
+              "pkg:pypi/pynacl@1.5.0"
+            ]
+          },
+          {
+            "id": "CVE-2026-3219",
+            "severity": "MEDIUM",
+            "fixedVersion": "26.1",
+            "packages": [
+              "pkg:pypi/pip@25.2"
+            ]
+          },
+          {
+            "id": "CVE-2025-47912",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.24.8",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2025-58185",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.24.8",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2025-58186",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.24.8",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2025-58189",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.24.8",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2025-61724",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.24.8",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2025-61730",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.24.12",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-39825",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.25.10",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-42505",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.25.12",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-42507",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.25.11",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-6357",
+            "severity": "MEDIUM",
+            "fixedVersion": "26.1",
+            "packages": [
+              "pkg:pypi/pip@25.2"
+            ]
+          },
+          {
+            "id": "CVE-2026-32288",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.25.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-61801",
+            "severity": "MEDIUM",
+            "fixedVersion": "0.4.1",
+            "packages": [
+              "pkg:golang/github.com/moby/sys/user@0.1.0"
+            ]
+          },
+          {
+            "id": "CVE-2026-13346",
+            "severity": "MEDIUM",
+            "fixedVersion": "26.2.0",
+            "packages": [
+              "pkg:pypi/pip@25.2"
+            ]
+          },
+          {
+            "id": "CVE-2025-8869",
+            "severity": "MEDIUM",
+            "fixedVersion": "25.3",
+            "packages": [
+              "pkg:pypi/pip@25.2"
+            ]
+          },
+          {
+            "id": "CVE-2026-56860",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.25.13",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-27142",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.25.8",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-32289",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.25.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-39823",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.25.10",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-39826",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.25.10",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-56858",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.25.13",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-94448",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.26.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-97030",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.26.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-32282",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.25.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2025-61727",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.24.11",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2025-61728",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.24.12",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-27145",
+            "severity": "MEDIUM",
+            "fixedVersion": "1.25.11",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-39892",
+            "severity": "MEDIUM",
+            "fixedVersion": "46.0.7",
+            "packages": [
+              "pkg:pypi/cryptography@45.0.7"
+            ]
+          },
+          {
+            "id": "CVE-2026-69248",
+            "severity": "MEDIUM",
+            "fixedVersion": "49.0.0",
+            "packages": [
+              "pkg:pypi/cryptography@45.0.7"
+            ]
+          },
+          {
+            "id": "CVE-2026-27459",
+            "severity": "HIGH",
+            "fixedVersion": "26.0.0",
+            "packages": [
+              "pkg:pypi/pyopenssl@25.1.0"
+            ]
+          },
+          {
+            "id": "CVE-2025-58187",
+            "severity": "HIGH",
+            "fixedVersion": "1.24.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2025-58188",
+            "severity": "HIGH",
+            "fixedVersion": "1.24.8",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2025-61723",
+            "severity": "HIGH",
+            "fixedVersion": "1.24.8",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2025-61725",
+            "severity": "HIGH",
+            "fixedVersion": "1.24.8",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2025-61726",
+            "severity": "HIGH",
+            "fixedVersion": "1.24.12",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2025-61729",
+            "severity": "HIGH",
+            "fixedVersion": "1.24.11",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-25679",
+            "severity": "HIGH",
+            "fixedVersion": "1.25.8",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-32280",
+            "severity": "HIGH",
+            "fixedVersion": "1.25.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-32281",
+            "severity": "HIGH",
+            "fixedVersion": "1.25.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-32283",
+            "severity": "HIGH",
+            "fixedVersion": "1.25.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-33811",
+            "severity": "HIGH",
+            "fixedVersion": "1.25.10",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-33814",
+            "severity": "HIGH",
+            "fixedVersion": "1.25.10",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-33818",
+            "severity": "HIGH",
+            "fixedVersion": "1.25.13",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-39820",
+            "severity": "HIGH",
+            "fixedVersion": "1.25.10",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-39836",
+            "severity": "HIGH",
+            "fixedVersion": "1.25.10",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-42499",
+            "severity": "HIGH",
+            "fixedVersion": "1.25.10",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-42504",
+            "severity": "HIGH",
+            "fixedVersion": "1.25.11",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-56853",
+            "severity": "HIGH",
+            "fixedVersion": "1.25.13",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-56859",
+            "severity": "HIGH",
+            "fixedVersion": "1.25.13",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-56862",
+            "severity": "HIGH",
+            "fixedVersion": "1.25.13",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-56866",
+            "severity": "HIGH",
+            "fixedVersion": "1.26.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-78659",
+            "severity": "HIGH",
+            "fixedVersion": "1.26.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-78660",
+            "severity": "HIGH",
+            "fixedVersion": "1.26.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-78667",
+            "severity": "HIGH",
+            "fixedVersion": "1.26.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-78669",
+            "severity": "HIGH",
+            "fixedVersion": "1.26.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-94439",
+            "severity": "HIGH",
+            "fixedVersion": "1.26.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-94440",
+            "severity": "HIGH",
+            "fixedVersion": "1.26.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-97031",
+            "severity": "HIGH",
+            "fixedVersion": "1.26.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-97032",
+            "severity": "HIGH",
+            "fixedVersion": "1.26.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "GHSA-537c-gmf6-5ccf",
+            "severity": "HIGH",
+            "fixedVersion": "48.0.1",
+            "packages": [
+              "pkg:pypi/cryptography@45.0.7"
+            ]
+          },
+          {
+            "id": "CVE-2026-39822",
+            "severity": "HIGH",
+            "fixedVersion": "1.25.12",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-26007",
+            "severity": "HIGH",
+            "fixedVersion": "46.0.5",
+            "packages": [
+              "pkg:pypi/cryptography@45.0.7"
+            ]
+          },
+          {
+            "id": "CVE-2026-69247",
+            "severity": "HIGH",
+            "fixedVersion": "50.0.0",
+            "packages": [
+              "pkg:pypi/cryptography@45.0.7"
+            ]
+          },
+          {
+            "id": "CVE-2026-69249",
+            "severity": "HIGH",
+            "fixedVersion": "49.0.0",
+            "packages": [
+              "pkg:pypi/cryptography@45.0.7"
+            ]
+          },
+          {
+            "id": "CVE-2026-78663",
+            "severity": "CRITICAL",
+            "fixedVersion": "1.26.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-39821",
+            "severity": "CRITICAL",
+            "fixedVersion": "1.25.13",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2026-56857",
+            "severity": "CRITICAL",
+            "fixedVersion": "1.26.9",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          },
+          {
+            "id": "CVE-2025-68121",
+            "severity": "CRITICAL",
+            "fixedVersion": "1.24.13",
+            "packages": [
+              "pkg:golang/stdlib@1.24.6"
+            ]
+          }
+        ]
+      }
+    ],
+    "limitation": "Advisory package matches, not proof of exploitability. Exit zero from Scout means report generated, not vulnerability-free."
+  },
+  "limitations": [
+    "No public deployment/certificate renewal",
+    "Development-mode load results do not certify production login quotas or exclusive-host capacity",
+    "Production backup storage/rotation/alerts not integrated",
+    "Container advisories remain; public release security gate FAIL"
+  ],
+  "suites": [
+    {
+      "name": "dev.bidarena.AppConfigTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.067
+    },
+    {
+      "name": "dev.bidarena.PasswordHasherTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 1.177
+    },
+    {
+      "name": "dev.bidarena.AuctionIT",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 15.195
+    },
+    {
+      "name": "dev.bidarena.BackupIT",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 5.663
+    },
+    {
+      "name": "dev.bidarena.BoundaryIT",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 12.185
+    },
+    {
+      "name": "dev.bidarena.DatabaseIT",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 38.361
+    },
+    {
+      "name": "dev.bidarena.HttpSimulationIT",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 99.475
+    },
+    {
+      "name": "dev.bidarena.RuntimePermissionsIT",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 2.404
+    },
+    {
+      "name": "dev.bidarena.SecurityHttpIT",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 8.639
+    },
+    {
+      "name": "dev.bidarena.SecurityIT",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 8.164
+    },
+    {
+      "name": "dev.bidarena.StabilityIT",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 485.944
+    },
+    {
+      "name": "dev.bidarena.StressIT",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 369.278
+    }
+  ],
+  "additionalVerification": {
+    "httpChecks": 49,
+    "simulationBots": 20,
+    "simulationAssertions": 65,
+    "browser": {
+      "status": "PASS",
+      "viewports": [
+        {
+          "width": 1440,
+          "height": 900,
+          "bodyWidth": 1440,
+          "bodyHeight": 900,
+          "listOverflow": "auto",
+          "inspectorOverflow": "auto"
+        },
+        {
+          "width": 1920,
+          "height": 1080,
+          "bodyWidth": 1920,
+          "bodyHeight": 1080,
+          "listOverflow": "auto",
+          "inspectorOverflow": "auto"
+        }
+      ],
+      "scope": "Admin, two users, Agent management, delayed response isolation, offline/reconnect, terminal wallet/result and no page errors"
+    },
+    "backupNegativeCases": "Existing file/target and invalid decryption key are intentionally rejected; their nonzero child exits remain in the appended local log and are asserted by BackupIT."
+  },
+  "standardStability": [
+    {
+      "file": "backend/target/stability-20.json",
+      "sha256": "2d75e8dba4ca93cce8d1011c720ca1b8fff72c7e2c0979c42f539c4add1571c8",
+      "summary": {
+        "status": "PASS",
+        "users": 20,
+        "requestedSeconds": 120,
+        "loadSeconds": 121.4147471,
+        "totalSeconds": 140.11681840000003,
+        "requests": 2408,
+        "httpSuccess": 2408,
+        "acceptedBidResponses": 148,
+        "expectedBusinessRejections": 692,
+        "httpErrors": 0,
+        "timeouts": 0,
+        "requestsPerSecond": 19.83284615349662,
+        "p50ms": 8.446199999991222,
+        "p95ms": 115.59100000000035,
+        "p99ms": 161.5853000000061,
+        "rooms": 12,
+        "reconnects": 320,
+        "maximumPoolWaiting": 0,
+        "maximumPoolActive": 3,
+        "before": {
+          "pool": {
+            "active": 0,
+            "maximum": 8,
+            "total": 1,
+            "waiting": 0,
+            "idle": 1
+          },
+          "metrics": {
+            "connection.acquire": {
+              "count": 114,
+              "totalMs": 5.3451,
+              "buckets": {
+                "le1Ms": 113,
+                "le5Ms": 114,
+                "le10Ms": 114,
+                "le50Ms": 114,
+                "le100Ms": 114,
+                "le500Ms": 114,
+                "le1000Ms": 114,
+                "le5000Ms": 114,
+                "le15000Ms": 114,
+                "le30000Ms": 114,
+                "infinity": 114
+              }
+            },
+            "http.latency": {
+              "count": 44,
+              "totalMs": 6571.1733,
+              "buckets": {
+                "le1Ms": 3,
+                "le5Ms": 3,
+                "le10Ms": 3,
+                "le50Ms": 3,
+                "le100Ms": 3,
+                "le500Ms": 44,
+                "le1000Ms": 44,
+                "le5000Ms": 44,
+                "le15000Ms": 44,
+                "le30000Ms": 44,
+                "infinity": 44
+              }
+            }
+          },
+          "uptimeMs": 10267,
+          "heapUsedBytes": 16958064,
+          "heapCommittedBytes": 58720256,
+          "processCpuLoad": 0.05571012432717026,
+          "processCpuTimeNs": 12921875000
+        },
+        "after": {
+          "pool": {
+            "active": 0,
+            "maximum": 8,
+            "total": 8,
+            "waiting": 0,
+            "idle": 8
+          },
+          "metrics": {
+            "bid.acceptedResponses": 148,
+            "bid.latency": {
+              "count": 840,
+              "totalMs": 28854.7359,
+              "buckets": {
+                "le1Ms": 0,
+                "le5Ms": 190,
+                "le10Ms": 365,
+                "le50Ms": 598,
+                "le100Ms": 788,
+                "le500Ms": 840,
+                "le1000Ms": 840,
+                "le5000Ms": 840,
+                "le15000Ms": 840,
+                "le30000Ms": 840,
+                "infinity": 840
+              }
+            },
+            "bid.rejectedResponses": 692,
+            "connection.acquire": {
+              "count": 6407,
+              "totalMs": 25591.7177,
+              "buckets": {
+                "le1Ms": 5210,
+                "le5Ms": 5509,
+                "le10Ms": 5641,
+                "le50Ms": 6296,
+                "le100Ms": 6393,
+                "le500Ms": 6407,
+                "le1000Ms": 6407,
+                "le5000Ms": 6407,
+                "le15000Ms": 6407,
+                "le30000Ms": 6407,
+                "infinity": 6407
+              }
+            },
+            "http.latency": {
+              "count": 2541,
+              "totalMs": 71204.5087,
+              "buckets": {
+                "le1Ms": 4,
+                "le5Ms": 967,
+                "le10Ms": 1566,
+                "le50Ms": 1979,
+                "le100Ms": 2336,
+                "le500Ms": 2540,
+                "le1000Ms": 2540,
+                "le5000Ms": 2541,
+                "le15000Ms": 2541,
+                "le30000Ms": 2541,
+                "infinity": 2541
+              }
+            },
+            "settlement.attempts": 15,
+            "settlement.latency": {
+              "count": 15,
+              "totalMs": 247.8516,
+              "buckets": {
+                "le1Ms": 0,
+                "le5Ms": 0,
+                "le10Ms": 4,
+                "le50Ms": 15,
+                "le100Ms": 15,
+                "le500Ms": 15,
+                "le1000Ms": 15,
+                "le5000Ms": 15,
+                "le15000Ms": 15,
+                "le30000Ms": 15,
+                "infinity": 15
+              }
+            },
+            "sql.auctionLockStatement": {
+              "count": 1442,
+              "totalMs": 8503.6341,
+              "buckets": {
+                "le1Ms": 927,
+                "le5Ms": 1083,
+                "le10Ms": 1172,
+                "le50Ms": 1440,
+                "le100Ms": 1442,
+                "le500Ms": 1442,
+                "le1000Ms": 1442,
+                "le5000Ms": 1442,
+                "le15000Ms": 1442,
+                "le30000Ms": 1442,
+                "infinity": 1442
+              }
+            },
+            "sql.walletLockStatement": {
+              "count": 56,
+              "totalMs": 28.6526,
+              "buckets": {
+                "le1Ms": 56,
+                "le5Ms": 56,
+                "le10Ms": 56,
+                "le50Ms": 56,
+                "le100Ms": 56,
+                "le500Ms": 56,
+                "le1000Ms": 56,
+                "le5000Ms": 56,
+                "le15000Ms": 56,
+                "le30000Ms": 56,
+                "infinity": 56
+              }
+            }
+          },
+          "uptimeMs": 151359,
+          "heapUsedBytes": 9521744,
+          "heapCommittedBytes": 58720256,
+          "processCpuLoad": 0.002261323342753395,
+          "processCpuTimeNs": 28312500000
+        }
+      },
+      "mysqlStatus": [
+        [
+          {
+            "Variable_name": "Innodb_row_lock_current_waits",
+            "Value": "0"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_time",
+            "Value": "9248409"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_waits",
+            "Value": "304265"
+          }
+        ],
+        [
+          {
+            "Variable_name": "Innodb_row_lock_current_waits",
+            "Value": "0"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_time",
+            "Value": "9265461"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_waits",
+            "Value": "305369"
+          }
+        ]
+      ]
+    },
+    {
+      "file": "backend/target/stability-50.json",
+      "sha256": "f3ca9cdaf06a35d74c011438de152794b06d766f259716d8f21aa94cd93cc3ea",
+      "summary": {
+        "status": "PASS",
+        "users": 50,
+        "requestedSeconds": 300,
+        "loadSeconds": 301.3821696,
+        "totalSeconds": 317.5449987,
+        "requests": 13618,
+        "httpSuccess": 13618,
+        "acceptedBidResponses": 384,
+        "expectedBusinessRejections": 4533,
+        "httpErrors": 0,
+        "timeouts": 0,
+        "requestsPerSecond": 45.185154842020225,
+        "p50ms": 8.04749999998603,
+        "p95ms": 450.36350000000675,
+        "p99ms": 647.9260999999824,
+        "rooms": 26,
+        "reconnects": 1739,
+        "maximumPoolWaiting": 43,
+        "maximumPoolActive": 8,
+        "before": {
+          "pool": {
+            "active": 0,
+            "maximum": 8,
+            "total": 8,
+            "waiting": 0,
+            "idle": 8
+          },
+          "metrics": {
+            "bid.acceptedResponses": 148,
+            "bid.latency": {
+              "count": 840,
+              "totalMs": 28854.7359,
+              "buckets": {
+                "le1Ms": 0,
+                "le5Ms": 190,
+                "le10Ms": 365,
+                "le50Ms": 598,
+                "le100Ms": 788,
+                "le500Ms": 840,
+                "le1000Ms": 840,
+                "le5000Ms": 840,
+                "le15000Ms": 840,
+                "le30000Ms": 840,
+                "infinity": 840
+              }
+            },
+            "bid.rejectedResponses": 692,
+            "connection.acquire": {
+              "count": 6679,
+              "totalMs": 25603.9154,
+              "buckets": {
+                "le1Ms": 5481,
+                "le5Ms": 5781,
+                "le10Ms": 5913,
+                "le50Ms": 6568,
+                "le100Ms": 6665,
+                "le500Ms": 6679,
+                "le1000Ms": 6679,
+                "le5000Ms": 6679,
+                "le15000Ms": 6679,
+                "le30000Ms": 6679,
+                "infinity": 6679
+              }
+            },
+            "http.latency": {
+              "count": 2646,
+              "totalMs": 87426.8459,
+              "buckets": {
+                "le1Ms": 7,
+                "le5Ms": 970,
+                "le10Ms": 1569,
+                "le50Ms": 1982,
+                "le100Ms": 2340,
+                "le500Ms": 2645,
+                "le1000Ms": 2645,
+                "le5000Ms": 2646,
+                "le15000Ms": 2646,
+                "le30000Ms": 2646,
+                "infinity": 2646
+              }
+            },
+            "settlement.attempts": 15,
+            "settlement.latency": {
+              "count": 15,
+              "totalMs": 247.8516,
+              "buckets": {
+                "le1Ms": 0,
+                "le5Ms": 0,
+                "le10Ms": 4,
+                "le50Ms": 15,
+                "le100Ms": 15,
+                "le500Ms": 15,
+                "le1000Ms": 15,
+                "le5000Ms": 15,
+                "le15000Ms": 15,
+                "le30000Ms": 15,
+                "infinity": 15
+              }
+            },
+            "sql.auctionLockStatement": {
+              "count": 1442,
+              "totalMs": 8503.6341,
+              "buckets": {
+                "le1Ms": 927,
+                "le5Ms": 1083,
+                "le10Ms": 1172,
+                "le50Ms": 1440,
+                "le100Ms": 1442,
+                "le500Ms": 1442,
+                "le1000Ms": 1442,
+                "le5000Ms": 1442,
+                "le15000Ms": 1442,
+                "le30000Ms": 1442,
+                "infinity": 1442
+              }
+            },
+            "sql.walletLockStatement": {
+              "count": 56,
+              "totalMs": 28.6526,
+              "buckets": {
+                "le1Ms": 56,
+                "le5Ms": 56,
+                "le10Ms": 56,
+                "le50Ms": 56,
+                "le100Ms": 56,
+                "le500Ms": 56,
+                "le1000Ms": 56,
+                "le5000Ms": 56,
+                "le15000Ms": 56,
+                "le30000Ms": 56,
+                "infinity": 56
+              }
+            }
+          },
+          "uptimeMs": 167839,
+          "heapUsedBytes": 26393744,
+          "heapCommittedBytes": 58720256,
+          "processCpuLoad": 0.046061197864342346,
+          "processCpuTimeNs": 43500000000
+        },
+        "after": {
+          "pool": {
+            "active": 0,
+            "maximum": 8,
+            "total": 8,
+            "waiting": 0,
+            "idle": 8
+          },
+          "metrics": {
+            "bid.acceptedResponses": 532,
+            "bid.latency": {
+              "count": 5757,
+              "totalMs": 457715.1909,
+              "buckets": {
+                "le1Ms": 0,
+                "le5Ms": 1031,
+                "le10Ms": 2480,
+                "le50Ms": 3567,
+                "le100Ms": 4352,
+                "le500Ms": 5651,
+                "le1000Ms": 5757,
+                "le5000Ms": 5757,
+                "le15000Ms": 5757,
+                "le30000Ms": 5757,
+                "infinity": 5757
+              }
+            },
+            "bid.rejectedResponses": 5225,
+            "connection.acquire": {
+              "count": 41255,
+              "totalMs": 771393.6504,
+              "buckets": {
+                "le1Ms": 33766,
+                "le5Ms": 34670,
+                "le10Ms": 34998,
+                "le50Ms": 36958,
+                "le100Ms": 38362,
+                "le500Ms": 41182,
+                "le1000Ms": 41255,
+                "le5000Ms": 41255,
+                "le15000Ms": 41255,
+                "le30000Ms": 41255,
+                "infinity": 41255
+              }
+            },
+            "http.latency": {
+              "count": 16391,
+              "totalMs": 1141604.5118,
+              "buckets": {
+                "le1Ms": 27,
+                "le5Ms": 5938,
+                "le10Ms": 10312,
+                "le50Ms": 12334,
+                "le100Ms": 13221,
+                "le500Ms": 15980,
+                "le1000Ms": 16388,
+                "le5000Ms": 16391,
+                "le15000Ms": 16391,
+                "le30000Ms": 16391,
+                "infinity": 16391
+              }
+            },
+            "settlement.attempts": 55,
+            "settlement.latency": {
+              "count": 55,
+              "totalMs": 1818.9155,
+              "buckets": {
+                "le1Ms": 0,
+                "le5Ms": 0,
+                "le10Ms": 6,
+                "le50Ms": 49,
+                "le100Ms": 51,
+                "le500Ms": 55,
+                "le1000Ms": 55,
+                "le5000Ms": 55,
+                "le15000Ms": 55,
+                "le30000Ms": 55,
+                "infinity": 55
+              }
+            },
+            "sql.auctionLockStatement": {
+              "count": 9632,
+              "totalMs": 99976.8536,
+              "buckets": {
+                "le1Ms": 5752,
+                "le5Ms": 7056,
+                "le10Ms": 7409,
+                "le50Ms": 8876,
+                "le100Ms": 9613,
+                "le500Ms": 9632,
+                "le1000Ms": 9632,
+                "le5000Ms": 9632,
+                "le15000Ms": 9632,
+                "le30000Ms": 9632,
+                "infinity": 9632
+              }
+            },
+            "sql.walletLockStatement": {
+              "count": 217,
+              "totalMs": 128.2699,
+              "buckets": {
+                "le1Ms": 201,
+                "le5Ms": 217,
+                "le10Ms": 217,
+                "le50Ms": 217,
+                "le100Ms": 217,
+                "le500Ms": 217,
+                "le1000Ms": 217,
+                "le5000Ms": 217,
+                "le15000Ms": 217,
+                "le30000Ms": 217,
+                "infinity": 217
+              }
+            }
+          },
+          "uptimeMs": 485374,
+          "heapUsedBytes": 22974256,
+          "heapCommittedBytes": 58720256,
+          "processCpuLoad": 0.00111095418315453,
+          "processCpuTimeNs": 85234375000
+        }
+      },
+      "mysqlStatus": [
+        [
+          {
+            "Variable_name": "Innodb_row_lock_current_waits",
+            "Value": "0"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_time",
+            "Value": "9265461"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_waits",
+            "Value": "305369"
+          }
+        ],
+        [
+          {
+            "Variable_name": "Innodb_row_lock_current_waits",
+            "Value": "0"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_time",
+            "Value": "9437711"
+          },
+          {
+            "Variable_name": "Innodb_row_lock_waits",
+            "Value": "311304"
+          }
+        ]
+      ]
+    }
+  ],
+  "localSecretScan": {
+    "status": "PASS",
+    "commits": 14,
+    "historyBlobs": 189,
+    "knownLocalCredentials": 3,
+    "evidenceFiles": 534,
+    "checks": [
+      "all reachable Git blobs",
+      "tracked and nonignored untracked working files",
+      "recursive local text evidence excluding clones/runtime packages",
+      "forbidden history paths",
+      "local credential exact matches",
+      "private keys and common access-token patterns"
+    ],
+    "limitation": "Pattern and known-value checks do not prove absence of every possible secret. Ignored logs and screenshots are excluded from Git and Docker contexts."
+  },
+  "applicationDependencyScan": {
+    "at": "2026-10-18T11:17:20.667Z",
+    "status": "PASS",
+    "source": "https://api.osv.dev/v1/querybatch",
+    "scanned": 41,
+    "findings": [],
+    "limitation": "Known advisory matches only; no exploitability or full container scan."
+  },
+  "npmAudit": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "dependencies": {
+      "prod": 26,
+      "dev": 105,
+      "optional": 53,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 130
+    }
+  },
+  "runtime": {
+    "at": "2026-10-18T12:13:27.412Z",
+    "status": "PASS",
+    "services": [
+      {
+        "service": "backend",
+        "name": "bid-arena-backend-1",
+        "health": "healthy",
+        "imageId": "sha256:5f3cfd742c57ec6026a52aef9437aeb0045ca6673665041f5dcd94d2306f7fa4",
+        "ports": "127.0.0.1:8080->8080/tcp"
+      },
+      {
+        "service": "frontend",
+        "name": "bid-arena-frontend-1",
+        "health": "healthy",
+        "imageId": "sha256:2b6f49d86d77aab27837d9a51537447f279f16d8190560fd61fef02955747782",
+        "ports": "127.0.0.1:5173->80/tcp"
+      },
+      {
+        "service": "mysql",
+        "name": "bid-arena-mysql-1",
+        "health": "healthy",
+        "imageId": "sha256:2952e3be7807f06fc18de50b3ea1a632d5c70d63482ff7d7376fe3aa8999babf",
+        "ports": "127.0.0.1:3307->3306/tcp"
+      }
+    ]
+  },
+  "frontendTests": 7,
+  "regression": {
+    "command": "node scripts/test-isolated.mjs",
+    "exit": 0,
+    "additionalCommands": [
+      "node scripts/test-isolated.mjs '-Dit.test=SecurityIT'",
+      "STABILITY_EXTENDED=resume100 node scripts/test-isolated.mjs"
+    ],
+    "notes": "Latest-source full standard suite follows the canonical-account fix. Extended 20/600 and 50/1800 completed in earlier attempts; 100/3600 completed in resumed full regression before the standard suite. Extended files archived before the short default grades overwrite target files. Interruption is not a successful test."
+  }
+}

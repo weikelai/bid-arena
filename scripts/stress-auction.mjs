@@ -17,7 +17,10 @@ async function parallel(items,work,limit=count){let index=0;await Promise.all(Ar
 const admin=(await call('/auth/login',null,{email:'admin@example.com',password:'Admin123456!'})).token;
 const users=[];for(let i=0;i<count;i++){const email=`stress-${run}-${i}@example.test`;const u=await call('/admin/users',admin,{email,password,kind:'HUMAN'});users.push({...u,email});}
 await parallel(users,async u=>u.token=(await call('/auth/login',null,{email:u.email,password})).token,16);
-const auction=await call('/admin/auctions',admin,{title:`stress-${run}-${count}`,durationSeconds:15});
+// This suite measures competing valid/rejected bids, not the deadline boundary.
+// A 15s fixture could expire during the 200-user burst on a shared host.
+// Keep every rejection assertion strict and leave enough RUNNING time instead.
+const auction=await call('/admin/auctions',admin,{title:`stress-${run}-${count}`,durationSeconds:60});
 measuring=true;const started=performance.now();
 await parallel(users,u=>call(`/auctions/${auction.id}/join`,u.token,{}));
 await call(`/admin/auctions/${auction.id}/start`,admin,{});
@@ -27,7 +30,7 @@ await parallel(users,()=>call(`/auctions/${auction.id}/bids`,users[0].token,{req
 await parallel(users,(u,i)=>call(`/auctions/${auction.id}/bids`,u.token,{requestId:`${run}-adjacent-${i}`,amount:130+(i%8)*10}));
 await parallel(users,async(u,i)=>{assert.equal((await call(`/auctions/${auction.id}/bids`,u.token,{requestId:`${run}-low-${i}`,amount:100})).error,'BID_TOO_LOW');assert.equal((await call(`/auctions/${auction.id}/bids`,u.token,{requestId:`${run}-funds-${i}`,amount:1001})).error,'INSUFFICIENT_FUNDS');const w=await call('/wallets/me',u.token);assert.equal(w.user_id,u.id);assert.equal(w.total_balance,1000);assert.ok(w.frozen_balance>=0&&w.available_balance>=0);assert.ok(w.transactions.every(t=>t.user_id===u.id));await call(`/auctions/${auction.id}/bids`,u.token);const events=await call(`/auctions/${auction.id}/events?after=0`,u.token);assert.ok(events.events.every((e,j,all)=>e.auctionId===auction.id&&(!j||e.seq>all[j-1].seq)));});
 const loadSeconds=(performance.now()-started)/1000;measuring=false;
-let state;const deadline=Date.now()+65000;do{state=await call(`/auctions/${auction.id}`,admin);if(state.status==='FINISHED')break;await new Promise(r=>setTimeout(r,200));}while(Date.now()<deadline);
+let state;const deadline=Date.now()+90000;do{state=await call(`/auctions/${auction.id}`,admin);if(state.status==='FINISHED')break;await new Promise(r=>setTimeout(r,200));}while(Date.now()<deadline);
 assert.equal(state.status,'FINISHED');assert.equal(state.current_price,200);assert.equal(state.result.length,1);assert.equal(state.result[0].price,200);
 await parallel(users,async u=>{const w=await call('/wallets/me',u.token);assert.equal(w.frozen_balance,0);assert.equal(w.total_balance,u.id===state.result[0].winner_id?800:1000);});
 const latency=records.map(r=>r.ms).sort((a,b)=>a-b),percentile=p=>latency[Math.min(latency.length-1,Math.ceil(latency.length*p)-1)];

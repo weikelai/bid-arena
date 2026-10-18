@@ -1,4 +1,35 @@
-# 2026-10-18 最终上线前审计（最新，取代下方当前状态）
+# 生产安全加固最终验证（2026-10-18 20:12:49+08:00，当前状态）
+
+本轮完整回归 STABILITY_EXTENDED=resume100 node scripts/test-isolated.mjs 实际退出0；其后按最新源码补跑安全与全量短档回归，具体命令和日志见本节追加记录。最新后端单元4、真实MySQL集成44，失败/错误/跳过均0；前端7测试、vue-tsc类型检查及Vite构建退出0。HTTP49、20人模拟65断言、Edge多会话/异步状态/断线恢复、Agent权限及四档短时压力通过。真实应用死锁与连接池超时用例仍保留，SQL资金对账无差异。
+
+持续负载分别完成20用户600秒、50用户1800秒、100用户3600秒。20档来自本轮较早完整运行（仅后续压力夹具失败），50档来自随后运行（100档中断），100档在本次最终全量中恢复执行；不能宣称一次进程连续跑完三档。完成摘要、实时SQL、源码/配置/日志SHA256见docs/PRODUCTION_HARDENING_20261018.json，不用历史评测基线替代本轮。共享Windows主机与开发登录模式的结果不认证生产登录配额或容量/SLA。
+
+生产加固：一次性管理员CLI、生产禁种子、数据库登录准入/有限哈希并发、持久会话吊销/换密、Migration/Runtime分离、本地校验证书的TLS入口、隔离加密恢复及运维探针均有本轮证据。独立生产Compose使用精确逐表权限完成双领先者/差额冻结/成交/取消，运行账号不能改写追加表。生产环境文件生成器不覆盖旧配置、不打印秘密；UTF-8/UTF-16LE发布扫描阻断探针通过。
+
+**生产公开上线：FAIL。** 生产MySQL镜像仍有4严重/35高危公告命中；后端37、前端/入口各2公告未闭合。容器扫描实际退出1，不能写为通过。真实公网域名/证书/续期/服务器、异地备份及外部告警BLOCKED。生产schema备份适配/保留、Windows ACL、生产SQL定时核对、数据库链路TLS、旧账号权限收窄、密码找回和灾难恢复NOT VERIFIED。正式录屏、本人讲解/临时修改及评测外部提交OUT OF SCOPE，未执行。GitHub最新状态以GITHUB_RELEASE_REPORT.md最新实核为准。
+
+---
+
+#以下保留此前审计与失败记录；其中历史的当前状态、未执行说明或较旧测试数量不代表本轮最终状态，最新结论以上方及本轮脱敏证据为准。
+
+ 2026-10-18 最终上线前审计（最新，取代下方当前状态）
+
+## 后续生产安全加固需求映射（以此补充为当前状态）
+
+| 编号 | 需求 | 实现/验证 | 状态 |
+|---|---|---|---|
+| PROD-01 | 生产无公开种子/管理员 | AppConfig严格模式，CLI一次性256位/10分钟引导；SecurityIT+生产Compose | PASS，具体最终命令见PRODUCTION_HARDENING_REPORT |
+| PROD-02 | 登录防护/可信来源 | 持久全局/来源/账号准入，PBKDF2并发4，父窗口饱和不增子状态，不信任XFF | PASS；代理后精确客户端IP NOT VERIFIED |
+| PROD-03 | 服务端撤销/换密 | logout/change-password/admin revoke-sessions，持久原因/过期，HTTP进程重启验证 | PASS：针对性HTTP1.1，最终回归另列 |
+| PROD-04 | 数据库最小权限 | Migration/Runtime/Test/Backup分离，真实DML生命周期和DDL/系统schema/删账/写引导拒绝 | PASS：新安装；既有生产旧权限收窄 NOT VERIFIED |
+| PROD-05 | HTTPS生产入口 | 独立Compose、后端/DB无宿主端口、本地CA显式信任验证 | 本地模板PASS；公网证书/续期BLOCKED |
+| PROD-06 | 加密备份恢复 | 专用只读备份身份，AES-GCM，拒绝覆盖，新隔离库Flyway/资金/成交核验 | 隔离PASS；生产适配/异地/保留/ACL NOT VERIFIED |
+| PROD-07 | 运维告警/日志 | 本地ops-check和已有metrics；生产日志10MiB×3 | 本地健康/磁盘探测PASS；完整告警BLOCKED/NOT VERIFIED |
+| PROD-08 | 依赖/镜像安全 | npm/Maven公告检查PASS；全层Scout已执行并发现残留 | FAIL：生产MySQL4严重/35高危；不能以扫描退出0判通过 |
+| PROD-09 | 持续负载 | 本轮分次完成20/600、50/1800、100/3600，默认短档另行回归；实时及最终SQL核验 | PASS（所测共享开发机范围）；100档304510请求、728次实时SQL、0错误/超时/资金差异；非生产容量认证，详细指标见最新测试/性能报告 |
+| PROD-10 | 发布与敏感信息 | 全历史/当前树/本地文本证据扫描、正常推送、独立克隆 | 最终记录见GITHUB_RELEASE_REPORT，不沿用旧提交 |
+
+以下所有“本轮36IT”等为前一次上线前审计历史；后续安全加固结果以最新测试节为准。人工交付仍OUT OF SCOPE。
 
 本轮最终实际执行 node scripts/compose-verify.mjs --integration，退出0；后端单元4、真实MySQL集成36、前端7，失败/错误/跳过均0；HTTP49、20人模拟65断言、真实Edge多会话/四种状态/字体/断网/旧响应、四档短时及20/50有界持续通过。包含Jackson2.21.7补丁、nginx安全头及UI当前实现，未改资金事务。原始日志.local/preflight/final-regression.log；脱敏指标、实际源码与日志SHA256见docs/PREFLIGHT_RUN_20261018.json，逐项映射见FUNCTIONAL_AUDIT_REPORT。
 

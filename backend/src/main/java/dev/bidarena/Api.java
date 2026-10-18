@@ -16,11 +16,13 @@ public final class Api {
     private final Database db;
     private final AuctionService auctions;
     private final PasswordHasher passwords=new PasswordHasher();
+    private final SecurityService security;
     private final ScheduledExecutorService jobs=Executors.newSingleThreadScheduledExecutor(r->{Thread t=new Thread(r,"auction-settlement");t.setDaemon(true);return t;});
-    public Api(Database db){this.db=db;this.auctions=new AuctionService(db);}
+    public Api(Database db){this(db,false);}
+    public Api(Database db,boolean production){this.db=db;this.auctions=new AuctionService(db);this.security=new SecurityService(db,production);}
     @FunctionalInterface interface Endpoint {Object run(Context c)throws Exception;}
     private void route(SolonApp app,String method,String path,Endpoint handler) {
-        org.noear.solon.core.handle.Handler action=c->{long started=System.nanoTime();try {Object out=handler.run(c);c.outputAsJson(json(out));}
+        org.noear.solon.core.handle.Handler action=c->{long started=System.nanoTime();c.headerSet("Cache-Control","no-store");try {Object out=handler.run(c);c.outputAsJson(json(out));}
             catch(Fault e){c.status(e.status);c.outputAsJson(json(Map.of("error",e.code)));}
             catch(IllegalArgumentException e){c.status(400);c.outputAsJson(json(Map.of("error","INVALID_REQUEST")));}
             catch(Exception e){db.metrics.increment("http.systemErrors");System.err.println("API failure: "+e.getClass().getSimpleName());c.status(500);c.outputAsJson(json(Map.of("error","INTERNAL_ERROR")));}
@@ -30,7 +32,10 @@ public final class Api {
     public void register(SolonApp app) {
         route(app,"GET","/api/v1/admin/metrics",c->{admin(c);return db.metricsSnapshot();});
         app.get("/api/v1/openapi.json",c->{try(var stream=Api.class.getResourceAsStream("/openapi.json")){c.contentType("application/json");c.output(new String(Objects.requireNonNull(stream).readAllBytes(),StandardCharsets.UTF_8));}});
-        route(app,"POST","/api/v1/auth/login",c->login(body(c)));
+        route(app,"POST","/api/v1/auth/login",c->{var b=body(c);return security.login(text(b,"email"),text(b,"password"),c.remoteIp());});
+        route(app,"POST","/api/v1/auth/logout",c->{var p=human(c);security.revoke(p.user,p.user,digest(c.header("Authorization").substring(7)));return Map.of("revoked",true);});
+        route(app,"POST","/api/v1/auth/change-password",c->{var p=human(c);var b=body(c);security.rotate(p.user,text(b,"currentPassword"),text(b,"newPassword"));return Map.of("rotated",true);});
+        route(app,"POST","/api/v1/admin/users/{id}/revoke-sessions",c->{var p=admin(c);security.revoke(p.user,id(c),null);return Map.of("revoked",true);});
         route(app,"GET","/api/v1/users/me",c->{var p=human(c);return query("SELECT id,email,role,status,kind FROM users WHERE id=?",p.user).get(0);});
         route(app,"GET","/api/v1/wallets/me",c->{var p=human(c);return walletSnapshot(p.user);});
         route(app,"GET","/api/v1/auctions",c->{human(c);return query("SELECT * FROM auctions ORDER BY id DESC LIMIT 200");});
@@ -46,6 +51,7 @@ public final class Api {
         route(app,"POST","/api/v1/admin/users",c->{admin(c);return createUser(body(c));});
         route(app,"POST","/api/v1/admin/agent-tokens/{id}/revoke",c->{admin(c);db.transaction(x->{update(x,"UPDATE agent_tokens SET revoked_at=UTC_TIMESTAMP(6) WHERE id=?",id(c));return null;});return Map.of("revoked",true);});
         jobs.scheduleWithFixedDelay(()->{try{auctions.tick();}catch(Exception e){System.err.println("Settlement scan failed: "+e.getClass().getSimpleName());}},1,1,TimeUnit.SECONDS);
+        jobs.scheduleWithFixedDelay(()->{try{security.cleanup();}catch(Exception e){db.metrics.increment("auth.cleanupFailures");}},60,60,TimeUnit.SECONDS);
         Runtime.getRuntime().addShutdownHook(new Thread(jobs::shutdownNow));
     }
     Map<String,Object> walletSnapshot(long user)throws SQLException {
@@ -56,15 +62,6 @@ public final class Api {
             w.put("holds",rows(c,"SELECT auction_id,amount FROM auction_holds WHERE user_id=? AND amount>0",user));
             c.commit();return w;
         }
-    }
-    private Object login(Map<String,Object> b)throws SQLException {
-        String email=text(b,"email"),password=text(b,"password");
-        if(email.length()>254||password.length()>256)throw new Fault(400,"INVALID_REQUEST");
-        var found=query("SELECT * FROM users WHERE email=? AND status='ACTIVE' AND kind='HUMAN'",email);
-        if(found.isEmpty()||!passwords.verify(password.toCharArray(),(String)found.get(0).get("password_hash")))throw new Fault(401,"INVALID_CREDENTIALS");
-        long user=number(found.get(0),"id");String token=randomToken();
-        db.transaction(c->{update(c,"INSERT INTO auth_sessions(digest,user_id,expires_at) VALUES(?,?,DATE_ADD(UTC_TIMESTAMP(6),INTERVAL 8 HOUR))",digest(token),user);return null;});
-        return Map.of("token",token,"role",found.get(0).get("role"),"userId",user);
     }
     private Object createUser(Map<String,Object> b)throws SQLException {
         String email=text(b,"email"),password=text(b,"password"),kind=text(b,"kind");
@@ -78,7 +75,9 @@ public final class Api {
     record Principal(long user,String role,Long agent){}
     private Principal authenticate(Context c)throws SQLException {
         String h=c.header("Authorization");if(h==null||!h.startsWith("Bearer ")||h.length()>256)throw new Fault(401,"UNAUTHORIZED");byte[] hash=digest(h.substring(7));
-        var sessions=query("SELECT u.id,u.role FROM auth_sessions s JOIN users u ON u.id=s.user_id WHERE s.digest=? AND s.expires_at>UTC_TIMESTAMP(6) AND u.status='ACTIVE'",hash);
+        var sessions=query("SELECT u.id,u.role,s.revoked_at,s.expires_at<=UTC_TIMESTAMP(6) expired FROM auth_sessions s JOIN users u ON u.id=s.user_id WHERE s.digest=? AND u.status='ACTIVE'",hash);
+        if(!sessions.isEmpty()&&sessions.get(0).get("revoked_at")!=null)throw new Fault(401,"SESSION_REVOKED");
+        if(!sessions.isEmpty()&&((Number)sessions.get(0).get("expired")).intValue()!=0)throw new Fault(401,"SESSION_EXPIRED");
         if(!sessions.isEmpty())return new Principal(number(sessions.get(0),"id"),(String)sessions.get(0).get("role"),null);
         return db.transaction(x->{var tokens=rows(x,"SELECT t.*,u.status FROM agent_tokens t JOIN users u ON u.id=t.user_id WHERE digest=? AND expires_at>UTC_TIMESTAMP(6) AND revoked_at IS NULL AND u.status='ACTIVE' FOR UPDATE",hash);
             if(tokens.isEmpty())throw new Fault(401,"UNAUTHORIZED");var t=tokens.get(0);long id=number(t,"id");

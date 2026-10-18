@@ -34,13 +34,6 @@ if(process.argv.includes('--integration')) {
     const r=spawnSync('npm',args,{shell:process.platform==='win32',stdio:'inherit'});
     if(r.status!==0)throw new Error('Frontend verification failed');
   }
-  const name='it_'+randomBytes(8).toString('hex'), password=randomBytes(32).toString('hex');
-  sql(`CREATE USER '${name}'@'%' IDENTIFIED BY '${password}'; GRANT ALL PRIVILEGES ON \`bid\\_arena\\_it\\_%\`.* TO '${name}'@'%';`, true);
-  try {
-    const r=spawnSync('mvn', ['-B','-f','backend/pom.xml','verify','-Pmysql-it'], {
-      shell:process.platform==='win32',stdio:'inherit',env:{...process.env,
-        TEST_DB_URL:'jdbc:mysql://127.0.0.1:3307/?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true&allowPublicKeyRetrieval=true&useSSL=false',
-        TEST_DB_USER:name,TEST_DB_PASSWORD:password}});
-    if(r.status!==0) throw new Error(`Real MySQL tests exited ${r.status}`);
-  } finally { sql(`DROP USER '${name}'@'%';`,true); }
+  const r=spawnSync('node',['scripts/test-isolated.mjs'],{stdio:'inherit',env:process.env});
+  if(r.status!==0)throw new Error(`Real MySQL tests exited ${r.status}`);
 }

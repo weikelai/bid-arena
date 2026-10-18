@@ -9,8 +9,10 @@ import java.sql.SQLException;
 public final class Database implements AutoCloseable {
     private final HikariDataSource source;
     final Metrics metrics=new Metrics();
+    private final AppConfig config;
 
     public Database(AppConfig config) {
+        this.config=config;
         HikariConfig pool = new HikariConfig();
         pool.setJdbcUrl(config.databaseUrl());
         pool.setUsername(config.databaseUser());
@@ -26,7 +28,7 @@ public final class Database implements AutoCloseable {
     }
 
     public Flyway migrations() {
-        return Flyway.configure().dataSource(source).locations("classpath:db/migration")
+        return Flyway.configure().dataSource(config.databaseUrl(),config.migrationUser(),config.migrationPassword()).locations("classpath:db/migration")
                 .validateMigrationNaming(true).validateOnMigrate(true).cleanDisabled(true).load();
     }
 

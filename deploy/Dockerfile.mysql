@@ -1,0 +1,3 @@
+FROM mysql:8.4.8
+# Patch identified OS packages without changing the MySQL server package/version.
+RUN microdnf update -y curl libcurl openssl openssl-libs pcre2 pcre2-syntax sqlite sqlite-libs gnutls krb5-libs libcap acl libacl glib2 libevent libxml2 && microdnf clean all

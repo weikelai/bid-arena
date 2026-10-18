@@ -1,0 +1,4 @@
+FROM nginx:1.28-alpine
+# Refresh OS security revisions within the same Alpine branch; scan the built image.
+RUN apk del nginx-module-acme nginx-module-geoip nginx-module-image-filter nginx-module-njs nginx-module-xslt && apk upgrade --no-cache && apk add --no-cache --upgrade nginx=1.28.3-r7
+COPY deploy/nginx-main.conf /etc/nginx/nginx.conf

@@ -10,9 +10,15 @@ class AppConfigTest {
         return new HashMap<>(Map.of("DB_URL","jdbc:mysql://localhost/example", "DB_USER","example", "DB_PASSWORD","test-only"));
     }
     @Test void productionDisablesDemoByDefault() {
-        AppConfig config = AppConfig.from(base());
+        var env=base();assertThrows(IllegalArgumentException.class,()->AppConfig.from(env));
+        env.put("APPROVED_HTTPS_PROXY","true");
+        AppConfig config = AppConfig.from(env);
         assertEquals("production", config.environment());
         assertFalse(config.seedDemo());
+        env.put("MIGRATION_DB_USER","migration");env.put("MIGRATION_DB_PASSWORD","independent-test-only");
+        assertThrows(IllegalArgumentException.class,()->AppConfig.from(env));
+        assertEquals("migration",AppConfig.from(env,true).databaseUser());
+        env.put("APP_ENV","prodution");assertThrows(IllegalArgumentException.class,()->AppConfig.from(env,true));
     }
     @Test void productionCannotEnablePublicDemoPasswords() {
         Map<String,String> env = base(); env.put("SEED_DEMO","true");

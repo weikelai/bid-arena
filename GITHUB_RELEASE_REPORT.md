@@ -1,4 +1,16 @@
-# 2026-10-18 风险闭环发布核验（最新）
+# 2026-10-18 最终上线前审计发布核验（最新）
+
+仓库 https://github.com/weikelai/bid-arena.git，分支master。实际实现及完整回归证据提交 **1ec71e2a6fe642df3ef77b2213249314ed43ff4e**。实际执行 `git -c credential.interactive=false push origin master` 退出0，从f2b97da正常推进到1ec71e2，无强推。
+
+实际执行 `git -c credential.interactive=false clone --single-branch --branch master https://github.com/weikelai/bid-arena.git .local/preflight/remote-check` 退出0；随后 `node .local/preflight/remote-check.mjs .local/preflight/remote-check` 退出0，2026-10-18 16:45:14+08:00。本地、ls-remote与独立克隆HEAD均为上述ID；完整树8dc79b7d54f44c6c6c4dc9ec7c59a25973b756c0一致，97文件、21项必要文件存在、禁止路径0、工作区干净。包含源码、V1–V3迁移、测试、脚本及全部审计文档，不包含真实.env、Token、本地日志或数据库数据。
+
+本轮最终完整回归16:42:07+08:00结束，退出0：4单元、36真实MySQL集成、7前端，失败/错误/跳过0；HTTP49、模拟65断言、Edge、四档短时压力及20/50有界持续通过，SQL对账无差异。三服务healthy，部署只读24检查通过。敏感审计退出0，13真实提交、188历史blob及387文本证据未命中已知本地凭据或常见密钥模式；npm0，41项运行时Maven依赖OSV补丁后0命中，不保证绝对安全。
+
+本节作为真实文档更新正常提交推送；包含自身的最终文档提交ID由最终git/ls-remote/独立克隆核验记录，不伪造自引用ID。已测试实现提交如上，证据在.local/preflight/remote-verification.json，脱敏回归数据在docs/PREFLIGHT_RUN_20261018.json。生产公开部署FAIL；长期稳定性、完整镜像扫描等NOT VERIFIED；正式录屏、本人讲解/临时修改及外部提交OUT OF SCOPE。历史保留如下。
+
+---
+
+# 2026-10-18 风险闭环发布核验（历史）
 
 仓库：https://github.com/weikelai/bid-arena.git，分支master。本轮已测试实现与证据提交 **164aa9e23d6b2950e268317edf0666764673da60**，从52448b738dadd8a169e742547fdd2341544f4406正常推进；没有强推、删除历史或空提交。
 

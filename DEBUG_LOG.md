@@ -1,5 +1,17 @@
 # 真实问题记录
 
+## 2026-10-18 上线前审计真实失败与修复
+
+- 最终补丁完整回归的50用户持续档在约242秒后因`powershell.exe Get-Process`采样子进程超过5000ms，被SIGTERM终止，StabilityIT实际失败1；日志sampling-failure-evidence保留，不能用早先通过覆盖。最小修复只将本地进程采样预算改为15000ms并使用NonInteractive/ErrorAction Stop，仍禁止重叠采样、缺失即失败，保留HTTP15秒、资金断言、资源上限及整档截止不变；实际采样探针及修复后全量结果见最新报告。不能据此宣称业务无性能风险或忽略监控失败。
+
+- PowerShell执行Maven依赖清单时未引用含点号的`-DoutputFile`，被拆成生命周期`.txt`，退出1；引用完整-D参数后解析成功（.local/preflight/maven-dependencies*.log）。不属应用业务缺陷。
+- PDF提取先缺pypdf，随后默认GBK控制台无法输出项目符号；仅在忽略目录安装pypdf，UTF8文件提取成功并读取完整五页，不改系统Python或原题文件。
+- Maven运行时OSV初次匹配Jackson2.19.1的15条公告；查阅受影响范围和版本可用性后用BOM2.21.7统一2.x补丁版本，41依赖重扫无命中。是否存在实际可利用路径未证明；不能冒充渗透结果。兼容性以最终完整回归为准。
+- 新浏览器截图路径缺乏新克隆父目录初始化，补充mkdir recursive，不削弱原断言。
+- 审计执行顺序错误：Compose尚在up时验证包装器因匹配到MySQL Healthy提前重启backend，导致up退出1/后端143、前端未启动、代理就绪失败。保留final-up.log/start-order-failure.log；串行up重试三服务健康后再执行完整回归，没有改资金逻辑。执行者为Agent，不把该失败归因于业务代码。
+
+本轮详细结果见FINAL_RELEASE_AUDIT.md和docs/PREFLIGHT_RUN_20261018.json；下方历史原样保留。
+
 ## 2026-10-17 冻结回归：浏览器列表等待超时
 
 本轮首次完整回归退出1：HttpSimulationIT中Edge在自动成交场景等待新拍品列表按钮30秒超时；后端单元4、AuctionIT14、DatabaseIT6、前端5和模拟65断言已通过，但不能据此将完整套件标PASS。证据：.local/freeze-tests.log、freeze-browser-failed.log、freeze-http-failed.log，失败结束20:43:18+08:00。

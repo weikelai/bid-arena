@@ -1,13 +1,19 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue';
+import WalletSummary from './components/WalletSummary.vue';
+import AuctionMainPanel from './components/AuctionMainPanel.vue';
+import RightInspector, {type InspectorTab} from './components/RightInspector.vue';
+import BidHistoryTable from './components/BidHistoryTable.vue';
+import LedgerTable from './components/LedgerTable.vue';
 import { acceptRoom, outcome, requiresSnapshot, secondsLeft, type Room, type RoomEvent } from './room';
+const inspectorTab=ref<InspectorTab>('history');
 const token=ref(sessionStorage.getItem('bid-arena-token')??'');
 const role=ref(sessionStorage.getItem('bid-arena-role')??'');
 const email=ref('bidder_a@example.com'),password=ref(''),notice=ref(''),error=ref(''),busy=ref(false);
 const list=ref<Room[]>([]),room=ref<Room|null>(null),wallet=ref<{total_balance:number;frozen_balance:number;available_balance:number;version:number;user_id:number;server_time:string;holds:{auction_id:number;amount:number}[];transactions:{id:number;user_id:number;auction_id:number|null;request_id:string|null;created_at:string;type:string;delta_total:number;delta_frozen:number}[]}|null>(null);
 const amount=ref(110),title=ref('新拍品'),duration=ref(180),connection=ref('同步中'),clock=ref(Date.now()),offset=ref(0);
 const agentEmail=ref(''),agentPassword=ref(''),agentId=ref<number>(),issued=ref('');
-const bids=ref<{id:number;user_id:number;amount:number;seq:number}[]>([]);
+const bids=ref<{id:number;user_id:number;amount:number;seq:number;created_at?:string}[]>([]);
 let sessionEpoch=0,roomEpoch=0;
 const selectedId=ref<number|null>(null),userId=ref<number|null>(null),walletSync=ref('同步中');
 const standing=computed(()=>outcome(room.value,userId.value,bids.value.some(b=>b.user_id===userId.value)));
@@ -15,16 +21,16 @@ const roomHold=computed(()=>wallet.value?.holds?.find(h=>h.auction_id===selected
 const roomLedger=computed(()=>wallet.value?.transactions.filter(t=>t.auction_id===selectedId.value)??[]);
 const released=computed(()=>-roomLedger.value.filter(t=>t.type==='RELEASE').reduce((n,t)=>n+t.delta_frozen,0));
 const captured=computed(()=>roomLedger.value.filter(t=>t.type==='CAPTURE').reduce((n,t)=>n+t.delta_total,0));
-const ledgerName=(type:string)=>({INITIAL_CREDIT:'初始积分',FREEZE:'冻结积分（非扣款）',RELEASE:'释放冻结（不增加总余额）',CAPTURE:'成交扣款'}[type]??type);
-const signed=(n:number)=>n>0?'+'+n:String(n);
 let timer:ReturnType<typeof setInterval>,ticking=false;
 const remaining=computed(()=>secondsLeft(room.value?.end_at??null,offset.value,clock.value));
 async function api(path:string,body?:unknown){const epoch=sessionEpoch;const response=await fetch('/api/v1'+path,{method:body===undefined?'GET':'POST',headers:{Authorization:'Bearer '+token.value,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});const data=await response.json();if(epoch!==sessionEpoch)throw new Error('登录状态已变更，请重新操作');if(!response.ok)throw new Error(data.error??`HTTP ${response.status}`);return data;}
 async function action(work:()=>Promise<void>){busy.value=true;error.value='';try{await work();}catch(e){error.value=e instanceof Error?e.message:'请求失败';}finally{busy.value=false;}}
 async function refreshWallet(){const data=await api('/wallets/me');if(userId.value!==null&&data.user_id!==userId.value)return;if(wallet.value&&data.version<wallet.value.version)return;userId.value=data.user_id;wallet.value=data;walletSync.value='已同步 '+new Date(data.server_time).toLocaleTimeString();}
+const visibleList=computed(()=>list.value.map(item=>item.id===room.value?.id?room.value:item));
+function listCountdown(item:Room){if(item.status==='DRAFT')return '待开始';if(item.status==='RUNNING')return item.end_at?secondsLeft(item.end_at,offset.value,clock.value)+'s':'同步中';return item.status==='SETTLING'?'结算中':'已结束';}
 async function refreshList(){list.value=await api('/auctions');}
 async function login(){await action(async()=>{const data=await api('/auth/login',{email:email.value,password:password.value});userId.value=data.userId;token.value=data.token;role.value=data.role;sessionStorage.setItem('bid-arena-token',data.token);sessionStorage.setItem('bid-arena-role',data.role);password.value='';await refreshList();await refreshWallet();});}
-function logout(){sessionEpoch++;roomEpoch++;selectedId.value=null;userId.value=null;token.value='';role.value='';sessionStorage.removeItem('bid-arena-token');sessionStorage.removeItem('bid-arena-role');room.value=null;wallet.value=null;issued.value='';list.value=[];bids.value=[];agentId.value=undefined;agentPassword.value='';notice.value='';error.value='';}
+function logout(){inspectorTab.value='history';sessionEpoch++;roomEpoch++;selectedId.value=null;userId.value=null;token.value='';role.value='';sessionStorage.removeItem('bid-arena-token');sessionStorage.removeItem('bid-arena-role');room.value=null;wallet.value=null;issued.value='';list.value=[];bids.value=[];agentId.value=undefined;agentPassword.value='';notice.value='';error.value='';}
 async function snapshot(id:number){const epoch=roomEpoch;const data=await api(`/auctions/${id}`) as Room;const history=await api(`/auctions/${id}/bids`);if(epoch!==roomEpoch||!acceptRoom(room.value,data,selectedId.value??0))return;offset.value=Date.parse(data.server_time)-Date.now();room.value=data;bids.value=history.filter((b:{seq:number})=>b.seq<=data.seq);amount.value=Math.max(amount.value,data.current_price+data.min_increment);}
 async function select(id:number){roomEpoch++;selectedId.value=id;room.value=null;bids.value=[];notice.value='';await action(async()=>{await snapshot(id);connection.value='已同步';});}
 async function join(){const id=selectedId.value,epoch=roomEpoch;if(!id)return;await action(async()=>{await api(`/auctions/${id}/join`,{});if(epoch!==roomEpoch)return;await snapshot(id);notice.value='已加入拍卖';});}
@@ -38,23 +44,155 @@ onMounted(()=>{if(token.value)action(async()=>{await refreshList();await refresh
 </script>
 
 <template>
-  <main>
-    <header><div><p class="eyebrow">多人实时拍卖间</p><h1>Bid Arena</h1></div><button v-if="token" @click="logout">退出登录</button></header>
-    <p v-if="error" class="error" role="alert">{{ error }}</p><p v-if="notice" class="notice" role="status">{{ notice }}</p>
-    <p v-if="room" class="notice" data-testid="standing">{{ standing }}</p>
-    <p v-if="wallet">当前用户 ID {{ wallet.user_id }} · {{ walletSync }} · 本场冻结 {{ roomHold }} 积分。冻结不是扣款，释放不增加总余额。</p>
-    <p v-if="wallet&&room">本场已加载流水：释放冻结 {{ released }} 积分 · 成交扣款 {{ signed(captured) }} 积分（流水最多显示最近200条）。</p>
-    <section v-if="!token" class="login"><h2>登录拍卖间</h2><form @submit.prevent="login"><label>邮箱<input v-model="email" type="email" required autocomplete="username"></label><label>密码<input v-model="password" type="password" required autocomplete="current-password"></label><button :disabled="busy">登录</button></form><p>演示账号及密码请参阅 README。使用独立浏览器或无痕窗口体验多人竞拍。</p></section>
-    <div v-else class="grid">
-      <aside><section v-if="wallet"><h2>我的钱包</h2><p class="price">{{ wallet.available_balance }} <small>可用积分</small></p><p>总余额 {{ wallet.total_balance }} · 冻结 {{ wallet.frozen_balance }}</p></section><section><h2>拍卖列表</h2><button @click="action(refreshList)">刷新列表</button><button v-for="item in list" :key="item.id" class="auction" @click="select(item.id)"><strong>{{ item.title }}</strong><span>{{ item.status }} · {{ item.current_price }} 积分</span></button></section><section v-if="role==='ADMIN'"><h2>创建拍卖</h2><label>名称<input v-model="title" maxlength="200"></label><label>时长（秒）<input v-model.number="duration" type="number" min="1" max="86400"></label><button :disabled="busy" @click="create">创建 DRAFT 拍品</button></section></aside>
-      <div><section v-if="room" class="room"><p class="eyebrow">{{ room.status }} · {{ connection }} · seq {{ room.seq }}</p><h2>{{ room.title }}</h2><div class="stats"><div><small>当前最高价</small><p class="price">{{ room.current_price }}</p></div><div><small>剩余时间</small><p class="price">{{ room.status==='DRAFT'?'待开始':room.status==='RUNNING'?remaining+'s':'已结束' }}</p></div></div><p>领先者 {{ room.leader_id??'暂无' }} · 已延时 {{ room.extension_count }}/3 次</p><p v-if="room.end_at">截止 {{ new Date(room.end_at).toLocaleString() }}</p><div class="controls"><button :disabled="busy||!['DRAFT','RUNNING'].includes(room.status)" @click="join">加入拍卖</button><label>出价积分<input v-model.number="amount" type="number" :min="room.current_price+room.min_increment" step="10"></label><button :disabled="busy||room.status!=='RUNNING'" @click="bid">提交出价</button></div><div v-if="role==='ADMIN'" class="controls"><button :disabled="busy||room.status!=='DRAFT'" @click="lifecycle('start')">开始拍卖</button><button :disabled="busy||!['DRAFT','RUNNING'].includes(room.status)" @click="lifecycle('cancel')">取消拍卖</button></div><h3>参与者（{{ room.participants.length }}）</h3><p v-for="p in room.participants" :key="p.user_id">{{ p.email }} · {{ p.kind }}</p><div v-for="result in room.result" :key="result.reason" class="notice">成交结果 {{ result.reason }} · 赢家 {{ result.winner_id??'无' }} · 成交价 {{ result.price }}</div></section><section v-else><h2>选择一件拍品</h2><p>演示拍品保持草稿状态，由管理员手动开始。</p></section>
-      <section v-if="role==='ADMIN'&&room"><h2>竞拍 Agent</h2><label>新 Agent 邮箱<input v-model="agentEmail" type="email"></label><label>初始密码（至少 12 位）<input v-model="agentPassword" type="password" autocomplete="new-password"></label><button :disabled="busy" @click="createAgent">创建 Agent 用户</button><label>Agent 用户 ID<input v-model.number="agentId" type="number"></label><button :disabled="busy||!agentId" @click="issue">签发本场受限 Token</button><div v-if="issued"><p>仅本次显示；录屏前隐藏。</p><textarea readonly :value="issued" aria-label="一次性 Agent Token"></textarea><button @click="issued=''">隐藏 Token</button></div></section>
-      <section v-if="room"><h2>出价历史</h2><table aria-label="出价历史"><thead><tr><th>序号</th><th>用户</th><th>金额</th></tr></thead><tbody><tr v-for="b in bids" :key="b.id"><td>{{ b.seq }}</td><td>{{ b.user_id }}</td><td>{{ b.amount }}</td></tr></tbody></table></section>
-      <section v-if="wallet"><h2>资金流水</h2><table><thead><tr><th>编号</th><th>拍卖 / 请求</th><th>类型</th><th>余额变化</th><th>冻结变化</th></tr></thead><tbody><tr v-for="t in wallet.transactions" :key="t.id"><td>{{ t.id }}</td><td>{{ t.auction_id??'初始化' }} / {{ t.request_id??'—' }}</td><td>{{ ledgerName(t.type) }}</td><td>{{ signed(t.delta_total) }}</td><td>{{ signed(t.delta_frozen) }}</td></tr></tbody></table></section></div>
+  <main :class="token?'console-layout':'auth-layout'">
+    <div v-if="!token" class="system-mark" aria-hidden="true">BID_ARENA // INITIALIZED</div>
+    <p v-if="!token&&error" class="error" role="alert">{{error}}</p>
+    <section v-if="!token" class="login">
+      <div class="welcome-panel">
+<div class="panel-coordinate" aria-hidden="true">01 / BID ARENA</div>
+<div class="welcome-copy">
+<p class="welcome-title">HELLO BIDDER</p>
+<p class="welcome-caption">EVERY BID TELLS A STORY.<br>YOUR NEXT MOVE STARTS HERE.</p>
+<div class="welcome-rule">
+</div>
+<span class="welcome-tag">实时竞拍 · 每一次出价都有回响</span>
+</div>
+<span class="panel-signature" aria-hidden="true">ARENA_01</span>
+</div>
+      <div class="login-panel">
+<div class="login-heading">
+<span class="identity-mark" aria-hidden="true">
+<i>
+</i>
+</span>
+<div>
+<h2>登录拍卖间</h2>
+<p>连接你的竞拍身份</p>
+</div>
+</div>
+<form @submit.prevent="login">
+<label>邮箱<input v-model="email" type="email" placeholder="YOUR@EMAIL.COM" required autocomplete="username">
+</label>
+<label>密码<input v-model="password" type="password" placeholder="输入登录密码" required autocomplete="current-password">
+</label>
+<button class="login-submit" :disabled="busy">
+<span>{{ busy?'正在连接':'登录' }}</span>
+<span aria-hidden="true">↗</span>
+</button>
+</form>
+<p class="login-help">演示账号及密码请参阅 README。<br>使用独立浏览器会话体验多人竞拍。</p>
+<div class="login-footer">
+<span>SECURE SESSION</span>
+<span>● 身份验证</span>
+</div>
+</div>
+    </section>
+
+    <div v-else class="console-shell">
+      <aside class="sidebar" aria-label="导航与资产">
+        <header class="sidebar-brand">
+<p class="eyebrow">AUCTION CONTROL / 01</p>
+<h1>Bid Arena<span class="brand-dot">.</span>
+</h1>
+<p class="micro">
+<span class="status-dot">
+</span> NODE // CONNECTED</p>
+</header>
+        <div class="identity-row">
+<div>
+<span class="micro">{{role}} / #{{userId??'—'}}</span>
+<p>竞拍控制台</p>
+</div>
+<button class="secondary logout-button" @click="logout">退出登录</button>
+</div>
+        <WalletSummary :wallet="wallet" :sync="walletSync" />
+        <div class="auction-list-heading">
+<h2>拍卖列表 <span>{{visibleList.length}}</span>
+</h2>
+<button class="text-button" :disabled="busy" @click="action(refreshList)">刷新列表</button>
+</div>
+        <nav class="auction-list-scroll" aria-label="拍卖列表">
+<button v-for="item in visibleList" :key="item.id" class="auction" :class="{'is-selected':selectedId===item.id}" :aria-current="selectedId===item.id?'true':undefined" @click="select(item.id)">
+<span class="auction-row">
+<span class="state-tag" :class="'state-'+item.status.toLowerCase()">{{item.status}}</span>
+<span class="micro">#{{item.id}}</span>
+</span>
+<strong>{{item.title}}</strong>
+<span class="auction-row">
+<b>{{item.current_price}} <small>PTS</small>
+</b>
+<span class="micro">{{listCountdown(item)}}</span>
+</span>
+</button>
+<p v-if="!list.length" class="empty-copy">暂无拍卖</p>
+</nav>
+        <div v-if="role==='ADMIN'" class="sidebar-admin">
+<span class="micro">ADMIN TOOLS</span>
+<div>
+<button class="secondary" @click="inspectorTab='create'">创建拍卖</button>
+<button class="secondary" @click="inspectorTab='agent'">Agent 管理</button>
+</div>
+</div>
+        <footer class="sidebar-footer micro">MYSQL AUTHORITY · LIVE SYNC</footer>
+      </aside>
+      <AuctionMainPanel :room="room" :connection="connection" :remaining="remaining" :standing="standing" :busy="busy" :admin="role==='ADMIN'" v-model:amount="amount" :notice="notice" :error="error" :bids="bids" @join="join" @bid="bid" @lifecycle="lifecycle" />
+      <RightInspector :active="inspectorTab" :admin="role==='ADMIN'" @change="inspectorTab=$event">
+        <template #history>
+<BidHistoryTable :bids="bids" />
+<p v-if="!room" class="empty-copy">选择拍卖后查看本场记录</p>
+</template>
+        <template #ledger>
+<LedgerTable :transactions="wallet?.transactions??[]" :auction-id="selectedId" :hold="roomHold" :released="released" :captured="captured" />
+</template>
+        <template #create>
+<div class="panel-heading">
+<h2>创建拍卖</h2>
+<span class="micro">ADMIN</span>
+</div>
+<p class="inspector-hint">新拍卖保持 DRAFT，由管理员手动开始。起拍100积分，最小加价10积分。</p>
+<form @submit.prevent="create">
+<label>名称<input v-model="title" maxlength="200" required>
+</label>
+<label>时长（秒）<input v-model.number="duration" type="number" min="1" max="86400" required>
+</label>
+<button class="full-button" :disabled="busy">创建 DRAFT 拍品</button>
+</form>
+</template>
+        <template #agent>
+<div class="panel-heading">
+<h2>竞拍 Agent</h2>
+<span class="micro">SCOPED ACCESS</span>
+</div>
+<p class="inspector-hint">独立身份 · 本场 auction:read / auction:bid。有效期1小时，每分钟120次。Token只显示一次，请安全保存。</p>
+<form @submit.prevent="createAgent">
+<label>新 Agent 邮箱<input v-model="agentEmail" type="email" required>
+</label>
+<label>初始密码（至少 12 位）<input v-model="agentPassword" type="password" autocomplete="new-password" minlength="12" required>
+</label>
+<button class="secondary full-button" :disabled="busy">创建 Agent 用户</button>
+</form>
+<div class="inspector-divider">
+</div>
+<label>Agent 用户 ID<input v-model.number="agentId" type="number" min="1">
+</label>
+<p v-if="room" class="micro">授权拍卖 #{{room.id}} · {{room.title}}</p>
+<p v-else class="inspector-hint">先从左栏选择要授权的拍卖。</p>
+<button class="full-button" :disabled="busy||!agentId||!room" @click="issue">签发本场受限 Token</button>
+<div v-if="issued" class="token-once">
+<p>仅本次显示；录屏前隐藏。</p>
+<textarea readonly :value="issued" aria-label="一次性 Agent Token">
+</textarea>
+<button class="secondary" @click="issued=''">隐藏 Token</button>
+</div>
+</template>
+      </RightInspector>
     </div>
   </main>
 </template>
 
-<style>
-:root{font-family:Inter,system-ui,sans-serif;color:#e8eef9;background:#0b1220;font-synthesis:none}*{box-sizing:border-box}body{margin:0}main{max-width:1200px;margin:40px auto;padding:24px}header{display:flex;justify-content:space-between;align-items:center}h1{font-size:52px;letter-spacing:-.05em;margin:8px 0 24px}h2{margin-top:0;font-size:24px}.eyebrow{color:#79dec4;font-size:13px;letter-spacing:.06em}.grid{display:grid;grid-template-columns:320px 1fr;gap:24px}section{background:#152035;border:1px solid #293a53;border-radius:16px;padding:24px;margin-bottom:24px}.login{max-width:500px}.login p,small{color:#a4b4ca}label{display:block;margin:14px 0;font-size:14px}input,textarea{display:block;width:100%;margin-top:8px;padding:12px;background:#0b1425;border:1px solid #41526a;border-radius:8px;color:inherit;font:inherit}button{border:0;border-radius:8px;padding:12px 18px;background:#80e1c7;color:#102a26;font:inherit;cursor:pointer}button:disabled{opacity:.45;cursor:default}.auction{display:block;width:100%;text-align:left;margin-top:12px;background:#22314b;color:inherit}.auction span{display:block;font-size:12px;color:#a4b4ca;margin-top:8px}.price{font-size:36px;font-weight:700;margin:12px 0}.price small{font-size:13px;font-weight:400}.stats,.controls{display:flex;gap:24px;align-items:center;flex-wrap:wrap}.stats>div{flex:1}.error,.notice{padding:16px;border-radius:8px;background:#243c37;color:#9be9cb}.error{background:#442631;color:#ffc4c4}table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:10px;border-bottom:1px solid #293a53}@media(max-width:800px){.grid{grid-template-columns:1fr}main{margin:12px auto;padding:16px}h1{font-size:40px}}
+<style src="./theme.css">
+</style>
+<style src="./console.css">
+</style>
+<style src="./typography.css">
 </style>

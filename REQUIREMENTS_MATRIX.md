@@ -1,3 +1,13 @@
+# 2026-10-18 最终上线前审计（最新，取代下方当前状态）
+
+本轮最终实际执行 node scripts/compose-verify.mjs --integration，退出0；后端单元4、真实MySQL集成36、前端7，失败/错误/跳过均0；HTTP49、20人模拟65断言、真实Edge多会话/四种状态/字体/断网/旧响应、四档短时及20/50有界持续通过。包含Jackson2.21.7补丁、nginx安全头及UI当前实现，未改资金事务。原始日志.local/preflight/final-regression.log；脱敏指标、实际源码与日志SHA256见docs/PREFLIGHT_RUN_20261018.json，逐项映射见FUNCTIONAL_AUDIT_REPORT。
+
+部署检查24项、实际Edge CSP加载、隔离备份恢复探针通过；原演示库只读SQL inconsistent=0、duplicate_capture=0、pending=0，Flyway1–3成功；3306未改动。npm0漏洞；Maven41运行时依赖修复后OSV无命中；不保证绝对安全。
+
+公开生产部署FAIL：TLS、生产管理员引导、登录防暴力破解/服务端退出吊销、最小数据库权限和备份恢复/告警仍不完善。NOT VERIFIED：10/30/60分钟、生产容量、断电/完整容器网络分区、完整渗透/镜像层扫描、早期全过程Git历史和本人独立能力、可选线上部署。OUT OF SCOPE：正式录屏、本人现场讲解/临时修改、评测方外部提交，均未执行，不宣称原始评分全部通过。GitHub状态以GITHUB_RELEASE_REPORT最新实际核验为准。
+
+---
+
 # 2026-10-18 风险闭环最新状态
 
 本节为2026-10-18风险闭环最新状态，取代下方历史当前结论，但保留旧日志和失败。最终 `node scripts/compose-verify.mjs --integration` 退出0：后端4单元、36真实MySQL集成（AuctionIT15、BoundaryIT11、DatabaseIT7、HttpSimulationIT1、StabilityIT1、StressIT1），失败/错误/跳过0；前端7、HTTP49、模拟65断言、Edge多会话及四档压力通过。脱敏指标与原始日志哈希见docs/RISK_RUN_20261018.json。

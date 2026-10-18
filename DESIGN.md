@@ -1,5 +1,9 @@
 # 实际实现设计
 
+## 2026-10-18 上线前安全与交付补充
+
+资金事务、锁序、接收定义和结算边界保持不变。本轮将Flyway传递的Jackson通过2.21.7 BOM约束统一补丁线，修复已知公告匹配；实际兼容性以本轮完整回归证据为准。nginx增加同源CSP、禁止嵌入、nosniff、referrer及权限策略，不引入TLS伪完成或新权威数据层。生产仍缺TLS/管理员引导/登录防暴力破解/服务端退出吊销，不能公开上线。UI分为App状态及展示组件，字号变量集中typography.css，权威状态依旧来自服务端；禁止用UI修饰代替账务正确性。审计依据FINAL_RELEASE_AUDIT与SECURITY_AUDIT_REPORT最新节。
+
 本文描述当前代码；DESIGN_DRAFT.md 与原始 PROJECT_AUDIT.md 保留历史，不代表最终实现状态。
 
 ## 模块边界

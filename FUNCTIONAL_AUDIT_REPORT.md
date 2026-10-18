@@ -1,0 +1,36 @@
+# 功能独立复核（2026-10-18 上线前审计）
+
+依据原始Markdown及PDF五页逐条核对，历史结果不作为本轮通过证据。最新实测计数及日志哈希集中在 `docs/PREFLIGHT_RUN_20261018.json`，执行情况见TEST_EXECUTION_REPORT最新节。源代码路径均相对仓库根。
+
+| 要求 | 实现/接口 | 本轮验证入口 | 判断边界 |
+|---|---|---|---|
+| Vue3/TS可操作页面 | frontend/src/App.vue、components/*；room.ts | Vitest room/health；browser-check.mjs | 不只依赖API脚本；真人能力不由自动化证明 |
+| Java17/Solon3/MySQL8 | backend/pom.xml、Application、Database、compose.yaml | 构建、健康、DatabaseIT | 无Redis；MySQL唯一权威 |
+| 自动迁移/种子 | database/migrations/V1–V3、DemoSeeder | DatabaseIT migrationHistory、repeatedAndConcurrentSeeds、twoRealProcessStarts | 不重置已有钱包；演示DRAFT不启动倒计时 |
+| 登录/身份/权限 | Api.login/authenticate/human/admin/permit | HTTP边界、模拟、浏览器会话切换 | 客户端退出不是服务端会话吊销，见安全报告 |
+| 状态机/创建/开始/取消/加入 | AuctionService.create/start/join/finishTransaction | AuctionIT、BoundaryIT transitions、browser admin流程 | SETTLING通常在事务内不可见，明确测试遗留SETTLING |
+| 100/10/180/1000 | V1默认值、Api/DemoSeeder/createUser | DatabaseIT、BoundaryIT金额/模拟 | 非浮点；单次出价上限9万亿 |
+| 严格截止 | bid_requests.received_at；place received.isBefore | receiptMicrosecondBeforeEqualAndAfterDeadline、intakeLock、跨锁等待 | 接收定义为取得数据库接收门后，不是HTTP首字节；隐藏脚本解释风险保留 |
+| 幂等与并发 | (user_id,request_id)主键、指纹、auction_intake/行锁 | concurrentDuplicate、competingUsers/sharedWallets、HTTP并发Token重试 | 用户全局requestId；不同载荷409；不能只查再判断 |
+| 冻结/释放/差额/拒绝无副作用 | wallets/holds、money条件UPDATE、effect_key唯一 | differentialRelease、exactFunds、回滚及SQL对账 | 多表关系由同一事务保证，CHECK不是跨表求和 |
+| 最后5秒延10秒最多3次 | place最新end_at同事务更新 | extendsThreeTimes、concurrentSnipes、thirdExtensionRaceAndRollback | 上限后仍可接受合法出价 |
+| 自动唯一结算/无人/取消/恢复 | Api定时扫描、finish、auction_results主键 | restartScanner、processDeath、settlementFailure、concurrentExecutors | 真实进程中断不等于宿主断电 |
+| 通知失败不撤账/seq/重连 | event同事务持久化；events/snapshot；room.ts | 模拟、浏览器离线、旧快照/HTTP延迟 | 每秒轮询等价实时方案；私有拒绝可形成公共seq缺口，取快照 |
+| 钱包/流水/用户隔离 | Api.walletSnapshot重复读事务；sessionEpoch/roomEpoch/version | privateWalletSnapshot、旧钱包跨登录响应浏览器测试 | 已有UI三栏/字体/独立滚动也在浏览器检查 |
+| Agent摘要/一次返回/授权/到期/吊销/限流 | Api.issue/authenticate/permit；V1 tokens/scopes/rate_windows | simulate-auction、http-boundaries、browser Agent签发隐藏吊销 | 管理API可配策略，UI当前固定策略；隐藏不是吊销 |
+| Agent不能管理/访问私有数据 | human/admin拒绝Agent，指定auction scope | HTTP401/403/429及Agent子进程 | 示例脚本对非200退出，不宣称智能模型/自动退避 |
+| OpenAPI路径/结构 | backend/src/main/resources/openapi.json；Api.register | 模拟必需路径及实际HTTP读取 | JSON文档，无内置Swagger UI |
+| 20人同场/并发/重试/延时/结果 | scripts/simulate-auction.mjs、HttpSimulationIT | 输出SIMULATION_SUMMARY和SQL | 可通过auctionId选择专用短时测试场，不向原演示库负载 |
+| 文档/环境/测试/发布 | README、DESIGN、DECISIONS、DEBUG_LOG、AI_USAGE、AGENT_TOOL_SPEC | 文件树、命令与发布核验 | AI_USAGE不伪造本人决策/比例；早期全过程历史NOT VERIFIED |
+
+所有自动化项是否PASS以本轮最终完整回归证据为准；`FINAL_RELEASE_AUDIT.md`不把尚在执行/未执行项描述通过。录屏、本人现场讲解/临时修改及外部提交OUT OF SCOPE；线上部署、隐藏评测结果、本人独立能力NOT VERIFIED。
+
+## 源码审查与最小修复
+
+完整读取Api/AuctionService/Database/AppConfig/DemoSeeder/Sql/PasswordHasher、三份迁移、Vue主组件/核心状态/展示组件、Compose/Dockerfile/nginx及集成脚本。保留已验证资金锁序，不重构核心。
+
+发现并修复：新克隆运行字体截图测试时父目录可能不存在，browser-check现在先递归创建；账务无变化。移除App.vue两个在组件拆分后不再引用的格式化函数；未删除重要文档/脚本。安全配置与依赖修复见SECURITY_AUDIT_REPORT。
+
+## 测试质量与限制
+
+并发/结算使用真实MySQL，断言唯一效果、回滚、资金汇总，不用内存Mock冒充数据库。真实死锁用测试钩子建立实际两连接环，确认驱动1213/40001后传播生产重试；另有异常注入用例，不混为一谈。Vue单测覆盖状态决策纯函数，浏览器补真实交互；不能宣称单元测试已覆盖所有展示组件。轮询/快照存在额外读取成本，未完成生产大规模推送。服务端接收时间契约与网络入站时间区别需评审知悉；不改规则掩盖边界。

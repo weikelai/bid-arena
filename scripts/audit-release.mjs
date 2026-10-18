@@ -27,18 +27,25 @@ for(const entry of entries){
   if(secrets.some(s=>data.includes(s)))findings.push(`${entry.path}: local credential in history`);
   if(patterns.some(p=>p.test(data.toString('utf8'))))findings.push(`${entry.path}: credential pattern in history`);
 }
-for(const path of git('ls-files').toString('utf8').trim().split('\n')){
+const workingPaths=new Set([...git('ls-files','-z').toString('utf8').split('\0'),...git('ls-files','--others','--exclude-standard','-z').toString('utf8').split('\0')].filter(Boolean));
+for(const path of workingPaths){
   if(!existsSync(path))continue;
   const data=readFileSync(path);
   if(secrets.some(s=>data.includes(s))||patterns.some(p=>p.test(data.toString('utf8'))))findings.push(`${path}: credential in worktree`);
 }
 let evidenceFiles=0;
-for(const dir of ['.local','backend/target'])if(existsSync(dir))for(const entry of readdirSync(dir,{withFileTypes:true})){
-  if(!entry.isFile()||!entry.name.endsWith('.log'))continue;
-  const data=readFileSync(`${dir}/${entry.name}`);evidenceFiles++;
-  if(secrets.some(s=>data.includes(s))||patterns.some(p=>p.test(data.toString('utf8'))))findings.push(`${dir}/${entry.name}: credential in local evidence`);
+function scanEvidence(dir){
+  if(!existsSync(dir))return;
+  for(const entry of readdirSync(dir,{withFileTypes:true})){
+    const path=`${dir}/${entry.name}`;
+    if(entry.isDirectory()){if(!['.git','node_modules','python'].includes(entry.name))scanEvidence(path);continue;}
+    if(!entry.isFile()||!/[.](log|json|xml|txt)$/i.test(entry.name))continue;
+    const data=readFileSync(path);evidenceFiles++;
+    if(secrets.some(s=>data.includes(s))||patterns.some(p=>p.test(data.toString('utf8'))))findings.push(`${path}: credential in local evidence`);
+  }
 }
+for(const dir of ['.local','backend/target'])scanEvidence(dir);
 if(findings.length){console.error([...new Set(findings)].join('\n'));process.exit(1);}
-const report={status:'PASS',commits:Number(git('rev-list','--count','--all').toString().trim()),historyBlobs:blobs,knownLocalCredentials:secrets.length,evidenceFiles,checks:['all reachable Git blobs','tracked working files','local evidence logs','forbidden history paths','local credential exact matches','private keys and common access-token patterns'],limitation:'Pattern and known-value checks do not prove absence of every possible secret. Ignored logs and screenshots are excluded from Git and Docker contexts.'};
+const report={status:'PASS',commits:Number(git('rev-list','--count','--all').toString().trim()),historyBlobs:blobs,knownLocalCredentials:secrets.length,evidenceFiles,checks:['all reachable Git blobs','tracked and nonignored untracked working files','recursive local text evidence excluding clones/runtime packages','forbidden history paths','local credential exact matches','private keys and common access-token patterns'],limitation:'Pattern and known-value checks do not prove absence of every possible secret. Ignored logs and screenshots are excluded from Git and Docker contexts.'};
 writeFileSync('.local/release-security.json',JSON.stringify(report,null,2));
 console.log(JSON.stringify(report));

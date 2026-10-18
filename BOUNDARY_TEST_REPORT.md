@@ -1,3 +1,9 @@
+# 本轮上线前审计补充（2026-10-18T08:43:22.630Z）
+
+最终完整回归退出0；本轮真实计数/日志哈希见docs/PREFLIGHT_RUN_20261018.json，性能详见PERFORMANCE_AUDIT_REPORT，功能/死锁映射见FUNCTIONAL_AUDIT_REPORT。不将下方历史数值冒充本轮。生产公开部署FAIL，人工三项OUT OF SCOPE。
+
+---
+
 # 风险闭环补充：真实应用死锁（2026-10-18，最新）
 
 本节为2026-10-18风险闭环最新状态，取代下方历史当前结论，但保留旧日志和失败。最终 `node scripts/compose-verify.mjs --integration` 退出0：后端4单元、36真实MySQL集成（AuctionIT15、BoundaryIT11、DatabaseIT7、HttpSimulationIT1、StabilityIT1、StressIT1），失败/错误/跳过0；前端7、HTTP49、模拟65断言、Edge多会话及四档压力通过。脱敏指标与原始日志哈希见docs/RISK_RUN_20261018.json。

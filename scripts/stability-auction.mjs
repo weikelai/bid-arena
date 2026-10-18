@@ -34,7 +34,9 @@ async function sample(){if(sampling)return;sampling=true;try{
  const m=await call('/admin/metrics',admin);samples.push({at:Date.now(),...m});
  assert.ok(m.heapUsedBytes<1024**3,'stop: heap > 1 GiB');
  for(const key of ['connection.acquireTimeouts','bid.systemErrors','http.systemErrors'])assert.equal(m.metrics[key]??0,before.metrics[key]??0,`stop: ${key}`);
- const exec=promisify(execFile);const p=await exec('powershell.exe',['-NoProfile','-Command',`Get-Process -Id ${Number(process.env.STRESS_JAVA_PID)} | Select-Object CPU,WorkingSet64 | ConvertTo-Json -Compress`],{timeout:5000});
+ // Process startup on the shared Windows host can exceed 5s while tests are active.
+ // Keep sampling bounded and non-overlapping; failed/absent samples still fail the run.
+ const exec=promisify(execFile);const p=await exec('powershell.exe',['-NoProfile','-NonInteractive','-Command',`Get-Process -Id ${Number(process.env.STRESS_JAVA_PID)} -ErrorAction Stop | Select-Object CPU,WorkingSet64 | ConvertTo-Json -Compress`],{timeout:15000});
  const java=JSON.parse(p.stdout);assert.ok(java.WorkingSet64<2*1024**3,'stop: process RSS > 2 GiB');
  const d=await exec('docker',['compose','stats','--no-stream','--format','{{json .}}','mysql'],{timeout:8000});
  resources.push({at:Date.now(),java,mysql:d.stdout.trim().split('\n').filter(Boolean).map(v=>JSON.parse(v))});

@@ -1,0 +1,22 @@
+name: bid-arena-agent
+services:
+  agent-worker:
+    build: { context: .., dockerfile: agent-worker/Dockerfile }
+    environment:
+      AGENT_API_URL: ${AGENT_API_URL:?HTTPS backend API required}
+      AGENT_CONTROL_SECRET: ${AGENT_CONTROL_SECRET:?Private coordination credential required}
+      AGENT_VAULT_KEY: ${AGENT_VAULT_KEY:?Private encryption key required}
+    volumes: ["agent-vault:/data"]
+    # Vault is reachable only through a private authenticated TLS tunnel/reverse proxy.
+    # Never expose this HTTP listener on a public interface.
+    ports: ["127.0.0.1:8090:8090"]
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    cpus: 0.5
+    logging: { driver: json-file, options: { max-size: "10m", max-file: "3" } }
+volumes:
+  agent-vault:

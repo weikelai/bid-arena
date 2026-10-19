@@ -35,6 +35,15 @@ public final class Api {
         if(method.equals("GET"))app.get(path,action);else app.post(path,action);
     }
     public void register(SolonApp app) {
+        var agentJobs=new AgentJobs(db);
+        route(app,"GET","/api/v1/admin/agent-jobs",c->{admin(c);return agentJobs.list();});
+        route(app,"POST","/api/v1/admin/agent-jobs",c->{admin(c);return agentJobs.create(body(c));});
+        route(app,"GET","/api/v1/admin/agent-jobs/{job}/history",c->{admin(c);return agentJobs.history(jobId(c));});
+        route(app,"POST","/api/v1/admin/agent-jobs/{job}/{action}",c->{admin(c);return agentJobs.control(jobId(c),c.path().substring(c.path().lastIndexOf('/')+1),body(c));});
+        route(app,"POST","/api/v1/internal/agent-jobs/claim",c->{agentJobs.worker(c.header("Authorization"));return agentJobs.claim(text(body(c),"owner"));});
+        route(app,"POST","/api/v1/internal/agent-jobs/{job}/prepare",c->{agentJobs.worker(c.header("Authorization"));return agentJobs.prepare(jobId(c),body(c));});
+        route(app,"POST","/api/v1/internal/agent-jobs/{job}/recover",c->{agentJobs.worker(c.header("Authorization"));return agentJobs.recover(jobId(c),body(c));});
+        route(app,"POST","/api/v1/internal/agent-jobs/{job}/report",c->{agentJobs.worker(c.header("Authorization"));return agentJobs.report(jobId(c),body(c));});
         route(app,"GET","/api/v1/admin/metrics",c->{admin(c);return db.metricsSnapshot();});
         app.get("/api/v1/openapi.json",c->{try(var stream=Api.class.getResourceAsStream("/openapi.json")){c.contentType("application/json");c.output(new String(Objects.requireNonNull(stream).readAllBytes(),StandardCharsets.UTF_8));}});
         route(app,"POST","/api/v1/auth/login",c->{var b=body(c);return security.login(text(b,"email"),text(b,"password"),c.remoteIp());});
@@ -48,7 +57,7 @@ public final class Api {
         route(app,"GET","/api/v1/auctions/{id}/bids",c->{permit(c,id(c),"auction:read");return query("SELECT * FROM bids WHERE auction_id=? ORDER BY seq LIMIT 1000",id(c));});
         route(app,"GET","/api/v1/auctions/{id}/events",c->{var principal=permit(c,id(c),"auction:read");long after=Long.parseLong(c.paramOrDefault("after","0"));var events=query("SELECT auction_id auctionId,seq,type,server_time serverTime,payload FROM auction_events WHERE auction_id=? AND seq>? AND (visibility='PUBLIC' OR user_id=?) ORDER BY seq LIMIT 200",id(c),after,principal.user);long watermark=number(query("SELECT seq FROM auctions WHERE id=?",id(c)).get(0),"seq");return Map.of("events",events,"connectionState","CONNECTED","auctionId",id(c),"seq",watermark,"type","CONNECTION_STATE","serverTime",Instant.now().toString());});
         route(app,"POST","/api/v1/auctions/{id}/join",c->{var p=permit(c,id(c),"auction:bid");auctions.join(id(c),p.user);return Map.of("joined",true);});
-        route(app,"POST","/api/v1/auctions/{id}/bids",c->{var p=permit(c,id(c),"auction:bid");var b=body(c);return auctions.bid(id(c),p.user,text(b,"requestId"),integer(b,"amount"));});
+        route(app,"POST","/api/v1/auctions/{id}/bids",c->{var p=permit(c,id(c),"auction:bid");var b=body(c);String request=text(b,"requestId");return request.startsWith("agent:")?agentJobs.bid(auctions,p,id(c),request,integer(b,"amount")):auctions.bid(id(c),p.user,request,integer(b,"amount"));});
         route(app,"POST","/api/v1/admin/auctions",c->{var p=admin(c);var b=body(c);long duration=b.containsKey("durationSeconds")?integer(b,"durationSeconds"):180;if(duration<1||duration>86400)throw new Fault(400,"INVALID_AUCTION");return Map.of("id",auctions.create(p.user,text(b,"title"),(int)duration));});
         route(app,"POST","/api/v1/admin/auctions/{id}/start",c->{admin(c);auctions.start(id(c));return auctions.snapshot(id(c));});
         route(app,"POST","/api/v1/admin/auctions/{id}/cancel",c->{admin(c);auctions.cancel(id(c));return auctions.snapshot(id(c));});
@@ -108,6 +117,7 @@ public final class Api {
     private static Map<String,Object> body(Context c)throws Exception {try {Map<String,Object> value=ONode.deserialize(c.body(),Map.class);if(value==null)throw new Fault(400,"INVALID_REQUEST");return value;}catch(Fault e){throw e;}catch(Exception e){throw new Fault(400,"INVALID_JSON");}}
     private static String text(Map<String,Object>b,String k){if(!(b.get(k) instanceof String s))throw new Fault(400,"INVALID_"+k);return s;}
     private static long integer(Map<String,Object>b,String k){Object v=b.get(k);if(!(v instanceof Number n)||n instanceof Double||n instanceof Float||n instanceof java.math.BigDecimal)throw new Fault(400,"INVALID_"+k);try{return new java.math.BigInteger(n.toString()).longValueExact();}catch(Exception e){throw new Fault(400,"INVALID_"+k);}}
+    private static String jobId(Context c){String[] parts=c.path().split("/");if(parts.length<6||!parts[5].matches("[a-f0-9-]{36}"))throw new Fault(400,"INVALID_JOB_ID");return parts[5];}
     private static long id(Context c){String[] segments=c.path().split("/");for(int i=segments.length-1;i>=0;i--)try{long id=Long.parseLong(segments[i]);if(id>0)return id;}catch(NumberFormatException ignored){}throw new Fault(400,"INVALID_ID");}
     private static String randomToken(){byte[] b=new byte[32];new SecureRandom().nextBytes(b);return Base64.getUrlEncoder().withoutPadding().encodeToString(b);}
     static byte[] digest(String value){try{return MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8));}catch(NoSuchAlgorithmException impossible){throw new IllegalStateException(impossible);}}

@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Bid Arena",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Integer virtual points. MySQL durable receipt time is sampled after intake gate acquisition and before waiting for auction/wallet locks. Reuse the same requestId after transport failure. Agent token cannot access human list/wallet/admin APIs. Events are pulled from committed durable rows; snapshots use a public seq watermark."
   },
   "servers": [
@@ -1896,6 +1896,331 @@
           }
         ]
       }
+    },
+    "/api/v1/admin/agent-jobs": {
+      "get": {
+        "summary": "ADMIN: List up to 100 job configurations and observed states",
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid configuration"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Denied"
+          },
+          "409": {
+            "description": "State, scope or lease conflict"
+          },
+          "503": {
+            "description": "Worker unavailable"
+          }
+        }
+      },
+      "post": {
+        "summary": "ADMIN: Configure a stopped Agent job and forward token to vault",
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid configuration"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Denied"
+          },
+          "409": {
+            "description": "State, scope or lease conflict"
+          },
+          "503": {
+            "description": "Worker unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentJobCreate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/agent-jobs/{job}/history": {
+      "get": {
+        "summary": "ADMIN: Latest 100 redacted decision/control records",
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid configuration"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Denied"
+          },
+          "409": {
+            "description": "State, scope or lease conflict"
+          },
+          "503": {
+            "description": "Worker unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/agent-jobs/{job}/{action}": {
+      "post": {
+        "summary": "ADMIN: Start, pause, stop, revoke or configure (only while stopped/paused)",
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid configuration"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Denied"
+          },
+          "409": {
+            "description": "State, scope or lease conflict"
+          },
+          "503": {
+            "description": "Worker unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "action",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "start",
+                "pause",
+                "stop",
+                "revoke",
+                "configure"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/internal/agent-jobs/claim": {
+      "post": {
+        "summary": "PRIVATE WORKER coordination only: claim",
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid configuration"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Denied"
+          },
+          "409": {
+            "description": "State, scope or lease conflict"
+          },
+          "503": {
+            "description": "Worker unavailable"
+          }
+        },
+        "description": "Requires independent AGENT_CONTROL_SECRET Bearer credential; human sessions and auction-scoped tokens are rejected. Not an administrator credential. Owner and lease epoch fence stale workers.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/internal/agent-jobs/{job}/prepare": {
+      "post": {
+        "summary": "PRIVATE WORKER coordination only: {job}/prepare",
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid configuration"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Denied"
+          },
+          "409": {
+            "description": "State, scope or lease conflict"
+          },
+          "503": {
+            "description": "Worker unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "description": "Requires independent AGENT_CONTROL_SECRET Bearer credential; human sessions and auction-scoped tokens are rejected. Not an administrator credential. Owner and lease epoch fence stale workers.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/internal/agent-jobs/{job}/recover": {
+      "post": {
+        "summary": "PRIVATE WORKER coordination only: {job}/recover",
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid configuration"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Denied"
+          },
+          "409": {
+            "description": "State, scope or lease conflict"
+          },
+          "503": {
+            "description": "Worker unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "description": "Requires independent AGENT_CONTROL_SECRET Bearer credential; human sessions and auction-scoped tokens are rejected. Not an administrator credential. Owner and lease epoch fence stale workers.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/internal/agent-jobs/{job}/report": {
+      "post": {
+        "summary": "PRIVATE WORKER coordination only: {job}/report",
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid configuration"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Denied"
+          },
+          "409": {
+            "description": "State, scope or lease conflict"
+          },
+          "503": {
+            "description": "Worker unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "description": "Requires independent AGENT_CONTROL_SECRET Bearer credential; human sessions and auction-scoped tokens are rejected. Not an administrator credential. Owner and lease epoch fence stale workers.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2535,6 +2860,106 @@
           "serverTime": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "AgentJobCreate": {
+        "type": "object",
+        "required": [
+          "name",
+          "userId",
+          "auctionId",
+          "token",
+          "maxBidAmount"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "userId": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "auctionId": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "token": {
+            "type": "string",
+            "writeOnly": true,
+            "description": "One-time scoped token, forwarded to private encrypted Worker vault; never persisted in SQL"
+          },
+          "maxBidAmount": {
+            "type": "integer",
+            "minimum": 110,
+            "maximum": 1000000000
+          },
+          "maxBids": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "default": 20
+          },
+          "pollMs": {
+            "type": "integer",
+            "minimum": 3000,
+            "maximum": 60000,
+            "default": 3000
+          },
+          "timeoutMs": {
+            "type": "integer",
+            "minimum": 1000,
+            "maximum": 10000,
+            "default": 5000
+          },
+          "maxErrors": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 10
+          }
+        }
+      },
+      "AgentJob": {
+        "type": "object",
+        "description": "Administrator-only task metadata; no token or digest. desired is configuration; state is last observed worker state; lease and last_decision expose stale workers.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "enum": [
+              "STOPPED",
+              "STARTING",
+              "WAITING",
+              "RUNNING",
+              "PAUSED",
+              "STOPPING",
+              "FINISHED",
+              "ERROR"
+            ]
+          },
+          "desired": {
+            "enum": [
+              "RUNNING",
+              "PAUSED",
+              "STOPPED"
+            ]
+          },
+          "pending_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "bid_count": {
+            "type": "integer"
+          },
+          "last_result": {
+            "type": "string"
+          },
+          "last_error": {
+            "type": "string"
           }
         }
       }

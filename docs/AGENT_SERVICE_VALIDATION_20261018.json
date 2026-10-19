@@ -1,0 +1,281 @@
+{
+  "at": "2026-10-19T03:41:39.817Z",
+  "baseline": "7edbbe46deb9525e6bc915bc96faef6008082576",
+  "status": "PASS within stated scope",
+  "records": [
+    {
+      "started": "2026-10-18T13:45:53.298Z",
+      "finished": "2026-10-18T13:45:53.456Z",
+      "command": [
+        "docker",
+        "compose",
+        "--profile",
+        "agents",
+        "config",
+        "--quiet"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "log": ".local/agent-verified-config.log"
+    },
+    {
+      "started": "2026-10-18T13:42:48.348Z",
+      "finished": "2026-10-18T13:42:52.418Z",
+      "command": [
+        "docker",
+        "compose",
+        "--profile",
+        "agents",
+        "build"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "log": ".local/agent-verified-compose-build.log"
+    },
+    {
+      "started": "2026-10-18T13:42:52.532Z",
+      "finished": "2026-10-18T13:42:53.808Z",
+      "command": [
+        "docker",
+        "compose",
+        "--profile",
+        "agents",
+        "up",
+        "-d"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "log": ".local/agent-verified-compose-up.log"
+    },
+    {
+      "started": "2026-10-18T13:47:30.887Z",
+      "finished": "2026-10-18T13:47:49.783Z",
+      "command": [
+        "docker",
+        "compose",
+        "--profile",
+        "agents",
+        "up",
+        "-d",
+        "--no-deps",
+        "--force-recreate",
+        "--wait",
+        "backend",
+        "frontend",
+        "agent-worker"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "log": ".local/agent-verified-recreate.log"
+    },
+    {
+      "started": "2026-10-18T13:42:20.816Z",
+      "finished": "2026-10-18T13:47:09.636Z",
+      "command": [
+        "node",
+        "scripts/test-isolated.mjs",
+        "-Dit.test=AgentServiceIT,DatabaseIT,AuctionIT,BoundaryIT,HttpSimulationIT,SecurityIT,SecurityHttpIT,RuntimePermissionsIT,BackupIT"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "log": ".local/agent-verified-regression.log"
+    },
+    {
+      "started": "2026-10-18T13:48:00.606Z",
+      "finished": "2026-10-18T13:48:03.533Z",
+      "command": [
+        "node",
+        "scripts/compose-verify.mjs"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "log": ".local/agent-verified-core.log"
+    },
+    {
+      "started": "2026-10-18T13:48:03.635Z",
+      "finished": "2026-10-18T13:48:03.941Z",
+      "command": [
+        "node",
+        "scripts/agent-financial-check.mjs"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "log": ".local/agent-verified-finances.log"
+    },
+    {
+      "started": "2026-10-18T13:48:45.343Z",
+      "finished": "2026-10-18T13:48:45.566Z",
+      "command": [
+        "docker",
+        "compose",
+        "--profile",
+        "agents",
+        "ps",
+        "--format",
+        "json"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "log": ".local/agent-verified-ps.log"
+    },
+    {
+      "started": "2026-10-18T13:48:04.360Z",
+      "finished": "2026-10-18T13:48:04.556Z",
+      "command": [
+        "node",
+        "scripts/verify-secrets.mjs"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "log": ".local/agent-verified-secrets.log"
+    },
+    {
+      "started": "2026-10-18T13:48:04.663Z",
+      "finished": "2026-10-18T13:48:06.031Z",
+      "command": [
+        "node",
+        "scripts/audit-release.mjs"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "log": ".local/agent-verified-audit.log"
+    }
+  ],
+  "counts": {
+    "frontend": 7,
+    "unit": 4,
+    "mysqlIntegration": 43,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "workerScenarioGroups": 19,
+    "httpBoundaryAssertions": 49,
+    "simulationUsers": 20,
+    "simulationAssertions": 65
+  },
+  "containers": [
+    {
+      "service": "agent-worker",
+      "state": "running",
+      "health": "healthy",
+      "ports": "8090/tcp",
+      "image": "bid-arena-agent-worker"
+    },
+    {
+      "service": "backend",
+      "state": "running",
+      "health": "healthy",
+      "ports": "127.0.0.1:8080->8080/tcp",
+      "image": "bid-arena-backend"
+    },
+    {
+      "service": "frontend",
+      "state": "running",
+      "health": "healthy",
+      "ports": "127.0.0.1:5173->80/tcp",
+      "image": "bid-arena-frontend"
+    },
+    {
+      "service": "mysql",
+      "state": "running",
+      "health": "healthy",
+      "ports": "127.0.0.1:3307->3306/tcp",
+      "image": "mysql:8.4.8"
+    }
+  ],
+  "financial": {
+    "status": "PASS",
+    "walletLedgerHoldMismatches": 0,
+    "duplicateLedgerEffects": 0,
+    "duplicateAuctionResults": 0,
+    "pendingJobs": 0,
+    "migrationVersion": 5,
+    "invalidTokenDigests": 0
+  },
+  "evidence": [
+    {
+      "path": ".local/agent-verified-config.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".local/agent-verified-compose-build.log",
+      "sha256": "52455e23d1ca5acb67de24d18998782e1af9dd9edc7f07e09639caf9a86fd909"
+    },
+    {
+      "path": ".local/agent-verified-compose-up.log",
+      "sha256": "872053c5349bc7fcc2b1547fde4f65c4002f93e40a8b1362319a85d45434bd1a"
+    },
+    {
+      "path": ".local/agent-verified-recreate.log",
+      "sha256": "67b0cf4013eb486c9c1cf4abf1a93bc47a377ed6a41c12f7f2dc865a63324601"
+    },
+    {
+      "path": ".local/agent-verified-regression.log",
+      "sha256": "9c5fbe825f041c3b277e7570d10f766bd8bb6ea2aef2349d14553ea73809b96b"
+    },
+    {
+      "path": ".local/agent-verified-core.log",
+      "sha256": "36ccf2f0727abc50f22aa39004abfb0bd0872002cd45582e71d45f9a4156ef46"
+    },
+    {
+      "path": ".local/agent-verified-finances.log",
+      "sha256": "8dc33e9f3804ae8cfa0b005a93194d562a45ca851701f1032b18092f33c88919"
+    },
+    {
+      "path": ".local/agent-verified-ps.log",
+      "sha256": "af1d6c5b0a28c6fdd6b893c6011bd698bbeec8e95b75378f0538860c464ac919"
+    },
+    {
+      "path": ".local/agent-verified-secrets.log",
+      "sha256": "7977e804b03684a39378c966427c046fb3ec0db83dff4a0eb8942c5bb7490c2d"
+    },
+    {
+      "path": ".local/agent-verified-audit.log",
+      "sha256": "3ef4422e7536b032aa2a01090cea0a5238bc32989c18b9dc86eb9565d6edd3eb"
+    },
+    {
+      "path": ".local/agent-frontend-test.log",
+      "sha256": "8ac4418d5bc38d9fbdb8680ad00a64bc0427ef464efd518191f74adbc5e73a52"
+    },
+    {
+      "path": ".local/agent-frontend-build.log",
+      "sha256": "05b07e49241f36a731958e62c8bbbfecd2f974fbe1acdd51f332e6a2cab12edc"
+    },
+    {
+      "path": ".local/agent-compose-verification.log",
+      "sha256": "cfda563f065e23507e9144f911e2a0e626e8d3fb55b4d7b4abc1902ae92eea98"
+    },
+    {
+      "path": ".local/agent-freeze-it.log",
+      "sha256": "2f06184439ca5db705bf572a0150065571efe77e659af82f80913e4885c96edf"
+    },
+    {
+      "path": ".local/agent-dependencies.log",
+      "sha256": "f8795e370c777f68ab9cb2de8ce169ead0765a02d38b84df61e1702270703415"
+    },
+    {
+      "path": ".local/agent-npm-audit.json",
+      "sha256": "fd40c0fe8ee6f79177388696b2a14d01ba0e60a7d3fb6a2ba08269af774bfa1c"
+    },
+    {
+      "path": "backend/target/agent-service-check.log",
+      "sha256": "0a8359aacfcc5092f6db38411755406b4fbff14b2f909c5a7379fa16dd239945"
+    },
+    {
+      "path": "backend/target/agent-browser-check.log",
+      "sha256": "2850c98b15914bd5dd08d6838baf3be186dd3beb9e9cd8b90fd744e846fb6358"
+    }
+  ],
+  "limits": [
+    "Logs stay local and are not published",
+    "StressIT and StabilityIT not rerun in this scope",
+    "Public deployment blocked; existing production image security gate remains failed",
+    "Cross-host vault and new Worker long-term soak not verified",
+    "Expired or revoked token together with durable intake pending fault combination not verified"
+  ],
+  "scopeExcluded": [
+    "formal recording",
+    "personal onsite defense and modification",
+    "external evaluation submission"
+  ]
+}

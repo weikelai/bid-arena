@@ -1,4 +1,33 @@
-## 2026-10-18 用户版 README 发布（最新范围）
+## 2026-10-18 独立自动竞拍 Agent 服务（最新）
+
+本轮为新增独立 Worker 的增量验证，不冒充重新执行所有历史压力/持续负载。下方保留历史失败和中止记录。
+
+| 实际命令 | 退出码 / 结果 | 本地证据 |
+|---|---|---|
+| `npm --prefix frontend test` | 0；7/7 | `.local/agent-frontend-test.log` |
+| `npm --prefix frontend run build` | 0；vue-tsc 与 Vite 通过 | `.local/agent-frontend-build.log` |
+| `node scripts/test-isolated.mjs '-Dit.test=AgentServiceIT,DatabaseIT,AuctionIT,BoundaryIT,HttpSimulationIT,SecurityIT,SecurityHttpIT,RuntimePermissionsIT,BackupIT'` | 0；单元4、IT43，失败/错误/跳过0 | `.local/agent-regression.log`；最终同范围复测采用下述 recorder 记录 |
+| `node scripts/test-isolated.mjs '-Dit.test=AgentServiceIT'` | 0；单元4、IT1，内部19组检查 | `.local/agent-freeze-it.log` |
+| `docker compose --profile agents config --quiet` | 0 | `.local/agent-verified-config.result.json` |
+| `docker compose --profile agents build` | 0；后端/前端/Worker 构建 | `.local/agent-verified-compose-build.result.json` |
+| `docker compose --profile agents up -d` | 0 | `.local/agent-verified-compose-up.result.json` |
+| `docker compose --profile agents up -d --no-deps --force-recreate --wait backend frontend agent-worker` | 0；确保容器实际采用最新构建 | `.local/agent-verified-recreate.result.json` |
+| `docker compose --profile agents ps --format json` | 0；mysql/backend/frontend/agent-worker healthy | `.local/agent-verified-ps.log` |
+| `AGENT_COMPOSE_DEMO=allow node scripts/agent-compose-verify.mjs`（PowerShell通过环境变量设置） | 0；独立 stop/start/restart、一次出价、取消释放及吊销 | `.local/agent-compose-verification.log` |
+| `node scripts/compose-verify.mjs` | 0；代理/迁移、后端重启前后种子和钱包事实不变 | `.local/agent-compose-core.log` |
+| `node scripts/agent-financial-check.mjs` | 0；wallet/ledger/hold差异0、重复流水/成交0、pending0、迁移5 | `.local/agent-verified-finances.log` |
+| `node scripts/audit-dependencies.mjs` | 0；Maven 41依赖无OSV命中 | `.local/agent-dependencies.log` |
+| `npm --prefix frontend audit --json` | 0；无已知漏洞命中 | `.local/agent-npm-audit.json` |
+
+最终同范围复测：`node scripts/record-command.mjs agent-verified-regression node scripts/test-isolated.mjs '-Dit.test=AgentServiceIT,DatabaseIT,AuctionIT,BoundaryIT,HttpSimulationIT,SecurityIT,SecurityHttpIT,RuntimePermissionsIT,BackupIT'`；2026-10-18 21:42:20–21:47:09 +08:00，实际退出0，单元4及IT43，失败/错误/跳过0。真实进程退出码、起止时间见 `.local/agent-verified-regression.result.json`。该 recorder 将原生 stderr 直接保留到日志，避免 PowerShell 将 Docker/Maven 的普通 stderr 包装成 NativeCommandError；早期包装记录保留，不隐瞒、不当成业务失败。
+
+Agent 测试使用真实隔离 MySQL schema、两个独立 Worker、故障代理及真实 Edge 三个隔离会话；包含19组业务检查和SQL结果验证，不把内部组数当作JUnit数。HttpSimulationIT包含HTTP49、20人模拟65断言和既有异步/断线恢复浏览器检查。新增真实超时、提交后响应丢失、后端/Worker重启、旧epoch、停止围栏与相同ID改金额拒绝均有断言。
+
+日志不上传Git；安全摘要、退出码与SHA256见 docs/AGENT_SERVICE_VALIDATION_20261018.json。未重跑StressIT/StabilityIT；公网部署BLOCKED、既有镜像门禁FAIL、跨主机与新Worker长时稳定性NOT VERIFIED。
+
+---
+
+## 2026-10-18 用户版 README 发布（历史范围）
 
 用户最新指示：停止继续安全排查，优先完成README并提交GitHub。README已完整改为普通用户教程，原开发/测试/运维全文迁至docs/DEVELOPMENT.md，实际按钮及链接检查通过；明确Agent需维护者启动、界面无吊销按钮、只有FINISHED成交结果确定赢家。
 

@@ -87,4 +87,14 @@
 ---
 # 2026-10-18 收尾复核：真实失败保留
 
+## 2026-10-18 独立 Agent 服务增量修复与验证
+
+新增流程初次集成发现：Solon handler 路径变量不能从该路由的 c.param 取得；改用严格校验后的实际路径段。MySQL `leading` 别名与保留字冲突，改为反引号。测试对省略 null 的序列化和真实 Agent 标签定位的假设已按实际协议/界面修正；保留 `.local/agent-check-failure1..5.log`，未删除业务断言。新增真实超时和 replay 标记后重新执行完整 AgentServiceIT。
+
+托管任务协调需持有 job 行锁、同时调用原独立资金事务，增加最多三条并行托管提交的入口保护，避免默认连接池被双连接占满；超额返回可恢复503。原 AuctionService 钱包/出价/结算逻辑未修改。策略数字使用精确范围检查。
+
+最终相关九类回归实际退出0：单元4、IT43，失败/错误/跳过0，结束21:47:09+08:00；前端7和类型/构建通过。构建后核对发现运行容器的镜像ID与新标签不同，显式重建 backend/frontend/agent-worker（不动mysql/数据卷）并等待健康；退出0，之后代理/种子幂等/资金对账再次通过。摘要生成一度恰逢后端重启health starting，严格健康断言拒绝生成；待恢复后重新抓取四服务healthy再生成，未把过渡状态当验收成功。
+
+PowerShell原生stderr包装与子进程实际退出状态分开记录；新增record-command保存原始stdout/stderr及真实退出码。日志留本地，安全摘要见docs/AGENT_SERVICE_VALIDATION_20261018.json。远程部署、长时Worker、Token失效同时durable PENDING组合未冒充通过。
+
 本轮首次全量44IT中SecurityHttpIT的POST权限拒绝响应发生Connection reset，退出1；独立原样复测通过，未声称确定底层网络根因。路由此前可能在消费POST请求体前完成授权拒绝，现先缓存请求体，避免未消费字节关闭连接的风险；增加20次完整403及FORBIDDEN响应断言，没有重试失败请求或修改资金业务。针对性通过，最终完整回归与生产演练见docs/CLOSEOUT_AUDIT.md。生产测试网络地址池耗尽失败也保留；只清本轮自己的停止容器/网络，数据卷和日志保留，没有全局prune。

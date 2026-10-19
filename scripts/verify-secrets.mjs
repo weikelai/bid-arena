@@ -5,7 +5,7 @@ const values = [];
 for (const file of ['.env', '.local/test.env']) {
   if (!existsSync(file)) continue;
   for (const line of readFileSync(file, 'utf8').split(/\r?\n/)) {
-    if (/^[A-Z_]*PASSWORD=.+/.test(line)) values.push(line.slice(line.indexOf('=') + 1));
+    if (/^[A-Z_]*(?:PASSWORD|TOKEN|SECRET|VAULT_KEY)=.+/.test(line)) values.push(line.slice(line.indexOf('=') + 1));
   }
 }
 const ignored = new Set(['.local', '.git', 'node_modules', 'target', 'dist']);

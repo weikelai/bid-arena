@@ -1,4 +1,14 @@
-# 用户版 README 发布核验（2026-10-18，最新记录）
+# 独立 Agent 服务发布（2026-10-19，当前记录）
+
+仓库 https://github.com/weikelai/bid-arena.git ，分支 master。内容包含独立 Worker/Dockerfile、V5迁移、任务API及管理员界面、真实MySQL/双Worker/浏览器测试、用户README、远程模板和验收文档。验证实际发生于2026-10-18，发布日期不冒充测试日期。
+
+本轮相关回归：前端7、单元4、IT43，失败/错误/跳过0；Worker19组、HTTP49、20人模拟65、SQL对账和四服务healthy。证据清单见docs/AGENT_SERVICE_VALIDATION_20261018.json。生产安全门禁仍FAIL，公网部署BLOCKED；未重跑历史StressIT/StabilityIT，不冒充全部生产验收通过。
+
+发布使用已有历史正常提交和推送，不强推。当前章节先随实现提交；实际内容提交ID、远端匹配和独立克隆结果在完成后追加。最终报告提交不自引用自身SHA，以远端master及会话实核为准。真实.env、Token、本地日志、凭证卷、数据库和构建产物不纳入发布。
+
+---
+
+# 用户版 README 发布核验（2026-10-18，历史记录）
 
 PASS：用户要求停止继续安全排查并尽快发布README，已执行。仓库 https://github.com/weikelai/bid-arena.git ，分支 master；实际正常推送命令 git -c credential.interactive=false -c credential.https://github.com.username=weikelai push origin master 退出0，无强推。
 

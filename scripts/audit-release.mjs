@@ -9,7 +9,7 @@ function git(...args) {
 const secrets=[];
 for(const file of ['.env','.local/test.env','.local/production.env'])if(existsSync(file)) {
   for(const line of readFileSync(file,'utf8').split(/\r?\n/)) {
-    const match=line.match(/^[A-Z_]*(?:PASSWORD|TOKEN|SECRET|API_KEY)=(.+)$/);
+    const match=line.match(/^[A-Z_]*(?:PASSWORD|TOKEN|SECRET|API_KEY|VAULT_KEY)=(.+)$/);
     if(match&&match[1].length>=8)secrets.push(Buffer.from(match[1]));
   }
 }

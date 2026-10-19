@@ -1,4 +1,24 @@
-## 2026-10-18 用户版 README 发布（最新范围）
+## 2026-10-18 独立 Agent 服务增量验收（最新）
+
+| 需求 | 当前状态 | 本轮证据及边界 |
+|---|---|---|
+| 独立运行、后台自动决策 | PASS | agent-worker/worker.mjs，Compose agents profile；DRAFT 等待，不代管理员开拍 |
+| 预算/次数/频率、领先不自抬、终态停止 | PASS | AgentServiceIT 内部 19 组业务检查，真实 MySQL 对账 |
+| 管理员任务与状态/历史/暂停/停止/吊销 | PASS | AgentJobsPanel、真实 Edge 管理员及双用户流程；期望与观测状态分开 |
+| 每场 Token、角色隔离与秘密保存 | PASS | 权限拒绝/过期/吊销测试；数据库只存摘要，Worker 私有卷加密；扫描有限范围通过 |
+| requestId、重启、未知结果与双 Worker | PASS | 持久 pending、租约 epoch、响应丢失/真实超时及进程重启恢复；不重复资金效果 |
+| 已接收 PENDING 与失效 Token 组合 | NOT VERIFIED | 未完成组合故障端到端验证；保留 pending，等待原服务端事务或结算，不伪报立即停止 |
+| 构建、相关核心回归、20 人模拟、资金对账 | PASS | 前端7、单元4、相关IT43、HTTP49、模拟65；完整命令及证据见测试报告 |
+| 本轮四档压力/长时稳定性 | NOT VERIFIED | 保留旧证据，本轮不冒充重新执行；新增 Worker 长时验证未执行 |
+| 独立服务器、公网 HTTPS、跨主机容灾 | BLOCKED / NOT VERIFIED | 仅提供远程模板；缺实际资源，未公网部署或验证跨主机共享 |
+| 公开生产安全门禁 | FAIL | 既有镜像风险未在本轮消除，不可公开上线 |
+| 录屏、本人现场讲解/修改、外部提交 | OUT OF SCOPE | 用户明确本次不执行 |
+
+本轮发布与独立克隆见 GITHUB_RELEASE_REPORT.md；下方保留历史验收记录，不代表最新能力。
+
+---
+
+## 2026-10-18 用户版 README 发布（历史范围）
 
 用户最新指示：停止继续安全排查，优先完成README并提交GitHub。README已完整改为普通用户教程，原开发/测试/运维全文迁至docs/DEVELOPMENT.md，实际按钮及链接检查通过；明确Agent需维护者启动、界面无吊销按钮、只有FINISHED成交结果确定赢家。
 

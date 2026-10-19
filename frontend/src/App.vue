@@ -5,6 +5,7 @@ import AuctionMainPanel from './components/AuctionMainPanel.vue';
 import RightInspector, {type InspectorTab} from './components/RightInspector.vue';
 import BidHistoryTable from './components/BidHistoryTable.vue';
 import LedgerTable from './components/LedgerTable.vue';
+import AgentJobsPanel from './components/AgentJobsPanel.vue';
 import { acceptRoom, outcome, requiresSnapshot, secondsLeft, type Room, type RoomEvent } from './room';
 const inspectorTab=ref<InspectorTab>('history');
 const token=ref(sessionStorage.getItem('bid-arena-token')??'');
@@ -184,6 +185,7 @@ onMounted(()=>{if(token.value)action(async()=>{await refreshList();await refresh
 </textarea>
 <button class="secondary" @click="issued=''">隐藏 Token</button>
 </div>
+<AgentJobsPanel v-if="role==='ADMIN'" :api="api" :user-id="agentId" :auction-id="room?.id" :issued="issued" @consumed="issued=''" />
 </template>
       </RightInspector>
     </div>

@@ -1,4 +1,20 @@
-## 2026-10-18 用户版 README 发布（最新范围）
+## 2026-10-18 独立自动竞拍 Agent 服务（最新交付范围）
+
+本节取代下方历史记录中“仅本地脚本、界面不能吊销”的能力描述，历史运行结果仍按原时间保留。新增独立 Worker、管理员任务面板和 V5 迁移，未修改原有 AuctionService 资金事务。
+
+- PASS：前端 7 测试、类型检查及生产构建；后端单元 4、相关真实 MySQL 集成 43（失败/错误/跳过均 0）。本轮未重新执行 StressIT/StabilityIT，不能将旧压力、持续负载结果当成本轮结果。
+- PASS：Worker 19 组业务检查、真实 Edge 管理员/双用户/Worker 同场、超时及响应丢失恢复、双 Worker 租约隔离；HTTP 边界 49、20 人模拟 65 断言及资金 SQL 对账。
+- PASS：Compose 配置/镜像构建/启动，四服务 healthy；Worker 独立停止/启动/重启、后端重启种子幂等、前端代理、V5 自动迁移与账务核对。宿主 MySQL 3306 未操作，应用数据库使用容器 3307。
+- PASS（有限范围）：依赖及已知凭据/完整 Git 历史扫描；不是绝对安全证明。实际命令、退出码及日志散列见 TEST_EXECUTION_REPORT.md 和 docs/AGENT_SERVICE_VALIDATION_20261018.json。
+- NOT VERIFIED：跨主机 vault 共享与网络分区、新 Worker 长时稳定性/大量任务、完整 Worker 镜像漏洞扫描、Token 失效同时存在 durable PENDING 的完整故障组合。停止不会撤销服务端已接收的请求，可能保持 STOPPING 等待结算。
+- FAIL / BLOCKED：既有生产镜像安全门禁仍失败；真实公网服务器、域名、证书及安全镜像未具备，未公开上线。远程模板不等于公网部署完成。
+- OUT OF SCOPE：正式录屏、本人现场讲解/修改及评测方外部提交，未执行。
+
+服务教程见 README.md；详细架构、验证与局限见 AGENT_SERVICE_REPORT.md；实际发布核验见 GITHUB_RELEASE_REPORT.md。
+
+---
+
+## 2026-10-18 用户版 README 发布（历史范围）
 
 用户最新指示：停止继续安全排查，优先完成README并提交GitHub。README已完整改为普通用户教程，原开发/测试/运维全文迁至docs/DEVELOPMENT.md，实际按钮及链接检查通过；明确Agent需维护者启动、界面无吊销按钮、只有FINISHED成交结果确定赢家。
 

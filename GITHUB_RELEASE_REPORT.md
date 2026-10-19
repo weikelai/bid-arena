@@ -4,7 +4,11 @@
 
 本轮相关回归：前端7、单元4、IT43，失败/错误/跳过0；Worker19组、HTTP49、20人模拟65、SQL对账和四服务healthy。证据清单见docs/AGENT_SERVICE_VALIDATION_20261018.json。生产安全门禁仍FAIL，公网部署BLOCKED；未重跑历史StressIT/StabilityIT，不冒充全部生产验收通过。
 
-发布使用已有历史正常提交和推送，不强推。当前章节先随实现提交；实际内容提交ID、远端匹配和独立克隆结果在完成后追加。最终报告提交不自引用自身SHA，以远端master及会话实核为准。真实.env、Token、本地日志、凭证卷、数据库和构建产物不纳入发布。
+实际内容提交：`a8b49075f9379cd6ba646a3529792683612f7a4b`，树 `81e3982c3da20217a52c8865fec0f883a0409b28`。2026-10-19 11:42:50–11:42:53 +08:00，执行 `git -c credential.interactive=false -c credential.https://github.com.username=weikelai push origin master`，退出0，无强推。日志 `.local/agent-release-push.log` 及同名 result.json。
+
+11:42:57 +08:00 `node scripts/verify-remote.mjs` 退出0：`git ls-remote`匹配；独立克隆HEAD/文件树一致，144文件、31项必需路径、禁止路径0，代码/Worker/迁移/测试/脚本/文档确实存在。安全扫描 `node scripts/verify-secrets.mjs` 和 `node scripts/audit-release.mjs` 本轮退出0；已知凭据、历史和交付文件扫描未命中，不等于绝对安全证明。真实.env、Token、本地日志、凭证卷、数据库和构建产物不纳入发布。
+
+本条发布结果随真实文档提交追加并再次正常推送/独立克隆，不自引用自身SHA；最终报告提交ID以GitHub master及最终会话实核为准。没有伪造早期开发历史或人工交付。
 
 ---
 

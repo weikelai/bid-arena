@@ -253,3 +253,21 @@ Edge浏览器三独立上下文：管理员创建/开始/取消、两用户加�
 | node scripts/verify-secrets.mjs；node scripts/audit-release.mjs | 最终扫描结果在发布记录，不把CVE失败冒充凭据泄露 | hardening-secret-final.log / hardening-allhistory-final.log |
 
 以上日志均位于忽略目录.local，JUnit/脚本子日志位于backend/target；原始日志、凭据、备份和证书私钥不发布。脱敏摘要及SHA256在docs/PRODUCTION_HARDENING_20261018.json。真实失败及中断保留，不伪造其退出码。
+
+## 2026-10-19 Agent 一键启动与四参与者回归
+
+本轮浏览器使用三个独立 Edge 上下文（管理员、真人 A、真人 B），独立 Worker 为第四参与者；不是四个人工登录账号或四个浏览器窗口。隔离 MySQL 8.4.0 监听 3317，未操作本机 3306 数据。临时后端和 Worker 在验证结束后停止。
+
+| 实际命令 | 退出码与结果 | 本地证据 |
+|---|---|---|
+| `node .local/run-four-browser.mjs` | 0；一键创建/启动、DRAFT 等待、管理员开拍、两真人及 Worker 出价、暂停/恢复/停止、刷新恢复、取消/撤销、1440×900 与 1920×1080 布局及局部滚动通过；无 page errors | `.local/four-browser-check.log`，相关后端/Worker 日志与 `backend/target/agent-wizard-*.png` |
+| `mvn -B -f backend/pom.xml verify -Pmysql-it -Dit.test=AgentServiceIT`（TEST_DB_* 指向 3317） | 0；单个 JUnit 集成入口执行 Agent 生命周期场景，失败/错误/跳过 0；V1–V6 迁移及账务 SQL 对账通过 | `.local/agent-wizard-it-retry.log`，`backend/target/failsafe-reports/` |
+| `mvn -B -f backend/pom.xml test` | 0；4 项单元测试通过，失败/错误/跳过 0 | `.local/backend-unit-final.log` |
+| `npm --prefix frontend test` | 0；3 文件、10 项测试通过 | 本轮终端输出 |
+| `npm --prefix frontend run build` | 0；vue-tsc 与 Vite 生产构建通过 | 本轮终端输出 |
+
+浏览器隔离库只读核对：4 个用户对应 4 条初始积分流水、合计 4000；钱包合计 4000、冻结 0；5 条冻结与 5 条释放抵消；无 PENDING 请求；演示拍卖仍 DRAFT，测试拍卖 CANCELLED，任务 STOPPED。集成用例另验证成交扣款、唯一请求及最终账务一致性。
+
+真实失败保留：首次浏览器 runner 的 root 无密码连接不可用，改用专用测试账号；首次集成夹具的 SIGNAL trigger 因 binlog/SUPER 权限失败，改为仅在随机测试库创建 CHECK 约束产生真实 SQL 失败，未提升权限。一次根目录 `mvn test` 因无 pom.xml 返回 1，改用上述 `-f backend/pom.xml` 命令后通过。
+
+本轮 `docker version` / `docker compose ps` 无法执行（当前 PowerShell 找不到 docker 命令），因此 Compose 构建与健康状态本轮 NOT VERIFIED，不沿用历史 PASS 代替当前结果。未重跑全部历史压力/长期稳定性测试；此前生产镜像漏洞风险不因本轮通过而解除。`.env`、`.local`、截图与原始日志继续忽略，不发布。

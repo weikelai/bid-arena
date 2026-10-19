@@ -47,7 +47,7 @@ class DatabaseIT {
         int query = adminUrl.indexOf('?');
         if (query >= 0) url += adminUrl.substring(query);
         database = new Database(new AppConfig(url,user,password,"development",true));
-        assertEquals(5, database.migrations().migrate().migrationsExecuted);
+        assertEquals(6, database.migrations().migrate().migrationsExecuted);
         // Run two bootstraps simultaneously, then migrate and seed again.
         ExecutorService pool = Executors.newFixedThreadPool(2);
         try {
@@ -74,7 +74,7 @@ class DatabaseIT {
     @Test void migrationHistoryIsVersionedAndAllTablesUseInnoDb() throws Exception {
         assertEquals(1, scalar("SELECT COUNT(*) FROM flyway_schema_history WHERE success=1 AND version='1'"));
         assertEquals(0, scalar("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND engine<>'InnoDB'"));
-        Set<String> expected=Set.of("users","wallets","auctions","auction_participants","auction_holds","bid_requests","bids","wallet_transactions","auction_results","auction_events","agent_tokens","agent_token_scopes","agent_rate_windows","seed_state","auth_sessions","auction_intake","security_bootstrap","login_windows","security_audit","agent_jobs","agent_job_events");
+        Set<String> expected=Set.of("users","wallets","auctions","auction_participants","auction_holds","bid_requests","bids","wallet_transactions","auction_results","auction_events","agent_tokens","agent_token_scopes","agent_rate_windows","seed_state","auth_sessions","auction_intake","security_bootstrap","login_windows","security_audit","agent_jobs","agent_job_events","agent_job_creations");
         Set<String> actual=new HashSet<>();
         try(Connection c=database.connection(); Statement s=c.createStatement(); ResultSet rows=s.executeQuery("SELECT table_name FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name<>'flyway_schema_history'")) {
             while(rows.next()) actual.add(rows.getString(1));

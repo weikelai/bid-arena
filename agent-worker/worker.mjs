@@ -1,6 +1,6 @@
 import http from 'node:http';
 import {randomUUID,randomBytes,createCipheriv,createDecipheriv,timingSafeEqual} from 'node:crypto';
-import {mkdir,readFile,writeFile,rename,chmod} from 'node:fs/promises';
+import {mkdir,readFile,writeFile,rename,chmod,unlink} from 'node:fs/promises';
 import {join} from 'node:path';
 import {setTimeout as sleep} from 'node:timers/promises';
 
@@ -16,6 +16,7 @@ async function store(id,token){const iv=randomBytes(12),cipher=createCipheriv('a
 async function load(id){if(!uuid.test(id))throw Error('VAULT_ID');const buf=await readFile(join(dir,id));const decipher=createDecipheriv('aes-256-gcm',Buffer.from(key,'hex'),buf.subarray(0,12));decipher.setAuthTag(buf.subarray(12,28));return Buffer.concat([decipher.update(buf.subarray(28)),decipher.final()]).toString('utf8');}
 const server=http.createServer(async(req,res)=>{try{
  if(req.method==='GET'&&req.url==='/health'){res.writeHead(Date.now()-lastCycle<120000?200:503);res.end('agent-worker');return;}
+ if(req.method==='DELETE'&&/^\/vault\/[a-f0-9-]{36}$/.test(req.url)&&authorized(req.headers.authorization)){try{await unlink(join(dir,req.url.slice('/vault/'.length)));}catch(error){if(error.code!=='ENOENT')throw error;}res.writeHead(204);res.end();return;}
  if(req.method!=='POST'||req.url!=='/vault'||!authorized(req.headers.authorization)){res.writeHead(403);res.end();return;}
  let body='',bytes=0;for await(const chunk of req){bytes+=chunk.length;if(bytes>2048){res.writeHead(413);res.end();req.destroy();return;}body+=chunk;}
  const b=JSON.parse(body);if(!uuid.test(b.id)||!/^[A-Za-z0-9_-]{43}$/.test(b.token)){res.writeHead(400);res.end();return;}
@@ -29,6 +30,7 @@ async function control(path,body){return call('/internal/agent-jobs/'+path,secre
 export function decide(job,room){
  if(['FINISHED','CANCELLED'].includes(room.status))return {state:'FINISHED',detail:room.status,result:room.result};
  if(room.status!=='RUNNING')return {state:'WAITING',detail:room.status};
+ if(job.strategy==='MONITOR')return {state:'WAITING',detail:'MONITOR_ONLY'};
  if(room.leader_id===job.user_id)return {state:'RUNNING',detail:'ALREADY_LEADING'};
  if(job.bid_count>=job.max_bids)return {state:'WAITING',detail:'MAX_BIDS_MONITOR_ONLY'};
  const amount=room.current_price+room.min_increment;

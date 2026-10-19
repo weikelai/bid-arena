@@ -13,7 +13,6 @@ const role=ref(sessionStorage.getItem('bid-arena-role')??'');
 const email=ref('bidder_a@example.com'),password=ref(''),notice=ref(''),error=ref(''),busy=ref(false);
 const list=ref<Room[]>([]),room=ref<Room|null>(null),wallet=ref<{total_balance:number;frozen_balance:number;available_balance:number;version:number;user_id:number;server_time:string;holds:{auction_id:number;amount:number}[];transactions:{id:number;user_id:number;auction_id:number|null;request_id:string|null;created_at:string;type:string;delta_total:number;delta_frozen:number}[]}|null>(null);
 const amount=ref(110),title=ref('新拍品'),duration=ref(180),connection=ref('同步中'),clock=ref(Date.now()),offset=ref(0);
-const agentEmail=ref(''),agentPassword=ref(''),agentId=ref<number>(),issued=ref('');
 const bids=ref<{id:number;user_id:number;amount:number;seq:number;created_at?:string}[]>([]);
 let sessionEpoch=0,roomEpoch=0;
 const selectedId=ref<number|null>(null),userId=ref<number|null>(null),walletSync=ref('同步中');
@@ -31,15 +30,13 @@ const visibleList=computed(()=>list.value.map(item=>item.id===room.value?.id?roo
 function listCountdown(item:Room){if(item.status==='DRAFT')return '待开始';if(item.status==='RUNNING')return item.end_at?secondsLeft(item.end_at,offset.value,clock.value)+'s':'同步中';return item.status==='SETTLING'?'结算中':'已结束';}
 async function refreshList(){list.value=await api('/auctions');}
 async function login(){await action(async()=>{const data=await api('/auth/login',{email:email.value,password:password.value});userId.value=data.userId;token.value=data.token;role.value=data.role;sessionStorage.setItem('bid-arena-token',data.token);sessionStorage.setItem('bid-arena-role',data.role);password.value='';await refreshList();await refreshWallet();});}
-function logout(){const previous=token.value;inspectorTab.value='history';sessionEpoch++;const epoch=sessionEpoch;roomEpoch++;selectedId.value=null;userId.value=null;token.value='';role.value='';sessionStorage.removeItem('bid-arena-token');sessionStorage.removeItem('bid-arena-role');room.value=null;wallet.value=null;issued.value='';list.value=[];bids.value=[];agentId.value=undefined;agentPassword.value='';notice.value='';error.value='';if(previous)void fetch('/api/v1/auth/logout',{method:'POST',headers:{Authorization:'Bearer '+previous,'Content-Type':'application/json'},body:'{}'}).then(r=>{if(!r.ok&&epoch===sessionEpoch&&!token.value)error.value='本地已退出，但服务端吊销未确认，请检查网络或联系管理员撤销会话。';}).catch(()=>{if(epoch===sessionEpoch&&!token.value)error.value='本地已退出，但服务端吊销未确认，请检查网络或联系管理员撤销会话。';});}
+function logout(){const previous=token.value;inspectorTab.value='history';sessionEpoch++;const epoch=sessionEpoch;roomEpoch++;selectedId.value=null;userId.value=null;token.value='';role.value='';sessionStorage.removeItem('bid-arena-token');sessionStorage.removeItem('bid-arena-role');room.value=null;wallet.value=null;list.value=[];bids.value=[];notice.value='';error.value='';if(previous)void fetch('/api/v1/auth/logout',{method:'POST',headers:{Authorization:'Bearer '+previous,'Content-Type':'application/json'},body:'{}'}).then(r=>{if(!r.ok&&epoch===sessionEpoch&&!token.value)error.value='本地已退出，但服务端吊销未确认，请检查网络或联系管理员撤销会话。';}).catch(()=>{if(epoch===sessionEpoch&&!token.value)error.value='本地已退出，但服务端吊销未确认，请检查网络或联系管理员撤销会话。';});}
 async function snapshot(id:number){const epoch=roomEpoch;const data=await api(`/auctions/${id}`) as Room;const history=await api(`/auctions/${id}/bids`);if(epoch!==roomEpoch||!acceptRoom(room.value,data,selectedId.value??0))return;offset.value=Date.parse(data.server_time)-Date.now();room.value=data;bids.value=history.filter((b:{seq:number})=>b.seq<=data.seq);amount.value=Math.max(amount.value,data.current_price+data.min_increment);}
 async function select(id:number){roomEpoch++;selectedId.value=id;room.value=null;bids.value=[];notice.value='';await action(async()=>{await snapshot(id);connection.value='已同步';});}
 async function join(){const id=selectedId.value,epoch=roomEpoch;if(!id)return;await action(async()=>{await api(`/auctions/${id}/join`,{});if(epoch!==roomEpoch)return;await snapshot(id);notice.value='已加入拍卖';});}
 async function bid(){const id=selectedId.value,epoch=roomEpoch;if(!id)return;await action(async()=>{const data=await api(`/auctions/${id}/bids`,{requestId:crypto.randomUUID(),amount:amount.value});if(epoch!==roomEpoch||selectedId.value!==id)return;notice.value=data.type==='BID_ACCEPTED'?'出价已接受（不代表最终获胜）':'出价被拒绝：'+data.error;await snapshot(id);await refreshWallet();});}
 async function lifecycle(kind:string){const id=selectedId.value,epoch=roomEpoch;if(!id)return;await action(async()=>{await api(`/admin/auctions/${id}/${kind}`,{});if(epoch!==roomEpoch)return;await snapshot(id);await refreshList();await refreshWallet();});}
 async function create(){await action(async()=>{const data=await api('/admin/auctions',{title:title.value,durationSeconds:duration.value});await refreshList();await select(data.id);});}
-async function createAgent(){await action(async()=>{const data=await api('/admin/users',{email:agentEmail.value,password:agentPassword.value,kind:'AGENT'});agentId.value=data.id;agentPassword.value='';notice.value='Agent 已创建，初始积分 1000';});}
-async function issue(){await action(async()=>{issued.value='';const data=await api('/admin/agent-tokens',{userId:agentId.value,auctionId:room.value!.id,permissions:['auction:read','auction:bid'],expiresInSeconds:3600,rateLimit:120});issued.value=data.token;notice.value='Token 仅本次显示，请安全交给 Agent';});}
 async function tick(){clock.value=Date.now();if(ticking||!token.value)return;ticking=true;const epoch=roomEpoch,id=selectedId.value;try{if(id&&room.value){const data=await api(`/auctions/${id}/events?after=${room.value.seq}`);if(epoch!==roomEpoch)return;if(connection.value!=='已同步'||data.seq>room.value.seq||requiresSnapshot(room.value.seq,data.events as RoomEvent[]))await snapshot(id);}await refreshWallet();if(epoch===roomEpoch)connection.value='已同步';}catch{connection.value='连接中断，正在重试';walletSync.value='同步中，数据可能暂未更新';}finally{ticking=false;}}
 onMounted(()=>{if(token.value)action(async()=>{await refreshList();await refreshWallet();});timer=setInterval(tick,1000);});onUnmounted(()=>clearInterval(timer));
 </script>
@@ -160,32 +157,7 @@ onMounted(()=>{if(token.value)action(async()=>{await refreshList();await refresh
 </form>
 </template>
         <template #agent>
-<div class="panel-heading">
-<h2>竞拍 Agent</h2>
-<span class="micro">SCOPED ACCESS</span>
-</div>
-<p class="inspector-hint">独立身份 · 本场 auction:read / auction:bid。有效期1小时，每分钟120次。Token只显示一次，请安全保存。</p>
-<form @submit.prevent="createAgent">
-<label>新 Agent 邮箱<input v-model="agentEmail" type="email" required>
-</label>
-<label>初始密码（至少 12 位）<input v-model="agentPassword" type="password" autocomplete="new-password" minlength="12" required>
-</label>
-<button class="secondary full-button" :disabled="busy">创建 Agent 用户</button>
-</form>
-<div class="inspector-divider">
-</div>
-<label>Agent 用户 ID<input v-model.number="agentId" type="number" min="1">
-</label>
-<p v-if="room" class="micro">授权拍卖 #{{room.id}} · {{room.title}}</p>
-<p v-else class="inspector-hint">先从左栏选择要授权的拍卖。</p>
-<button class="full-button" :disabled="busy||!agentId||!room" @click="issue">签发本场受限 Token</button>
-<div v-if="issued" class="token-once">
-<p>仅本次显示；录屏前隐藏。</p>
-<textarea readonly :value="issued" aria-label="一次性 Agent Token">
-</textarea>
-<button class="secondary" @click="issued=''">隐藏 Token</button>
-</div>
-<AgentJobsPanel v-if="role==='ADMIN'" :api="api" :user-id="agentId" :auction-id="room?.id" :issued="issued" @consumed="issued=''" />
+<AgentJobsPanel v-if="role==='ADMIN'" :api="api" :room="room" />
 </template>
       </RightInspector>
     </div>

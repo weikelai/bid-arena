@@ -1,4 +1,4 @@
-export interface Room { id: number; title: string; status: string; current_price: number; min_increment: number; leader_id: number | null; end_at: string | null; extension_count: number; seq: number; server_time: string; result: { winner_id: number | null; price: number; reason: string }[]; participants: { user_id: number; email: string; kind: string }[] }
+export interface Room { id: number; title: string; status: string; current_price: number; start_price?: number; min_increment: number; leader_id: number | null; end_at: string | null; extension_count: number; seq: number; server_time: string; result: { winner_id: number | null; price: number; reason: string }[]; participants: { user_id: number; email: string; kind: string }[] }
 export interface RoomEvent { auctionId: number; seq: number; serverTime: string; type: string; payload: string }
 export function acceptRoom(current:Room|null,incoming:Room,selected:number):boolean {
   return incoming.id===selected&&(!current||current.id!==incoming.id||incoming.seq>=current.seq);

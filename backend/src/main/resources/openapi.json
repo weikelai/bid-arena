@@ -1897,6 +1897,30 @@
         ]
       }
     },
+    "/api/v1/admin/agent-launch": {
+      "post": {
+        "summary": "ADMIN: Idempotently provision identity, scoped token and a running Agent task",
+        "requestBody": {"required":true,"content":{"application/json":{"schema":{
+          "type":"object","required":["requestId","name","auctionId","maxBidAmount","maxBids","strategy"],
+          "properties":{
+            "requestId":{"type":"string","format":"uuid"},
+            "name":{"type":"string","minLength":1,"maxLength":80},
+            "auctionId":{"type":"integer","minimum":1},
+            "maxBidAmount":{"type":"integer","minimum":110,"maximum":1000000000},
+            "maxBids":{"type":"integer","minimum":1,"maximum":10000},
+            "strategy":{"type":"string","enum":["BALANCED","CONSERVATIVE","MONITOR"]}
+          }
+        }}}},
+        "responses": {
+          "200":{"description":"Task id and replayed flag only; no password or token","content":{"application/json":{"schema":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"replayed":{"type":"boolean"}}}}}},
+          "400":{"description":"Invalid configuration"},
+          "401":{"description":"Unauthorized"},
+          "403":{"description":"Administrator required"},
+          "409":{"description":"Configuration conflict or terminal auction"},
+          "503":{"description":"Private Worker vault unavailable; provisioning rolled back"}
+        }
+      }
+    },
     "/api/v1/admin/agent-jobs": {
       "get": {
         "summary": "ADMIN: List up to 100 job configurations and observed states",

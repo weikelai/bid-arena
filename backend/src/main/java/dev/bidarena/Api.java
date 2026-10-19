@@ -38,6 +38,7 @@ public final class Api {
         var agentJobs=new AgentJobs(db);
         route(app,"GET","/api/v1/admin/agent-jobs",c->{admin(c);return agentJobs.list();});
         route(app,"POST","/api/v1/admin/agent-jobs",c->{admin(c);return agentJobs.create(body(c));});
+        route(app,"POST","/api/v1/admin/agent-launch",c->{var p=admin(c);return agentJobs.launch(p.user(),body(c));});
         route(app,"GET","/api/v1/admin/agent-jobs/{job}/history",c->{admin(c);return agentJobs.history(jobId(c));});
         route(app,"POST","/api/v1/admin/agent-jobs/{job}/{action}",c->{admin(c);return agentJobs.control(jobId(c),c.path().substring(c.path().lastIndexOf('/')+1),body(c));});
         route(app,"POST","/api/v1/internal/agent-jobs/claim",c->{agentJobs.worker(c.header("Authorization"));return agentJobs.claim(text(body(c),"owner"));});

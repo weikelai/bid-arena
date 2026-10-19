@@ -13,5 +13,5 @@ const input=`SELECT COUNT(*) FROM wallets w WHERE
 const r=spawnSync('docker',['compose','exec','-T','mysql','sh','-c','MYSQL_PWD="$MYSQL_PASSWORD" exec mysql -N -u"$MYSQL_USER" "$MYSQL_DATABASE"'],{input,encoding:'utf8'});
 if(r.status!==0)throw Error('Read-only application reconciliation failed');
 const values=r.stdout.trim().split(/\s+/).map(Number);
-if(values.length!==6||values.some((v,i)=>v!==(i===4?5:0)))throw Error('Unexplained financial, pending, migration or token anomaly: '+values.join(','));
+if(values.length!==6||values.some((v,i)=>v!==(i===4?6:0)))throw Error('Unexplained financial, pending, migration or token anomaly: '+values.join(','));
 console.log(JSON.stringify({status:'PASS',walletLedgerHoldMismatches:values[0],duplicateLedgerEffects:values[1],duplicateAuctionResults:values[2],pendingJobs:values[3],migrationVersion:values[4],invalidTokenDigests:values[5]}));

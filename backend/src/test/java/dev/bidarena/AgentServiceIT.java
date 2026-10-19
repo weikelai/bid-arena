@@ -14,6 +14,10 @@ class AgentServiceIT {
   String base=url.substring(0,url.indexOf('/',"jdbc:mysql://".length())+1),query=url.contains("?")?url.substring(url.indexOf('?')):"";
   try(var c=DriverManager.getConnection(url,user,password)){update(c,"CREATE DATABASE `"+schema+"`");}
   try{
+   try(var database=new Database(new AppConfig(base+schema+query,user,password,"development",false))){database.migrations().migrate();}
+   try(var c=DriverManager.getConnection(base+schema+query,user,password)){
+    update(c,"ALTER TABLE agent_jobs ADD CONSTRAINT reject_agent_wizard_test CHECK (name <> 'Forced SQL failure')");
+   }
    ProcessBuilder test=new ProcessBuilder("node","../scripts/agent-service-check.mjs");
    test.environment().putAll(Map.of("DB_URL",base+schema+query,"DB_USER",user,"DB_PASSWORD",password,"APP_ENV","development","SEED_DEMO","true","JAVA_BINARY",java.nio.file.Path.of(System.getProperty("java.home"),"bin","java").toString()));
    Process p=test.redirectErrorStream(true).redirectOutput(new java.io.File("target/agent-service-check.log")).start();
@@ -24,6 +28,10 @@ class AgentServiceIT {
     assertEquals(0,number(one(c,"SELECT COUNT(*) n FROM agent_jobs WHERE pending_id IS NOT NULL"),"n"));
     assertTrue(number(one(c,"SELECT COUNT(*) n FROM bids b JOIN users u ON u.id=b.user_id WHERE u.kind='AGENT'"),"n")>=5);
     assertTrue(number(one(c,"SELECT COUNT(*) n FROM auction_results WHERE reason='SOLD'"),"n")>=1);
+    assertEquals(0,number(one(c,"SELECT COUNT(*) n FROM agent_job_creations WHERE job_id IS NULL"),"n"));
+    assertEquals(number(one(c,"SELECT COUNT(*) n FROM agent_jobs"),"n"),number(one(c,"SELECT COUNT(*) n FROM users WHERE kind='AGENT'"),"n"),"No orphan accounts or repeated initial credits from failed/repeated creation");
+    assertEquals(0,number(one(c,"SELECT COUNT(*) n FROM agent_jobs j JOIN agent_token_scopes s ON s.token_id=j.token_id WHERE j.strategy='MONITOR' AND s.permission<>'auction:read'"),"n"));
+    assertTrue(number(one(c,"SELECT COUNT(*) n FROM agent_job_creations"),"n")>=5);
     System.out.println("AGENT_SQL_RECONCILIATION PASS: balances, holds, ledger, unique requests, no pending, sold result");
    }
   }finally{try(var c=DriverManager.getConnection(url,user,password)){update(c,"DROP DATABASE `"+schema+"`");}}
